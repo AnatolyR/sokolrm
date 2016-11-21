@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сокол СЭД</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../dist/bundle.css" />
+    <script src="../dist/bundle.js"></script>
+    <script src="../js/grid.js"></script>
+    <script src="grid.test.js"></script>
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<script>
+    $(window).bind('hashchange', $.proxy(function() {
+        var id = location.hash.slice(1);
+        
+        var gridTestModule = modules["grid"];
+
+        var body = $("body");
+        body.empty();
+        if (id) {
+            setTimeout(function() {
+                gridTestModule[id].action();
+            }, 0);
+        } else {
+            for (var name in gridTestModule) {
+                body.append($("<div><a href='#" + name+ "'>" + gridTestModule[name].title + " (" + name + ")</a></div>"));
+            }
+        }
+
+    }, this));
+    $(window).trigger('hashchange');
+
+</script>
+</body>
+</html>
