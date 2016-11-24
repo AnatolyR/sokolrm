@@ -8,7 +8,15 @@ module.exports = function(grunt) {
                     'node_modules/jquery-ui-dist/jquery-ui.js',
                     'node_modules/bootstrap/dist/js/bootstrap.js',
                     'node_modules/bootstrap-select/dist/js/bootstrap-select.js',
-                    'node_modules/bootstrap-select/dist/js/i18n/defaults-en_US.js'
+                    'node_modules/bootstrap-select/dist/js/i18n/defaults-en_US.js',
+                    'node_modules/moment/moment.js',
+                    'node_modules/moment/locale/ru.js',
+                    'vendor/bootstrap-filestyle.js',
+                    'node_modules/sifter/lib/sifter.js',
+                    'node_modules/microplugin/src/microplugin.js',
+                    'node_modules/selectize/dist/js/selectize.js',
+                    'node_modules/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js',
+                    'node_modules/bootstrap-notify/bootstrap-notify.js'
                 ]
             },
             css: {
@@ -16,7 +24,10 @@ module.exports = function(grunt) {
                 src: [
                     'node_modules/jquery-ui-dist/jquery-ui.css',
                     'node_modules/bootstrap/dist/css/bootstrap.css',
-                    'node_modules/bootstrap-select/dist/css/bootstrap-select.css'
+                    'node_modules/bootstrap-select/dist/css/bootstrap-select.css',
+                    'node_modules/selectize/dist/css/selectize.css',
+                    'node_modules/selectize/dist/css/selectize.bootstrap3.css',
+                    'node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
                 ]
             }
         },

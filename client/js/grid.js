@@ -15,6 +15,10 @@ $.widget("sokol.grid", {
         this.createList();
     },
 
+    _destroy: function() {
+        this.element.remove();
+    },
+
     _setOptions: function (options) {
         this._super(options);
         this.reload();

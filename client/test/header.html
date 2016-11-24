@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сокол СЭД</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../dist/bundle.css" />
+    <script src="../dist/bundle.js"></script>
+    <script src="../js/header.js"></script>
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
+
+</head>
+<body>
+<script>
+    var options = {
+        userName: "Test User",
+        leftMenu: [
+            {
+                title: "Главная",
+                link: ""
+            },
+            {
+                title: "Создать",
+                submenu: [
+                    {
+                        title: "Входящий",
+                        link: "#new/incomingDocument"
+                    },
+                    {
+                        title: "Исходящий",
+                        link: "#new/outgoingDocument"
+                    },
+                    {
+                        title: "Внутренний",
+                        link: "#new/internalDocument"
+                    }
+                ]
+            },
+            {
+                title: "Отчеты",
+                link: "#reports"
+            },
+            {
+                title: "Архив",
+                link: "#archive"
+            }
+        ],
+        rightMenu: [
+            {
+                title: "Администрирование",
+                link: "#admin"
+            },
+            {
+                title: "$userName",
+                submenu: [
+                    {
+                        title: "Настройки",
+                        link: "#settings"
+                    },
+                    {
+                        title: "Помощь",
+                        link: "#help"
+                    },
+                    {
+                        separator: true
+                    },
+                    {
+                        title: "Выход",
+                        link: "#logout"
+                    }
+                ]
+            }
+        ]
+    };
+    this.headerObject = $.sokol.header(options, $("<nav></nav>").appendTo("body"));
+</script>
+</body>
+</html>

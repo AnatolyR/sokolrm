@@ -205,13 +205,7 @@ modules["grid"] = (function() {
 
     var testComponent = null;
 
-    var assertEquals = function(expected, real, message) {
-        if (expected !== real) {
-            throw new Error(message + " : " + expected + " != " + real);
-        }
-    };
-
-    var testAll = function() {
+    var testAll = function(completeCallback) {
 
         var assertTableStateCorrect = function(count, rowCount, page, pageCount, firstDoc, secondDoc, lastDoc) {
 
@@ -261,7 +255,7 @@ modules["grid"] = (function() {
         });
         steps.push({
             step: function checkTable() {
-                assertTableStateCorrect(55, 20, 2, 3, "1TestDraftDocument 12016.11.21 13:25", "2TestDraftDocument 22016.11.21 13:25", "20TestDraftDocument 202016.11.21 13:25");
+                assertTableStateCorrect(55, 20, 1, 3, "1TestDraftDocument 12016.11.21 13:25", "2TestDraftDocument 22016.11.21 13:25", "20TestDraftDocument 202016.11.21 13:25");
             },
             wait: 500
         });
@@ -295,20 +289,20 @@ modules["grid"] = (function() {
             },
             wait: 500
         });
-
-        var doAction = function(i, steps) {
-            if (i < steps.length) {
-                if (steps[i].disable) {
-                    doAction(i + 1, steps);
-                } else {
-                    setTimeout(function executeStep() {
-                        console.info("[" + steps[i].step.name + "]");
-                        steps[i].step();
-                        doAction(i + 1, steps);
-                    }, steps[i].wait);
-                }
-            }
-        };
+        if (completeCallback) {
+            steps.push({
+                step: function() {
+                    testComponent.destroy();
+                },
+                wait: 500
+            });
+            steps.push({
+                step: function() {
+                    completeCallback();
+                },
+                wait: 500
+            });
+        }
 
         doAction(0, steps);
     };
@@ -316,8 +310,8 @@ modules["grid"] = (function() {
     return {
         testAll: {
             title: "Тестировать все",
-            action: function() {
-                testAll();
+            action: function(completeCallback) {
+                testAll(completeCallback);
             }
         },
         showDocuments: {

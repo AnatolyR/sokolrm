@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="../dist/bundle.css" />
     <script src="../dist/bundle.js"></script>
     <script src="testUtils.js"></script>
-    <script src="../js/grid.js"></script>
-    <script src="grid.test.js"></script>
+    <script src="../js/containerHeader.js"></script>
+    <script src="containerHeader.test.js"></script>
     <style>
         body {
             padding: 10px;
@@ -19,17 +19,17 @@
     $(window).bind('hashchange', $.proxy(function() {
         var id = location.hash.slice(1);
         
-        var gridTestModule = modules["grid"];
+        var testModule = modules["containerHeader"];
 
         var body = $("body");
         body.empty();
         if (id) {
             setTimeout(function() {
-                gridTestModule[id].action();
+                testModule[id].action();
             }, 0);
         } else {
-            for (var name in gridTestModule) {
-                body.append($("<div><a href='#" + name+ "'>" + gridTestModule[name].title + " (" + name + ")</a></div>"));
+            for (var name in testModule) {
+                body.append($("<div><a href='#" + name+ "'>" + testModule[name].title + " (" + name + ")</a></div>"));
             }
         }
 

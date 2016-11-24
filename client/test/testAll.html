@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сокол СЭД</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../dist/bundle.css"/>
+    <script src="../dist/bundle.js"></script>
+    <script src="testUtils.js"></script>
+
+    <script src="../js/grid.js"></script>
+    <script src="grid.test.js"></script>
+
+    <script src="../js/containerHeader.js"></script>
+    <script src="containerHeader.test.js"></script>
+
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<script>
+
+    var tests = [];
+    for (var moduleName in modules) {
+        var module = modules[moduleName];
+        tests.push({name: moduleName, action: module.testAll.action});
+    }
+
+//    console.log("=== " + tests[0].name + " ===");
+//    tests[0].action(function() {
+//        console.log("=== " + tests[1].name + " ===");
+//        tests[1].action(function() {
+//            $("body").html("ALL TEST PASSED");
+//        });
+//    });
+    try {
+        x(0)();
+    } catch(e) {
+        $('<div class="alert alert-danger">' + e + '</div>').prependTo("body");
+        throw e;
+    }
+
+    function x(i) {
+        if (i >= tests.length) {
+            return function() {
+                $('body').html('<div class="alert alert-success">ALL TESTS PASSED</div>');
+            };
+        }
+        return function() {
+            console.log("=== " + tests[i].name + " ===");
+            tests[i].action(x(i + 1));
+        }
+    }
+
+</script>
+</body>
+</html>
