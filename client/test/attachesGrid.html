@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сокол СЭД</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../dist/bundle.css" />
+    <script src="../dist/bundle.js"></script>
+    <script src="testUtils.js"></script>
+    <script src="../js/attachesGrid.js"></script>
+    <script src="attachesGrid.test.js"></script>
+
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
+
+</head>
+<body>
+
+<script>
+    var attachesResponse = {
+        "data" : [ {
+            "id" : "c082c2bc-4cc1-4de9-8c5f-968a6c22992b",
+            "title" : "ZFt7CsGffvM.jpg",
+            "size" : "67 KB",
+            "creationDate": "23.11.2016 22:23",
+            "creator": "Петров П. П."
+        }, {
+            "id" : "ecff1ca5-edce-4d86-b3e5-5baf10ca85ce",
+            "title" : "l9gi0kody5U.jpg",
+            "size" : "73 KB",
+            "creationDate": "23.11.2016 22:23",
+            "creator": "Петров П. П."
+        }, {
+            "id" : "e6789e58-4d94-42d3-8df8-1d7b1911a5a9",
+            "title" : "Badoo-2.jpg",
+            "size" : "72 KB",
+            "creationDate": "23.11.2016 22:23",
+            "creator": "Петров П. П."
+        } ]
+    };
+    $.getJSON = function(url, params, callback) {
+        setTimeout(function() {
+            if (url == 'app/attaches') {
+                callback(attachesResponse);
+            } else if (url == 'app/deleteAttach') {
+                var newAttachesList = [];
+                for (var i = 0; i < attachesResponse.data.length; i++) {
+                    var file = attachesResponse.data[i];
+                    if (file.id != params.id) {
+                        newAttachesList.push(file);
+                    }
+                }
+                attachesResponse.data = newAttachesList;
+                callback();
+            }
+        }, 0);
+    };
+
+    $(window).bind('hashchange', $.proxy(function() {
+        var id = location.hash.slice(1);
+
+        var testModule = modules["attachesGrid"];
+
+        var body = $("body");
+        body.empty();
+        if (id) {
+            setTimeout(function() {
+                testModule[id].action();
+            }, 0);
+        } else {
+            for (var name in testModule) {
+                body.append($("<div><a href='#" + name+ "'>" + testModule[name].title + " (" + name + ")</a></div>"));
+            }
+        }
+
+    }, this));
+    $(window).trigger('hashchange');
+
+</script>
+</body>
+</html>
