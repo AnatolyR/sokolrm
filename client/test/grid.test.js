@@ -46,14 +46,12 @@ modules["grid"] = (function() {
         });
     };
 
-    $.getJSON = function(url, params, callback) {
-        setTimeout(function() {
-            callback(rs.list(params.id, parseInt(params.size), parseInt(params.offset)))
-        }, 0);
+    mockResponses['app/gridtest'] = function(params, callback) {
+        callback(rs.list(params.id, parseInt(params.size), parseInt(params.offset)))
     };
 
     var options = {
-        url: "/gridtest",
+        url: "app/gridtest",
         columnsVisible: [
                 "id",
                 "documentNumber",

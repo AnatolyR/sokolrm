@@ -24,3 +24,13 @@ var doAction = function(i, steps) {
         }
     }
 };
+var mockResponses = [];
+$.getJSON = function(url, params, callback) {
+    setTimeout(function() {
+        if (mockResponses[url]) {
+            mockResponses[url](params, callback);
+        } else {
+            throw new Error('Not response for "' + url + '"');
+        }
+    }, 0);
+};
