@@ -18,6 +18,6 @@ $.widget('sokol.containerHeader', {
             ).appendTo(this.element);
     },
     _destroy: function() {
-        this.element.remove();
+        this.element.detach();
     }
 });

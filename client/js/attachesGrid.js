@@ -8,7 +8,7 @@ $.widget('sokol.attachesGrid', {
     },
 
     _destroy: function() {
-        this.element.remove();
+        this.element.detach();
     },
 
     setMode: function(mode) {

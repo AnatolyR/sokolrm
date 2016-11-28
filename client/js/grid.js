@@ -16,7 +16,7 @@ $.widget("sokol.grid", {
     },
 
     _destroy: function() {
-        this.element.remove();
+        this.element.detach();
     },
 
     _setOptions: function (options) {

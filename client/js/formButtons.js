@@ -47,6 +47,6 @@ $.widget('sokol.formButtons', {
     },
 
     _destroy: function() {
-        this.element.remove();
+        this.element.detach();
     }
 });
