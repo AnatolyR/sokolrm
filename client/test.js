@@ -9,7 +9,7 @@ page.viewportSize = {
 page.onConsoleMessage = function(msg) {
     console.log('CONSOLE: ' + msg);
     if (msg == 'TESTS COMPLETES') {
-        page.render('result.png');
+        page.render('test-complete-screenshot.png');
         phantom.exit();
     }
     //page.render('page' + i++ + '.png');
