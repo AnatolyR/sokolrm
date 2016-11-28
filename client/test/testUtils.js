@@ -24,6 +24,33 @@ var doAction = function(i, steps) {
         }
     }
 };
+
+var doTest = function(testComponent, steps, completeCallback) {
+    if (completeCallback) {
+        steps.push({
+            step: function () {
+                testComponent.destroy();
+            },
+            wait: 500
+        });
+        steps.push({
+            step: function () {
+                completeCallback();
+            },
+            wait: 500
+        });
+    } else {
+        steps.push({
+            step: function () {
+                $('<div class="alert alert-success">TEST PASSED</div>').prependTo('body');
+            },
+            wait: 500
+        });
+    }
+
+    doAction(0, steps);
+};
+
 var mockResponses = [];
 $.getJSON = function(url, params, callback) {
     setTimeout(function() {
@@ -33,4 +60,27 @@ $.getJSON = function(url, params, callback) {
             throw new Error('Not response for "' + url + '"');
         }
     }, 0);
+};
+
+var modules = [];
+var initTestPage = function(moduleName) {
+    $(window).bind('hashchange', $.proxy(function() {
+        var id = location.hash.slice(1);
+
+        var testModule = modules[moduleName];
+
+        var body = $("body");
+        body.empty();
+        if (id) {
+            setTimeout(function() {
+                testModule[id].action();
+            }, 0);
+        } else {
+            for (var name in testModule) {
+                body.append($("<div><a href='#" + name+ "'>" + testModule[name].title + " (" + name + ")</a></div>"));
+            }
+        }
+
+    }, this));
+    $(window).trigger('hashchange');
 };

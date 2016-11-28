@@ -19,6 +19,10 @@ module.exports = function(grunt) {
                     'node_modules/bootstrap-notify/bootstrap-notify.js'
                 ]
             },
+            app: {
+                dest: 'dist/app.js',
+                src: 'js/*.js'
+            },
             css: {
                 dest: 'dist/bundle.css',
                 src: [
