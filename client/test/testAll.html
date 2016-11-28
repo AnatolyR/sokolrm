@@ -48,7 +48,8 @@
     function x(i) {
         if (i >= tests.length) {
             return function() {
-                $('body').html('<div class="alert alert-success">ALL TESTS PASSED</div>');
+                $('body').html('<div class="alert alert-success">' + new Date() + ' ALL TESTS PASSED</div>');
+                console.log('TESTS COMPLETES');
             };
         }
         return function() {

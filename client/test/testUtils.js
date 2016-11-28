@@ -15,7 +15,7 @@ var doAction = function(i, steps) {
             doAction(i + 1, steps);
         } else {
             setTimeout(function executeStep() {
-                if (steps[i].step.name != 'step') {
+                if (steps[i].step.name && steps[i].step.name != 'step') {
                     console.info("[" + steps[i].step.name + "]");
                 }
                 steps[i].step();
