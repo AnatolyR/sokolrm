@@ -19,6 +19,10 @@
     <script src="../js/form.js"></script>
     <script src="form.test.js"></script>
 
+    <script src="../js/formButtons.js"></script>
+    <script src="../js/container.js"></script>
+    <script src="container.test.js"></script>
+
     <style>
         body {
             padding: 10px;
@@ -31,7 +35,7 @@
     var tests = [];
     for (var moduleName in modules) {
         var module = modules[moduleName];
-        tests.push({name: moduleName, action: module.testAll.action});
+        tests.push({name: moduleName, action: module.testAll.action, before: module.before});
     }
 
 //    console.log("=== " + tests[0].name + " ===");
@@ -57,6 +61,9 @@
         }
         return function() {
             console.log("=== " + tests[i].name + " ===");
+            if (tests[i].before) {
+                tests[i].before();
+            }
             tests[i].action(x(i + 1));
         }
     }

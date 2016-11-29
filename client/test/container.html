@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сокол СЭД</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../dist/bundle.css" />
+    <script src="../dist/bundle.js"></script>
+    <script src="../js/form.js"></script>
+    <script src="../js/container.js"></script>
+    <script src="../js/containerHeader.js"></script>
+    <script src="../js/attachesGrid.js"></script>
+    <script src="../js/formButtons.js"></script>
+    <script src="testUtils.js"></script>
+    <script src="container.test.js"></script>
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
+
+</head>
+<body>
+<script>
+
+    $.post = function(url, data, callback) {
+        setTimeout(function() {
+            data = JSON.parse(data);
+            var fields = data.fields;
+            for (var i = 0; i < fields.length; i++) {
+                var field = fields[i];
+                if (field.name == 'documentKind') {
+                    options.data.documentKind = field.value;
+                }
+            }
+
+            callback(data);
+        }, 0);
+    };
+
+    initTestPage('container');
+</script>
+</body>
+</html>
