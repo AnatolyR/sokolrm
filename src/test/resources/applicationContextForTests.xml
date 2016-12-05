@@ -4,20 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!--<context:property-placeholder location="file:///#{systemProperties.dbproperties2}"/>-->
-
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location">
-            <value>file:///${app_properties_path}</value>
-            <!--<value>file:///#{systemProperties['dbproperties']}</value>-->
-        </property>
-    </bean>
+    <context:property-placeholder location="classpath:test.properties"/>
 
     <!-- Enable annotation support-->
     <context:annotation-config/>
-
-    <!-- Search for beans and autowiring-->
-    <context:component-scan base-package="com.kattysoft"/>
 
     <bean id="pgDb" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="org.postgresql.Driver"/>
@@ -25,5 +15,10 @@
         <property name="username" value="${db.username}"/>
         <property name="password" value="${db.password}"/>
     </bean>
+
+    <!--<bean id="transactionManager"-->
+          <!--class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+        <!--<property name="dataSource" ref="pgDb" />-->
+    <!--</bean>-->
 
 </beans>

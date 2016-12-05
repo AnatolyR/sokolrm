@@ -10,10 +10,25 @@
 package com.kattysoft.core.impl;
 
 import com.kattysoft.core.DocumentService;
+import com.kattysoft.core.dao.DocumentDao;
+import com.kattysoft.core.model.Document;
+import com.kattysoft.core.specification.Specification;
+
+import java.util.List;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 20.07.2016
  */
 public class DocumentServiceImpl implements DocumentService {
+    private DocumentDao documentDao;
+
+    public List<Document> listDocuments(Specification specification) {
+        List<Document> documentsList = documentDao.getDocumentsList(specification);
+        return documentsList;
+    }
+
+    public void setDocumentDao(DocumentDao documentDao) {
+        this.documentDao = documentDao;
+    }
 }
