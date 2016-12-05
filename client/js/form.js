@@ -1,6 +1,7 @@
 $.widget('sokol.form', {
     options: {
-        mode: "read"
+        mode: 'read',
+        objectType: ''
     },
 
     _create: function () {
@@ -40,6 +41,9 @@ $.widget('sokol.form', {
             '</div>');
     },
     createFieldDate: function (formNode, field, value, edit) {
+        if (!value) {
+            return;
+        }
         value = moment(value).format("L LT");
         if (!edit) {
             $(formNode).append('' +
@@ -196,9 +200,9 @@ $.widget('sokol.form', {
             '</div>');
     },
     createMainBlock: function(container, form, data, edit) {
-        var formNode = $('#mainForm');
+        var formNode = this.element.find('[name="mainForm"]');
         if (formNode.length == 0) {
-            formNode = $('<form id="mainForm"></form>');
+            formNode = $('<form name="mainForm"></form>');
             var blockNode = this.createBlock(container, "Основные реквизиты");
             formNode.appendTo(blockNode);
         } else {
@@ -275,59 +279,65 @@ $.widget('sokol.form', {
         this.createMainBlock(this.element, this.options.form, this.options.data, mode == "edit");
     },
 
-    validateForm: function(form, values) {
+    validateForm: function() {
+        var form = this.options.form;
+        var mainForm = this.element.find('[name="mainForm"]');
+        var valuesList = mainForm.serializeArray();
+        var values = [];
+        for (var j = 0; j < valuesList.length; j++) {
+            var val = valuesList[j];
+            values[val.name] = val;
+        }
+
         var valid = true;
+
         for (var i = 0; i < form.fields.length; i++) {
             var field = form.fields[i];
-            for (var j = 0; j < values.length; j++) {
-                var val = values[j];
-                if (val.name == field.id || j + 1 == values.length) {
-                    var fieldDiv = $("#mainForm").find("[name=" + field.id + "]").parent();
-                    if (field.mandatory) {
-                        if (val && val.value) {
-                            fieldDiv.removeClass("has-error");
-                            var helpBlock = fieldDiv.find(".help-block");
-                            helpBlock.remove();
-                            break;
-                        } else {
-                            fieldDiv.addClass("has-error");
-                            fieldDiv.append($('<span class="help-block">Поле не может быть пустое</span>'));
-                            valid = false;
-                        }
+            var val = values[field.id];
 
-                    } else if(field.validation) {
-                        if (val.value.search(field.validation) < 0) {
-                            fieldDiv.addClass("has-error");
-                            valid = false;
-                        } else {
-                            fieldDiv.removeClass("has-error");
-                        }
+            var fieldDiv = mainForm.find("[name=" + field.id + "]").parent();
+            if (field.mandatory) {
+                if (val && val.value) {
+                    fieldDiv.removeClass("has-error");
+                    var helpBlock = fieldDiv.find(".help-block");
+                    helpBlock.remove();
+                } else {
+                    if (!fieldDiv.hasClass('has-error')) {
+                        fieldDiv.append($('<span class="help-block">Поле не может быть пустое</span>'));
                     }
+                    fieldDiv.addClass("has-error");
+                    valid = false;
+                }
+
+            } else if(field.validation) {
+                if (val.value.search(field.validation) < 0) {
+                    fieldDiv.addClass("has-error");
+                    valid = false;
+                } else {
+                    fieldDiv.removeClass("has-error");
                 }
             }
         }
         return valid;
     },
 
-    saveForm: function() {
-        var formFields = $("#mainForm").serializeArray();
-        if (!this.validateForm(this.options.form, formFields)) {
-            return;
-        }
-
+    getData: function() {
+        var valuesList = this.element.find('[name="mainForm"]').serializeArray();
         var data = {
             id: this.options.data.id,
-            fields: formFields
+            fields: valuesList
         };
         if (this.options.isNew) {
             data.isNew = this.options.isNew;
             data.type = this.options.data.type;
         }
-        $.post("app/save", JSON.stringify(data), $.proxy(function (data) {
-            this.options.dispatcher.open(data.id);
-            this.notify("Сохранено");
-        }, this)).fail(function() {
-            $.notify({message: 'Не удалось сохранить форму, проблемы с сетевым соединением'},{type: 'danger', delay: 1000, timer: 1000});
-        });
+        return data;
+    },
+
+    //todo remove
+    saveForm: function() {
+        if (!this.validateForm()) {
+            return;
+        }
     }
 });

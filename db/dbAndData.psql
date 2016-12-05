@@ -1,0 +1,4 @@
+BEGIN;
+\i documents.sql
+\i sampleData/documentsData.sql
+COMMIT;

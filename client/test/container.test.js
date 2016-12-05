@@ -1,52 +1,9 @@
-
 var modules;
 modules = modules || {};
 
 modules["container"] = (function() {
     var dispatcher = {
 
-    };
-
-    var documentKindsResponse = [ {
-        "id" : 1,
-        "title" : "Отчет"
-    }, {
-        "id" : 2,
-        "title" : "Письмо"
-    }, {
-        "id" : 3,
-        "title" : "Представление"
-    }, {
-        "id" : 4,
-        "title" : "Предписание"
-    }, {
-        "id" : 5,
-        "title" : "Претензия"
-    }, {
-        "id" : 6,
-        "title" : "Приглашение"
-    }, {
-        "id" : 7,
-        "title" : "Справка"
-    }, {
-        "id" : 8,
-        "title" : "Решение"
-    } ];
-
-    var attachesResponse = {
-        "data" : [ {
-            "id" : "c082c2bc-4cc1-4de9-8c5f-968a6c22992b",
-            "title" : "ZFt7CsGffvM.jpg",
-            "size" : "67 KB"
-        }, {
-            "id" : "ecff1ca5-edce-4d86-b3e5-5baf10ca85ce",
-            "title" : "l9gi0kody5U.jpg",
-            "size" : "73 KB"
-        }, {
-            "id" : "e6789e58-4d94-42d3-8df8-1d7b1911a5a9",
-            "title" : "Badoo-2.jpg",
-            "size" : "72 KB"
-        } ]
     };
 
     var options = {
@@ -177,14 +134,16 @@ modules["container"] = (function() {
 
     return {
         before: function() {
-            mockResponses['app/simpledic'] = function(params, callback) {
-                if (params.id == 'documentKind') {
-                    callback(documentKindsResponse);
+            mockResponses['app/save'] = function(data, callback) {
+                var data = JSON.parse(data);
+                var fields = data.fields;
+                for (var i = 0; i < fields.length; i++) {
+                    var field = fields[i];
+                    if (field.name == 'documentKind') {
+                        options.data.documentKind = field.value;
+                    }
                 }
-            };
-
-            mockResponses['app/attaches'] = function(params, callback) {
-                callback(attachesResponse);
+                callback(data.id);
             };
         },
         testAll: {
@@ -196,7 +155,7 @@ modules["container"] = (function() {
         showContainer: {
             title: "Отобразить",
             action: function() {
-                $.sokol.container(options, $('<div></div>').appendTo("body"));
+                testComponent = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }
         }
     }

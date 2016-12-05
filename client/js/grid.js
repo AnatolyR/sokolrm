@@ -8,7 +8,8 @@ $.widget("sokol.grid", {
         currentPage: 1,
         total: 0,
         title: "",
-        columnsVisible: []
+        columnsVisible: [],
+        objectType: 'document'
     },
 
     _create: function () {
@@ -27,6 +28,7 @@ $.widget("sokol.grid", {
     createList: function() {
         var central = this.element;
         central.empty();
+        central.addClass('container');
 
         var pagination = this.createPagination(central);
         this.createColumnsSelector(pagination);
@@ -199,7 +201,7 @@ $.widget("sokol.grid", {
                 var colType = columns[k].type;
                 if (colType != "hidden" && this.isColumnVisible(colId)) {
                     if (colId == "title") {
-                        var td = $('<td><a href="#' + rowObj.id + '" target="_blank">' + rowObj[colId] + '</a></td>');
+                        var td = $('<td><a href="#' + this.options.objectType + '/' + rowObj.id + '" target="_blank">' + rowObj[colId] + '</a></td>');
                         td.appendTo(row);
                     } else {
                         var val = rowObj[colId];

@@ -315,13 +315,13 @@ modules["grid"] = (function() {
         showDocuments: {
             title: "Загрузить выборку \"Документы\"",
             action: function() {
-                $.sokol.grid(options, $("<div class='container'></div>").appendTo("body"));
+                $.sokol.grid(options, $("<div></div>").appendTo("body"));
             }
         },
         showColumns: {
             title: "Видимость колонок",
             action: function() {
-                $.sokol.grid(optionsC, $("<div class='container'></div>").appendTo("body"));
+                $.sokol.grid(optionsC, $("<div></div>").appendTo("body"));
             }
         }
     }

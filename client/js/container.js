@@ -29,9 +29,9 @@ $.widget('sokol.container', {
 
         this.formButtons = $.sokol.formButtons({dispatcher: this}, $('<div></div>').prependTo(this.element));
 
-        this.form = $.sokol.form({data: data, form: form}, $('<div></div>').appendTo(this.element));
+        this.form = $.sokol.form({data: data, form: form, dispatcher: this.options.dispatcher}, $('<div></div>').appendTo(this.element));
 
-        this.attaches = $.sokol.attachesGrid(this.options, $('<div></div>').appendTo(this.element));
+        this.attaches = $.sokol.attachesGrid({documentId: data.id}, $('<div></div>').appendTo(this.element));
     },
 
     notify: function(message) {
@@ -55,6 +55,17 @@ $.widget('sokol.container', {
     },
 
     saveForm: function() {
-        this.form.saveForm();
+        if (!this.form.validateForm()) {
+            return;
+        }
+
+        var data = this.form.getData();
+
+        $.post("app/save", JSON.stringify(data), $.proxy(function (id) {
+            $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
+            this.options.dispatcher.open('document/' + id);
+        }, this)).fail(function() {
+            $.notify({message: 'Не удалось сохранить форму, проблемы с сетевым соединением'},{type: 'danger', delay: 1000, timer: 1000});
+        });
     }
 });

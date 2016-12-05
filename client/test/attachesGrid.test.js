@@ -2,49 +2,11 @@
 var modules;
 modules = modules || {};
 
-var attachesResponse = {
-    "data" : [ {
-        "id" : "c082c2bc-4cc1-4de9-8c5f-968a6c22992b",
-        "title" : "ZFt7CsGffvM.jpg",
-        "size" : "67 KB",
-        "creationDate": "23.11.2016 22:23",
-        "creator": "Петров П. П."
-    }, {
-        "id" : "ecff1ca5-edce-4d86-b3e5-5baf10ca85ce",
-        "title" : "l9gi0kody5U.jpg",
-        "size" : "73 KB",
-        "creationDate": "23.11.2016 22:23",
-        "creator": "Петров П. П."
-    }, {
-        "id" : "e6789e58-4d94-42d3-8df8-1d7b1911a5a9",
-        "title" : "Badoo-2.jpg",
-        "size" : "72 KB",
-        "creationDate": "23.11.2016 22:23",
-        "creator": "Петров П. П."
-    } ]
-};
-
-mockResponses['app/attaches'] = function(params, callback) {
-    callback(attachesResponse);
-};
-
-mockResponses['app/deleteAttach'] = function(params, callback) {
-    var newAttachesList = [];
-    for (var i = 0; i < attachesResponse.data.length; i++) {
-        var file = attachesResponse.data[i];
-        if (file.id != params.id) {
-            newAttachesList.push(file);
-        }
-    }
-    attachesResponse.data = newAttachesList;
-    callback();
-};
-
 
 modules["attachesGrid"] = (function() {
 
     var options = {
-
+        documentId: 'testAttaches'
     };
 
     var testComponent = null;
@@ -124,11 +86,11 @@ modules["attachesGrid"] = (function() {
         showGrid: {
             title: "Отобразить",
             action: function() {
-                var options = $('<div style="padding-bottom: 10px;"><a name="editLink" href="">Edit mode</a> <a name="readLink" href="">Read mode</a></div>');
-                options.appendTo('body');
+                var modes = $('<div style="padding-bottom: 10px;"><a name="editLink" href="">Edit mode</a> <a name="readLink" href="">Read mode</a></div>');
+                modes.appendTo('body');
                 var attaches = $.sokol.attachesGrid(options, $("<div></div>").appendTo("body"));
-                options.find('[name="editLink"]').click(function(e) {e.preventDefault(); attaches.setMode('edit')});
-                options.find('[name="readLink"]').click(function(e) {e.preventDefault(); attaches.setMode('read')});
+                modes.find('[name="editLink"]').click(function(e) {e.preventDefault(); attaches.setMode('edit')});
+                modes.find('[name="readLink"]').click(function(e) {e.preventDefault(); attaches.setMode('read')});
             }
         }
     }

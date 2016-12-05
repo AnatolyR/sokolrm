@@ -51,7 +51,7 @@ var doTest = function(testComponent, steps, completeCallback) {
     doAction(0, steps);
 };
 
-var mockResponses = [];
+var mockResponses = mockResponses || [];
 $.getJSON = function(url, params, callback) {
     setTimeout(function() {
         if (mockResponses[url]) {
@@ -60,6 +60,21 @@ $.getJSON = function(url, params, callback) {
             throw new Error('Not response for "' + url + '"');
         }
     }, 0);
+};
+
+$.post = function(url, data, callback) {
+    setTimeout(function() {
+        if (mockResponses[url]) {
+            mockResponses[url](data, callback);
+        } else {
+            throw new Error('Not response for "' + url + '"');
+        }
+    }, 0);
+    return {
+        fail: function() {
+
+        }
+    }
 };
 
 var modules = [];
@@ -73,11 +88,16 @@ var initTestPage = function(moduleName) {
         body.empty();
         if (id) {
             setTimeout(function() {
+                if (testModule.before) {
+                    testModule.before();
+                }
                 testModule[id].action();
             }, 0);
         } else {
             for (var name in testModule) {
-                body.append($("<div><a href='#" + name+ "'>" + testModule[name].title + " (" + name + ")</a></div>"));
+                if (name != 'before') {
+                    body.append($("<div><a href='#" + name+ "'>" + testModule[name].title + " (" + name + ")</a></div>"));
+                }
             }
         }
 

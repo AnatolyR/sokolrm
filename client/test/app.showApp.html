@@ -4,28 +4,37 @@
     <title>Сокол СЭД</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../dist/bundle.css" />
+    <link rel="stylesheet" href="../css/app.css" />
+
     <script src="../dist/bundle.js"></script>
+
     <script src="../js/form.js"></script>
     <script src="../js/container.js"></script>
     <script src="../js/containerHeader.js"></script>
     <script src="../js/attachesGrid.js"></script>
     <script src="../js/formButtons.js"></script>
+    <script src="../js/grid.js"></script>
+    <script src="../js/header.js"></script>
+    <script src="../js/app.js"></script>
 
+    <script src="mockResponses/appsettings.js"></script>
     <script src="mockResponses/attaches.js"></script>
+    <script src="mockResponses/grid.app.js"></script>
+    <script src="mockResponses/gridsettings.js"></script>
     <script src="mockResponses/simpledic.js"></script>
 
     <script src="testUtils.js"></script>
-    <script src="container.test.js"></script>
+    <script src="app.test.js"></script>
     <style>
-        body {
-            padding: 10px;
-        }
+
     </style>
 
 </head>
 <body>
 <script>
-    initTestPage('container');
+    var testModule = modules['app'];
+    testModule.before();
+    testModule.showApp.action();
 </script>
 </body>
 </html>

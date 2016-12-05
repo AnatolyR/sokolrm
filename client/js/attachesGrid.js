@@ -17,9 +17,9 @@ $.widget('sokol.attachesGrid', {
     },
 
     getAttachesList: function() {
-        var id = this.options.id;
-        $.getJSON("app/attaches",{objectId: id}, $.proxy(function (listData) {
-            this.createAttachesList(listData, id);
+        var documentId = this.options.documentId;
+        $.getJSON("app/attaches",{documentId: documentId}, $.proxy(function (listData) {
+            this.createAttachesList(listData, documentId);
         }, this));
     },
 
