@@ -16,7 +16,8 @@ module.exports = function(grunt) {
                     'node_modules/microplugin/src/microplugin.js',
                     'node_modules/selectize/dist/js/selectize.js',
                     'node_modules/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js',
-                    'node_modules/bootstrap-notify/bootstrap-notify.js'
+                    //'node_modules/bootstrap-notify/bootstrap-notify.js'
+                    'vendor/bootstrap-notify-fixed-for-sokol.js'
                 ]
             },
             appjs: {
