@@ -61,7 +61,7 @@ $.widget('sokol.container', {
 
         var data = this.form.getData();
 
-        $.post("app/save", JSON.stringify(data), $.proxy(function (id) {
+        $.post("app/savedocument", JSON.stringify(data), $.proxy(function (id) {
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
             this.options.dispatcher.open('document/' + id);
         }, this)).fail(function() {

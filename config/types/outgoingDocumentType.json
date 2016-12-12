@@ -1,0 +1,56 @@
+{
+  "title": "Исходящий",
+  "fields": [
+    {
+      "id": "title",
+      "title": "Заголовок",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "documentKind",
+      "title": "Вид документа",
+      "type": "select",
+      "dictionary": "documentKind"
+    },
+    {
+      "id": "correspondent",
+      "title": "Корреспондент",
+      "type": "dictionary",
+      "dictionary": "correspondent"
+    },
+    {
+      "id": "documentNumber",
+      "title": "Номер документа",
+      "type": "smallstring"
+    },
+    {
+      "id": "registrationDate",
+      "title": "Дата регистрации",
+      "type": "date"
+    },
+    {
+      "id": "pagesQuantity",
+      "title": "Количество листов",
+      "type": "number"
+    },
+    {
+      "id": "signer",
+      "title": "Подписант",
+      "type": "dictionary",
+      "dictionary": "organizationPersons"
+    },
+    {
+      "id": "executors",
+      "title": "Исполнители",
+      "type": "dictionary",
+      "multiple": true,
+      "dictionary": "organizationPersons"
+    },
+    {
+      "id": "projectNumber",
+      "title": "Номер проекта",
+      "type": "smallstring"
+    }
+  ]
+}

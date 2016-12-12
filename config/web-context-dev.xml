@@ -1,3 +1,3 @@
 <Context>
-    <Parameter name="app_properties_path" value="/Users/anatolii/Documents/sokolsed/config/app.properties" override="false"/>
+    <Parameter name="app_config_path" value="/Users/anatolii/Documents/sokolsed/config/" override="false"/>
 </Context>

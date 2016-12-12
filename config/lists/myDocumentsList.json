@@ -1,0 +1,33 @@
+{
+  "condition": "author = '$currentUser'",
+  "gridConfig": {
+    "columns": [
+      {
+        "id": "id",
+        "type": "hidden"
+      },
+      {
+        "id": "documentNumber",
+        "title": "Номер"
+      },
+      {
+        "id": "type",
+        "title": "Тип",
+        "render": "doctype"
+      },
+      {
+        "id": "status",
+        "title": "Статус"
+      },
+      {
+        "id": "title",
+        "title": "Заголовок"
+      },
+      {
+        "id": "registrationDate",
+        "title": "Дата регистрации",
+        "render": "datetime"
+      }
+    ]
+  }
+}

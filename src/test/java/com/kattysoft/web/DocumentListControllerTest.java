@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 29.11.2016
  */
-public class DocumentControllerTest {
+public class DocumentListControllerTest {
 
     private MockMvc mockMvc;
 
@@ -34,13 +34,13 @@ public class DocumentControllerTest {
     private DocumentService documentService;
 
     @InjectMocks
-    private DocumentController documentController;
+    private DocumentListController documentListController;
 
     @BeforeClass
     public void setup() {
-        documentController = new DocumentController();
+        documentListController = new DocumentListController();
         MockitoAnnotations.initMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(documentController).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(documentListController).build();
     }
 
     @Test
@@ -58,6 +58,7 @@ public class DocumentControllerTest {
         documents.add(document2);
 
         when(documentService.listDocuments(any(Specification.class))).thenReturn(documents);
+        when(documentService.getTotalCount(any(Specification.class))).thenReturn(2);
 
         ResultActions resultActions = this.mockMvc.perform(get("/documents").accept(MediaType.parseMediaType("application/json;charset=UTF-8")));
         MvcResult mvcResult = resultActions.andReturn();
@@ -66,10 +67,12 @@ public class DocumentControllerTest {
 
         resultActions.andExpect(status().isOk())
             .andExpect(content().contentType("application/json;charset=UTF-8"))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$[0].id").value("1"))
-            .andExpect(jsonPath("$[0].title").value("Title 1"))
-            .andExpect(jsonPath("$[1].id").value("2"))
-            .andExpect(jsonPath("$[1].title").value("Title 2"));
+            .andExpect(jsonPath("$.total").value(2))
+            .andExpect(jsonPath("$.offset").value(0))
+            .andExpect(jsonPath("$.data").isArray())
+            .andExpect(jsonPath("$.data[0].id").value("1"))
+            .andExpect(jsonPath("$.data[0].title").value("Title 1"))
+            .andExpect(jsonPath("$.data[1].id").value("2"))
+            .andExpect(jsonPath("$.data[1].title").value("Title 2"));
     }
 }

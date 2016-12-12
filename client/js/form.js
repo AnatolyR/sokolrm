@@ -1,7 +1,9 @@
 $.widget('sokol.form', {
     options: {
         mode: 'read',
-        objectType: ''
+        objectType: '',
+        fieldsInfo: [],
+        fieldsInfoMap: []
     },
 
     _create: function () {
@@ -84,10 +86,10 @@ $.widget('sokol.form', {
         $(formNode).append('' +
             '<div class="form-group single' + (field.mandatory && edit? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
             '<label class="control-label">' + field.title + ':</label>' +
-            '<select name="' + field.id + '" class="demo-default" id="selector_' + field.id + '">' + option + '</select>' +
+            '<select name="' + field.id + '" class="demo-default">' + option + '</select>' +
             '</div>' +
             '');
-        $('#selector_' + field.id).selectize({
+        this.element.find('[name=' + field.id + ']').selectize({
             maxItems: 1,
             //plugins: ['remove_button'],
             valueField: 'title',
@@ -110,8 +112,8 @@ $.widget('sokol.form', {
                 //        callback(res);
                 //    }
                 //});
-                $.getJSON('app/simpledic', {
-                                id: field.dictionary
+                $.getJSON('app/config', {
+                                id: "dictionaries/" + field.dictionary
                             }, callback);
             },
             create: false
@@ -247,6 +249,9 @@ $.widget('sokol.form', {
         var valueTitle = data[id + "Title"];
         var type = field.type;
 
+        this.options.fieldsInfo.push(field);
+        this.options.fieldsInfoMap[id] = field;
+
         if (!value) {
             value = "";
         }
@@ -280,7 +285,6 @@ $.widget('sokol.form', {
     },
 
     validateForm: function() {
-        var form = this.options.form;
         var mainForm = this.element.find('[name="mainForm"]');
         var valuesList = mainForm.serializeArray();
         var values = [];
@@ -291,8 +295,8 @@ $.widget('sokol.form', {
 
         var valid = true;
 
-        for (var i = 0; i < form.fields.length; i++) {
-            var field = form.fields[i];
+        for (var i = 0; i < this.options.fieldsInfo.length; i++) {
+            var field = this.options.fieldsInfo[i];
             var val = values[field.id];
 
             var fieldDiv = mainForm.find("[name=" + field.id + "]").parent();
@@ -323,9 +327,31 @@ $.widget('sokol.form', {
 
     getData: function() {
         var valuesList = this.element.find('[name="mainForm"]').serializeArray();
+        var fields = [];
+        for (var i = 0; i < valuesList.length; i++) {
+            var value = valuesList[i];
+            var fieldInfo = this.options.fieldsInfoMap[value.name];
+            if (fieldInfo.multiple) {
+                if (fields[value.name]) {
+                    fields[value.name].push(value.value);
+                } else {
+                    fields[value.name] = [value.value];
+                }
+            } else {
+                fields[value.name] = value.value;
+            }
+        }
+        var values = [];
+        for (var name in fields) {
+            values.push({
+                name: name,
+                value: fields[name]
+            });
+        }
         var data = {
             id: this.options.data.id,
-            fields: valuesList
+            fields: values,
+            type: this.options.data.type
         };
         if (this.options.isNew) {
             data.isNew = this.options.isNew;
@@ -336,8 +362,11 @@ $.widget('sokol.form', {
 
     //todo remove
     saveForm: function() {
-        if (!this.validateForm()) {
-            return;
-        }
+        console.log(">>>> form ", this.options.form);
+        console.log(">>>> fieldsInfo ", this.options.fieldsInfo);
+        //if (!this.validateForm()) {
+        //    return;
+        //}
+        //console.log("Data: ", this.getData());
     }
 });

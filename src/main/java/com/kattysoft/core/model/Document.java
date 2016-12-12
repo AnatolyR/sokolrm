@@ -9,6 +9,8 @@
  */
 package com.kattysoft.core.model;
 
+import java.util.Map;
+
 /**
  *
  * Class contains main document attributes like id, title, author, etc. and not containing
@@ -22,6 +24,8 @@ public class Document {
     private String title;
     private String type;
     private String kind;
+
+    private Map<String, Object> fields;
 
     public String getId() {
         return id;
@@ -53,5 +57,13 @@ public class Document {
 
     public void setKind(String kind) {
         this.kind = kind;
+    }
+
+    public Map<String, Object> getFields() {
+        return fields;
+    }
+
+    public void setFields(Map<String, Object> fields) {
+        this.fields = fields;
     }
 }

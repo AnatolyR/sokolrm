@@ -197,17 +197,26 @@ $.widget("sokol.grid", {
             var row = $("<tr></tr>");
             var rowObj = rowsData[j];
             for (var k = 0; k < columns.length; k++) {
-                var colId = columns[k].id;
-                var colType = columns[k].type;
+                var column = columns[k];
+                var colId = column.id;
+                var colType = column.type;
                 if (colType != "hidden" && this.isColumnVisible(colId)) {
-                    if (colId == "title") {
-                        var td = $('<td><a href="#' + this.options.objectType + '/' + rowObj.id + '" target="_blank">' + rowObj[colId] + '</a></td>');
-                        td.appendTo(row);
-                    } else {
-                        var val = rowObj[colId];
+                    var val = rowObj[colId];
+                    if (val) {
+                        if (colId == "title") {
+                            var td = $('<td><a href="#' + this.options.objectType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
+                            td.appendTo(row);
+                        } else if (column.render == 'datetime') {
+                            val = moment(val).format('L LT');
 
-                        var td = $('<td>' + (val ? val : '') + '</td>');
-                        td.appendTo(row);
+                            var td = $('<td>' + (val ? val : '') + '</td>');
+                            td.appendTo(row);
+                        } else {
+                            var td = $('<td>' + (val ? val : '') + '</td>');
+                            td.appendTo(row);
+                        }
+                    } else {
+                        row.append($('<td></td>'));
                     }
                 }
             }

@@ -1,0 +1,16 @@
+{
+  "fields": [
+    {
+      "id": "title"
+    },
+    {
+      "id": "registrationDate"
+    },
+    {
+      "id": "signer"
+    },
+    {
+      "id": "executors"
+    }
+  ]
+}

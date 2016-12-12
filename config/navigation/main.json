@@ -1,0 +1,70 @@
+{
+  "items": [
+    {
+      "id": "documents",
+      "title": "Документы",
+      "type": "header"
+    },
+    {
+      "id": "incomingDocuments",
+      "title": "Входящие"
+    },
+    {
+      "id": "outgoingDocuments",
+      "title": "Исходящие"
+    },
+    {
+      "id": "internalDocuments",
+      "title": "Внутренние"
+    },
+    {
+      "id": "myDocuments",
+      "title": "Мои документы"
+    },
+    {
+      "id": "favoriteDocuments",
+      "title": "Избранное"
+    },
+    {
+      "id": "incomingTasks",
+      "title": "Входящие задачи",
+      "type": "header"
+    },
+    {
+      "id": "",
+      "title": "На рассмотрение"
+    },
+    {
+      "id": "",
+      "title": "На подписание"
+    },
+    {
+      "id": "",
+      "title": "На согласование"
+    },
+    {
+      "id": "",
+      "title": "На ознакомление"
+    },
+    {
+      "id": "",
+      "title": "На исполнение"
+    },{
+      "id": "",
+      "title": "Исходящие задачи",
+      "type": "header"
+    },
+    {
+      "id": "",
+      "title": "Исполнение"
+    },
+    {
+      "id": "",
+      "title": "Утвердить"
+    },
+    {
+      "id": "",
+      "title": "Перенесение срока"
+    }
+  ]
+}

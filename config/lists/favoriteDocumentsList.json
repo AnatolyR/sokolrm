@@ -1,0 +1,34 @@
+{
+  "query": ["select * from documents d",
+  "left join favorites f on d.id = f.documentId::uuid where f.userId = '$currentUser'; "],
+  "gridConfig": {
+    "columns": [
+      {
+        "id": "id",
+        "type": "hidden"
+      },
+      {
+        "id": "documentNumber",
+        "title": "Номер"
+      },
+      {
+        "id": "type",
+        "title": "Тип",
+        "render": "doctype"
+      },
+      {
+        "id": "status",
+        "title": "Статус"
+      },
+      {
+        "id": "title",
+        "title": "Заголовок"
+      },
+      {
+        "id": "registrationDate",
+        "title": "Дата регистрации",
+        "render": "datetime"
+      }
+    ]
+  }
+}

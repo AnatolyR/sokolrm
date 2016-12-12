@@ -1,0 +1,29 @@
+{
+  "title": "Поручение",
+  "fields": [
+    {
+      "id": "title",
+      "title": "Заголовок",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "registrationDate",
+      "title": "Дата",
+      "type": "date"
+    },
+    {
+      "id": "signer",
+      "title": "Подписант",
+      "type": "dictionary",
+      "dictionary": "organizationPersons"
+    },
+    {
+      "id": "executors",
+      "title": "Исполнители",
+      "type": "dictionary",
+      "multiple": true,
+      "dictionary": "organizationPersons"
+    }
+  ]
+}

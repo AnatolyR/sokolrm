@@ -26,8 +26,8 @@ var mockResponses = mockResponses || [];
         "title" : "Решение"
     } ];
 
-    mockResponses['app/simpledic'] = function(params, callback) {
-        if (params.id == 'documentKind') {
+    mockResponses['app/config'] = function(params, callback) {
+        if (params.id == 'dictionaries/documentKind') {
             callback(documentKindsResponse);
         }
     };

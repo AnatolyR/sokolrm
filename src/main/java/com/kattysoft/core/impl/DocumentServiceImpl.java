@@ -24,8 +24,26 @@ public class DocumentServiceImpl implements DocumentService {
     private DocumentDao documentDao;
 
     public List<Document> listDocuments(Specification specification) {
+        //todo проверка прав на поля
         List<Document> documentsList = documentDao.getDocumentsList(specification);
         return documentsList;
+    }
+
+    public Integer getTotalCount(Specification specification) {
+        Integer total = documentDao.getTotalCount(specification);
+        return total;
+    }
+
+    public Document getDocument(String id) {
+        //todo проверка прав на поля
+        Document document = documentDao.getDocument(id, null);
+        return document;
+    }
+
+    @Override
+    public void saveDocument(Document document) {
+        //todo проверка прав на поля
+        documentDao.saveDocument(document);
     }
 
     public void setDocumentDao(DocumentDao documentDao) {

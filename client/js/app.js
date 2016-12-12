@@ -12,7 +12,7 @@ $.widget('sokol.app', {
             if (id) {
                 this.open(id);
             } else {
-                this.open("list/documents");
+                this.open("lists/documentsList");
             }
 
         }, this));
@@ -43,7 +43,7 @@ $.widget('sokol.app', {
             this.grid.destroy();
         }
 
-        if (id.startsWith('list/')) {
+        if (id.startsWith('lists/')) {
             this.createListWithNavigation(id)
         } else if (id.startsWith('document/')) {
             this.createDocumentForm(id.substring(9));
@@ -62,7 +62,9 @@ $.widget('sokol.app', {
                 options.dispatcher = this;
                 this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }, this)
-        );
+        ).fail($.proxy(function(e) {
+                $('<div class="alert alert-danger" role="alert">Не удалось загрузить документ "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+            }, this));
     },
 
     createListWithNavigation: function(id) {
@@ -75,9 +77,14 @@ $.widget('sokol.app', {
         //this.createNavigation();
         //this.createList(data);
 
-        $.getJSON('app/gridsettings', {id: id},
+        $.getJSON('app/config', {id: id},
             $.proxy(function (data) {
-                var options = data;
+                var options = {
+                    title: data.title,
+                    columnsVisible: data.columnsVisible,
+                    columns: data.columns,
+                    url: 'app/documents'
+                };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo("body"));
             }, this)
         );

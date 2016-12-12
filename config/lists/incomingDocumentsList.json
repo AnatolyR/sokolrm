@@ -1,0 +1,37 @@
+{
+  "condition": "type = 'incomingDocument' AND status <> 'Черновик'",
+  "gridConfig": {
+    "columns": [
+      {
+        "id": "id",
+        "type": "hidden"
+      },
+      {
+        "id": "documentNumber",
+        "title": "Номер"
+      },
+      {
+        "id": "type",
+        "title": "Тип",
+        "render": "doctype"
+      },
+      {
+        "id": "title",
+        "title": "Заголовок"
+      },
+      {
+        "id": "registrationDate",
+        "title": "Дата регистрации",
+        "render": "datetime"
+      },
+      {
+        "id": "correspondentTitle",
+        "title": "Корреспондент"
+      },
+      {
+        "id": "addresseeTitle",
+        "title": "Адресаты"
+      }
+    ]
+  }
+}

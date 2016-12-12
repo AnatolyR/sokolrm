@@ -21,7 +21,9 @@ public interface DocumentDao {
 
     List<Document> getDocumentsList(Specification specification);
 
-    Document saveDocument(Document document);
+    String saveDocument(Document document);
 
     Document deleteDocument(String documentId);
+
+    Integer getTotalCount(Specification specification);
 }

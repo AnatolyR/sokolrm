@@ -18,7 +18,8 @@ modules["grid"] = (function() {
                 type: "Test",
                 status: "Draft",
                 title: "Document " + i,
-                registrationDate: this.dateFormat(new Date (1479723927756), "%Y.%m.%d %H:%M", false)
+                //registrationDate: this.dateFormat(new Date (1479723927756), "%Y.%m.%d %H:%M", false)
+                registrationDate: new Date (1479723927756).toISOString()
             });
         }
 
@@ -253,7 +254,7 @@ modules["grid"] = (function() {
         });
         steps.push({
             step: function checkTable() {
-                assertTableStateCorrect(55, 20, 1, 3, "1TestDraftDocument 12016.11.21 13:25", "2TestDraftDocument 22016.11.21 13:25", "20TestDraftDocument 202016.11.21 13:25");
+                assertTableStateCorrect(55, 20, 1, 3, "1TestDraftDocument 121.11.2016 13:25", "2TestDraftDocument 221.11.2016 13:25", "20TestDraftDocument 2021.11.2016 13:25");
             },
             wait: 500
         });
@@ -283,7 +284,7 @@ modules["grid"] = (function() {
         });
         steps.push({
             step: function checkNextPage() {
-                assertTableStateCorrect(55, 5, 2, 2, "51TestDraftDocument 512016.11.21 13:25", "52TestDraftDocument 522016.11.21 13:25", "55TestDraftDocument 552016.11.21 13:25");
+                assertTableStateCorrect(55, 5, 2, 2, "51TestDraftDocument 5121.11.2016 13:25", "52TestDraftDocument 5221.11.2016 13:25", "55TestDraftDocument 5521.11.2016 13:25");
             },
             wait: 500
         });

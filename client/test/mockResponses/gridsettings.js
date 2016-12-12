@@ -41,7 +41,7 @@ var mockResponses = mockResponses || [];
         ]
     };
 
-    mockResponses['app/gridsettings'] = function(params, callback) {
+    mockResponses['app/config'] = function(params, callback) {
         callback(gridSettings);
     };
 })();

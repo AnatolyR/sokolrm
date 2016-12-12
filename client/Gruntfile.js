@@ -19,9 +19,12 @@ module.exports = function(grunt) {
                     'node_modules/bootstrap-notify/bootstrap-notify.js'
                 ]
             },
-            app: {
+            appjs: {
                 dest: 'dist/app.js',
-                src: 'js/*.js'
+                src: 'js/*.js',
+                options: {
+                    sourceMap: true
+                }
             },
             css: {
                 dest: 'dist/bundle.css',
@@ -33,6 +36,10 @@ module.exports = function(grunt) {
                     'node_modules/selectize/dist/css/selectize.bootstrap3.css',
                     'node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
                 ]
+            },
+            appcss: {
+                dest: 'dist/app.css',
+                src: 'css/*.css'
             }
         },
         copy: {
@@ -43,8 +50,20 @@ module.exports = function(grunt) {
                         src: ['dist/bundle.js']
                     },
                     {
+                        dest: '../src/main/webapp/js/app.js',
+                        src: ['dist/app.js']
+                    },
+                    {
+                        dest: '../src/main/webapp/js/app.js.map',
+                        src: ['dist/app.js.map']
+                    },
+                    {
                         dest: '../src/main/webapp/css/bundle.css',
                         src: ['dist/bundle.css']
+                    },
+                    {
+                        dest: '../src/main/webapp/css/app.css',
+                        src: ['dist/app.css']
                     }
                 ]
             }
@@ -56,5 +75,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('default', ['concat']);
+
+    grunt.registerTask('dist', ['concat', 'copy']);
 
 };

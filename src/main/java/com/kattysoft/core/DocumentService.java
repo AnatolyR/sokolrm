@@ -18,4 +18,10 @@ import java.util.List;
  */
 public interface DocumentService {
     List<Document> listDocuments(Specification specification);
+
+    Integer getTotalCount(Specification specification);
+
+    Document getDocument(String id);
+
+    void saveDocument(Document document);
 }

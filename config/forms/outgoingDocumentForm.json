@@ -1,0 +1,47 @@
+{
+  "fields": [
+    {
+      "id": "title"
+    },
+    {
+      "id": "documentKind",
+      "width": "300px"
+    },
+    {
+      "delimeter": true
+    },
+    {
+      "id": "correspondent"
+    },
+    {
+      "delimeter": true
+    },
+    {
+      "id": "signer"
+    },
+    {
+      "id": "executors"
+    },
+    {
+      "id": "projectNumber"
+    },
+    {
+      "cols": 4,
+      "items": [
+        {
+          "id": "documentNumber",
+          "cols": 2
+        },
+        {
+          "id": "registrationDate"
+        },
+        {
+          "id": "pagesQuantity"
+        }
+      ]
+    },
+    {
+      "delimeter": true
+    }
+  ]
+}

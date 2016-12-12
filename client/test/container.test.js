@@ -134,7 +134,7 @@ modules["container"] = (function() {
 
     return {
         before: function() {
-            mockResponses['app/save'] = function(data, callback) {
+            mockResponses['app/savedocument'] = function(data, callback) {
                 var data = JSON.parse(data);
                 var fields = data.fields;
                 for (var i = 0; i < fields.length; i++) {

@@ -1,0 +1,58 @@
+{
+  "fields": [
+    {
+      "id": "title"
+    },
+    {
+      "id": "documentKind",
+      "width": "300px"
+    },
+    {
+      "id": "addressee"
+    },
+    {
+      "delimeter": true
+    },
+    {
+      "id": "correspondent"
+    },
+    {
+      "items": [
+        {
+          "id": "externalSigner"
+        },
+        {
+          "id": "externalExecutor"
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "id": "externalNumber"
+        },
+        {
+          "id": "externalDate"
+        }
+      ]
+    },
+    {
+      "delimeter": true
+    },
+    {
+      "cols": 4,
+      "items": [
+        {
+          "id": "documentNumber",
+          "cols": 2
+        },
+        {
+          "id": "registrationDate"
+        },
+        {
+          "id": "pagesQuantity"
+        }
+      ]
+    }
+  ]
+}

@@ -7,16 +7,20 @@
     <!--<context:property-placeholder location="file:///#{systemProperties.dbproperties2}"/>-->
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
         <property name="location">
-            <value>file:///${app_properties_path}</value>
+            <value>file:///${app_config_path}app.properties</value>
             <!--<value>file:///#{systemProperties['dbproperties']}</value>-->
         </property>
     </bean>
 
-    <!-- Enable annotation support-->
+    <bean id="servletPropertyPlaceholderConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+    </bean>
+
+     <!--Enable annotation support-->
     <context:annotation-config/>
 
-    <!-- Search for beans and autowiring-->
+     <!--Search for beans and autowiring-->
     <context:component-scan base-package="com.kattysoft"/>
 
     <bean id="pgDb" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -24,6 +28,20 @@
         <property name="url" value="${db.url}"/>
         <property name="username" value="${db.username}"/>
         <property name="password" value="${db.password}"/>
+    </bean>
+
+    <bean id="documentDao" class="com.kattysoft.core.dao.DocumentDaoPg">
+        <property name="dataSource" ref="pgDb" />
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.DocumentServiceImpl">
+        <property name="documentDao" ref="documentDao" />
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.ConfigServiceImpl">
+        <property name="configPath">
+            <value>${app_config_path}</value>
+        </property>
     </bean>
 
 </beans>
