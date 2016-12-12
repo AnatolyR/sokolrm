@@ -302,14 +302,15 @@
 				self.settings.onClose.call(this.$ele);
 			}
 
-			this.$ele.one(this.animations.start, function(event) {
-				hasAnimation = true;
-			}).one(this.animations.end, function(event) {
-				$(this).remove();
-				if ($.isFunction(self.settings.onClosed)) {
-					self.settings.onClosed.call(this);
-				}
-			});
+			//SOKOL FIX
+			//this.$ele.one(this.animations.start, function(event) {
+			//	hasAnimation = true;
+			//}).one(this.animations.end, function(event) {
+			//	$(this).remove();
+			//	if ($.isFunction(self.settings.onClosed)) {
+			//		self.settings.onClosed.call(this);
+			//	}
+			//});
 
 			setTimeout(function() {
 				if (!hasAnimation) {
@@ -318,7 +319,7 @@
 						self.settings.onClosed(self.$ele);
 					}
 				}
-			}, 600);
+			}, 0); //SOKOL FIX chaged from 600 to 0
 		},
 		reposition: function(posX) {
 			var self = this,
