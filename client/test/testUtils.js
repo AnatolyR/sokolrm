@@ -60,6 +60,11 @@ $.getJSON = function(url, params, callback) {
             throw new Error('Not response for "' + url + '"');
         }
     }, 0);
+    return {
+        fail: function() {
+
+        }
+    }
 };
 
 $.post = function(url, data, callback) {

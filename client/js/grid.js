@@ -72,7 +72,9 @@ $.widget("sokol.grid", {
                 this.options.total = data.total;
                 this.refresh();
 
-            }, this));
+            }, this)).fail(function() {
+                $.notify({message: 'Не удалось загрузить данные. Обратитесь к администратору.'}, {type: 'danger', delay: 0, timer: 0});
+            });
         } else {
             this.options.total = this.options.data.length;
             this.refresh();

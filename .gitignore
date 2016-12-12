@@ -9,7 +9,7 @@ buildNumber.properties
 .mvn/timing.properties
 .idea
 *.iml
-node_modules
+node_modules/
 dist
 src/main/webapp/css/bundle.css
 src/main/webapp/js/bundle.js

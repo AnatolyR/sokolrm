@@ -379,7 +379,7 @@ $.widget('sokol.container', {
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
             this.options.dispatcher.open('document/' + id);
         }, this)).fail(function() {
-            $.notify({message: 'Не удалось сохранить форму, проблемы с сетевым соединением'},{type: 'danger', delay: 1000, timer: 1000});
+            $.notify({message: 'Не удалось сохранить документ. Обратитесь к администратору.'},{type: 'danger', delay: 1000, timer: 1000});
         });
     }
 });
@@ -906,7 +906,9 @@ $.widget("sokol.grid", {
                 this.options.total = data.total;
                 this.refresh();
 
-            }, this));
+            }, this)).fail(function() {
+                $.notify({message: 'Не удалось загрузить данные. Обратитесь к администратору.'}, {type: 'danger', delay: 0, timer: 0});
+            });
         } else {
             this.options.total = this.options.data.length;
             this.refresh();
