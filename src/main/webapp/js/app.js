@@ -379,7 +379,7 @@ $.widget('sokol.container', {
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
             this.options.dispatcher.open('document/' + id);
         }, this)).fail(function() {
-            $.notify({message: 'Не удалось сохранить документ. Обратитесь к администратору.'},{type: 'danger', delay: 1000, timer: 1000});
+            $.notify({message: 'Не удалось сохранить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
     }
 });
@@ -392,7 +392,7 @@ $.widget('sokol.containerHeader', {
     _create: function () {
         var form = this.options.form;
         var data = this.options.data;
-        var date = data.registrationDate ? moment(data.registrationDate).format("L") : '-';
+        var date = data.registrationDate ? moment(data.registrationDate, 'DD.MM.YYYY HH:mm').format("L") : '-';
         this.element.addClass('panel-body');
         $('<h3>' + (form.typeTitle ? form.typeTitle : '-') +
             ' № ' + (data.documentNumber ? data.documentNumber : '-') +
@@ -452,10 +452,7 @@ $.widget('sokol.form', {
             '</div>');
     },
     createFieldDate: function (formNode, field, value, edit) {
-        if (!value) {
-            return;
-        }
-        value = moment(value).format("L LT");
+        value = value ? moment(value, 'DD.MM.YYYY HH:mm').format("L LT") : '';
         if (!edit) {
             $(formNode).append('' +
                 '<div class="form-group' + (field.mandatory && edit? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
@@ -736,7 +733,7 @@ $.widget('sokol.form', {
 
     getData: function() {
         var valuesList = this.element.find('[name="mainForm"]').serializeArray();
-        var fields = [];
+        var fields = {};
         for (var i = 0; i < valuesList.length; i++) {
             var value = valuesList[i];
             var fieldInfo = this.options.fieldsInfoMap[value.name];
@@ -750,16 +747,10 @@ $.widget('sokol.form', {
                 fields[value.name] = value.value;
             }
         }
-        var values = [];
-        for (var name in fields) {
-            values.push({
-                name: name,
-                value: fields[name]
-            });
-        }
+
         var data = {
             id: this.options.data.id,
-            fields: values,
+            fields: fields,
             type: this.options.data.type
         };
         if (this.options.isNew) {

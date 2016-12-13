@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -40,6 +40,12 @@ public class DocumentCardController {
     private ConfigService configService;
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+    public DocumentCardController() {
+        mapper.setDateFormat(dateFormat);
+    }
 
     @RequestMapping(value = "/card", produces = "application/json; charset=utf-8")
     public String getDocumentCard(String id) {
@@ -90,27 +96,58 @@ public class DocumentCardController {
             Document document = new Document();
             document.setId(id);
 
-            Iterator<JsonNode> fields = data.get("fields").getElements();
+            JsonNode fields = data.get("fields");
+            Iterator<String> fieldsNames = fields.getFieldNames();
             Map<String, Object> resultFields = new HashMap<>();
-            while (fields.hasNext()) {
-                JsonNode field = fields.next();
-                String name = field.get("name").asText();
-                JsonNode value = field.get("value");
+            while (fieldsNames.hasNext()) {
+                String name = fieldsNames.next();
+                JsonNode value = fields.get(name);
                 JsonNode fieldInfo = fieldsInfo.get(name);
 
-                if (fieldInfo != null && "string".equals(fieldInfo.get("type").asText())) {
-                    if (value.isTextual()) {
-                        resultFields.put(name, value.asText());
+                if (fieldInfo != null && value != null) {
+                    String type = fieldInfo.get("type").asText();
+                    if ("string".equals(type)) {
+                        if (value.isTextual()) {
+                            resultFields.put(name, value.asText());
+                        }
+                    } else if ("smallstring".equals(type)) {
+                        if (value.isTextual()) {
+                            resultFields.put(name, value.asText());
+                        }
+                    } else if ("date".equals(type)) {
+                        if (value.isTextual()) {
+                            resultFields.put(name, dateFormat.parse(value.asText()));
+                        }
+                    } else if ("number".equals(type)) {
+                        if (value.isTextual()) {
+                            resultFields.put(name, Integer.parseInt(value.asText()));
+                        }
+                    } else if ("select".equals(type)) {
+                        if (value.isTextual()) {
+                            resultFields.put(name, value.asText());
+                        }
+                    } else if ("dictionary".equals(type)) {
+                        if (fieldInfo.get("multiple") != null && fieldInfo.get("multiple").asBoolean()) {
+                            List<String> values = new ArrayList<>();
+                            if (value.isArray()) {
+                                value.forEach(node -> {values.add(node.asText());});
+                                resultFields.put(name, values);
+                            }
+                        } else {
+                            if (value.isTextual()) {
+                                resultFields.put(name, value.asText());
+                            }
+                        }
                     }
                 }
-
             }
+
             document.setFields(resultFields);
 
             documentService.saveDocument(document);
 
             return id;
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
     }

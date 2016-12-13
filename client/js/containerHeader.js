@@ -6,7 +6,7 @@ $.widget('sokol.containerHeader', {
     _create: function () {
         var form = this.options.form;
         var data = this.options.data;
-        var date = data.registrationDate ? moment(data.registrationDate).format("L") : '-';
+        var date = data.registrationDate ? moment(data.registrationDate, 'DD.MM.YYYY HH:mm').format("L") : '-';
         this.element.addClass('panel-body');
         $('<h3>' + (form.typeTitle ? form.typeTitle : '-') +
             ' № ' + (data.documentNumber ? data.documentNumber : '-') +

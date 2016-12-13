@@ -1,45 +1,16 @@
 {
   "id": "20a8fac1-cebd-455a-8eb6-ce34e59c3631",
-  "fields": [
-    {
-      "name": "title",
-      "value": "1235"
-    },
-    {
-      "name": "documentKind",
-      "value": "Предписание"
-    },
-    {
-      "name": "addressee",
-      "value": "d2a301ed-2a03-4a28-bc01-df134109f6dd"
-    },
-    {
-      "name": "correspondent",
-      "value": ""
-    },
-    {
-      "name": "externalSigner",
-      "value": ""
-    },
-    {
-      "name": "externalExecutor",
-      "value": ""
-    },
-    {
-      "name": "externalNumber",
-      "value": ""
-    },
-    {
-      "name": "documentNumber",
-      "value": ""
-    },
-    {
-      "name": "registrationDate",
-      "value": "23.04.2016 00:03"
-    },
-    {
-      "name": "pagesQuantity",
-      "value": ""
-    }
-  ]
+  "type": "incomingDocument",
+  "fields": {
+    "title": "1235",
+    "documentKind": "Предписание",
+    "addressee": ["d2a301ed-2a03-4a28-bc01-df134109f6dd", "222"],
+    "correspondent": "test_corr_id",
+    "externalSigner": "",
+    "externalExecutor": "",
+    "externalNumber": "",
+    "documentNumber": "",
+    "registrationDate": "23.04.2016 00:03",
+    "pagesQuantity": "7"
+  }
 }

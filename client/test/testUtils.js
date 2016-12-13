@@ -1,9 +1,43 @@
 var assertEquals = function(expected, real, message) {
-    if (expected !== real) {
-        message = message || 'Not equal';
+    var splice = function(inp, idx, rem, str) {
+        return inp.slice(0, idx) + str + inp.slice(idx + Math.abs(rem));
+    };
 
-        var e = new Error(message + " : [" + expected + "] != [" + real + "]");
-        $('<div class="alert alert-danger">' + e + '</div>').prependTo("body");
+    if (expected !== real) {
+        message = message || '';
+
+        var len = Math.min(expected.length, real.length);
+        var maxDiffLen = 20;
+        var diffLen = 0;
+        var diffExp = "";
+        var diffR = "";
+        var diff = false;
+        var startPosition = 0;
+        for (var i = 0; i < len; i++) {
+            if (expected.charAt(i) != real.charAt(i)) {
+                diff = true;
+                startPosition = i;
+                break;
+            }
+            //if (diff) {
+            //    diffExp += expected.charAt(i);
+            //    diffR += real.charAt(i);
+            //    diffLen++;
+            //    if (diffLen >= maxDiffLen) {
+            //        break;
+            //    }
+            //}
+        }
+
+        var e = new Error(message + " : \nExpected: [" + expected + "]\n  Actual: [" + real + "]");
+
+        expected = splice(expected, startPosition, 0, "<span style='color: white; background-color: red;'>") + "</span>";
+        real = splice(real, startPosition, 0, "<span style='color: white; background-color: red;'>") + "</span>";
+
+        var error = message +
+            "<div style='font-family: \"Courier New\", Courier, monospace;'><span style='color: black; font-weight: bold;'>Expected:</span> [" + expected +"]</div>" +
+            "<div style='font-family: \"Courier New\", Courier, monospace;'><span style='color: black; font-weight: bold;'>&nbsp;&nbsp;Actual:</span> [" + real + "]</div>";
+        $('<div class="alert alert-danger">' + error + '</div>').prependTo("body");
 
         throw e;
     }

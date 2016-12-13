@@ -43,10 +43,7 @@ $.widget('sokol.form', {
             '</div>');
     },
     createFieldDate: function (formNode, field, value, edit) {
-        if (!value) {
-            return;
-        }
-        value = moment(value).format("L LT");
+        value = value ? moment(value, 'DD.MM.YYYY HH:mm').format("L LT") : '';
         if (!edit) {
             $(formNode).append('' +
                 '<div class="form-group' + (field.mandatory && edit? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
@@ -327,7 +324,7 @@ $.widget('sokol.form', {
 
     getData: function() {
         var valuesList = this.element.find('[name="mainForm"]').serializeArray();
-        var fields = [];
+        var fields = {};
         for (var i = 0; i < valuesList.length; i++) {
             var value = valuesList[i];
             var fieldInfo = this.options.fieldsInfoMap[value.name];
@@ -341,16 +338,10 @@ $.widget('sokol.form', {
                 fields[value.name] = value.value;
             }
         }
-        var values = [];
-        for (var name in fields) {
-            values.push({
-                name: name,
-                value: fields[name]
-            });
-        }
+
         var data = {
             id: this.options.data.id,
-            fields: values,
+            fields: fields,
             type: this.options.data.type
         };
         if (this.options.isNew) {
