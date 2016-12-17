@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 29.11.2016
  */
-public class DocumentListControllerTest {
+public class DocumentListControllerIT {
 
     private MockMvc mockMvc;
 

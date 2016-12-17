@@ -1,8 +1,5 @@
 package com.kattysoft.web;
 
-import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -12,19 +9,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.InputStream;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.testng.Assert.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 06.12.2016
  */
-public class AppSettingsControllerTest {
+public class AppSettingsControllerIT {
     private MockMvc mockMvc;
 
     private AppSettingsController appSettingsController;

@@ -3,13 +3,10 @@ package com.kattysoft.web;
 import com.kattysoft.core.DocumentService;
 import com.kattysoft.core.impl.ConfigServiceImpl;
 import com.kattysoft.core.model.Document;
-import com.kattysoft.core.specification.Specification;
 import org.apache.commons.io.IOUtils;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -18,26 +15,23 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.testng.Assert.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 08.12.2016
  */
-public class DocumentCardControllerTest {
+public class DocumentCardControllerIT {
 
     private MockMvc mockMvc;
 
@@ -94,7 +88,7 @@ public class DocumentCardControllerTest {
             return null;
         }).when(documentService).saveDocument(anyObject());
 
-        String content = IOUtils.toString(this.getClass().getResourceAsStream("DocumentCardControllerTest.document.json"), "UTF-8");
+        String content = IOUtils.toString(this.getClass().getResourceAsStream("DocumentCardControllerIT.document.json"), "UTF-8");
         ResultActions resultActions = this.mockMvc.perform(post("/savedocument").content(content));
         MvcResult mvcResult = resultActions.andReturn();
         String responseContent = mvcResult.getResponse().getContentAsString();

@@ -109,9 +109,11 @@ $.widget('sokol.form', {
                 //        callback(res);
                 //    }
                 //});
-                $.getJSON('app/config', {
-                                id: "dictionaries/" + field.dictionary
-                            }, callback);
+                $.getJSON('app/simpledictionary', {
+                                id: field.dictionary
+                            }, callback).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные для справочника. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                });
             },
             create: false
         });
@@ -163,7 +165,7 @@ $.widget('sokol.form', {
             options: options,
             load: function(query, callback) {
                 $.ajax({
-                    url: 'app/dic',
+                    url: 'app/dictionary',
                     type: 'GET',
                     dataType: 'json',
                     data: {

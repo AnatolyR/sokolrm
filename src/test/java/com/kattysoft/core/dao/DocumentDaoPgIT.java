@@ -2,7 +2,6 @@ package com.kattysoft.core.dao;
 
 import com.kattysoft.core.model.Document;
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -24,7 +23,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -36,7 +34,7 @@ import static org.hamcrest.Matchers.equalTo;
 @TestExecutionListeners({SqlScriptsTestExecutionListener.class})
 @ContextConfiguration(locations = { "classpath:applicationContextForTests.xml" })
 
-public class DocumentDaoPgTest extends AbstractTestNGSpringContextTests {
+public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private ApplicationContext applicationContext;

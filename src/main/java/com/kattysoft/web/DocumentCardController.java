@@ -69,6 +69,8 @@ public class DocumentCardController {
         };
         formConfig.get("fields").forEach(merge);
 
+        ((ObjectNode) formConfig).put("typeTitle", typeConfig.get("title"));
+
         ObjectNode card = mapper.createObjectNode();
         card.put("form", formConfig);
 

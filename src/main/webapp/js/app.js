@@ -518,8 +518,8 @@ $.widget('sokol.form', {
                 //        callback(res);
                 //    }
                 //});
-                $.getJSON('app/config', {
-                                id: "dictionaries/" + field.dictionary
+                $.getJSON('app/simpledictionary', {
+                                id: field.dictionary
                             }, callback);
             },
             create: false
