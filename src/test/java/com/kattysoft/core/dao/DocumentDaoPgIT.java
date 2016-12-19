@@ -108,6 +108,7 @@ public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
             DbUtils.closeQuietly(preparedStatement);
 
             Document document = new Document();
+            document.setType("incomingDocument");
             document.setId("d0e38e2e-18bd-48fd-91ec-5e102519cd06");
             Map<String, Object> fields = new HashMap<>();
             fields.put("title", "New title");
@@ -151,6 +152,7 @@ public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
             DbUtils.closeQuietly(resultSet);
 
             Document document = new Document();
+            document.setType("incomingDocument");
             Map<String, Object> fields = new HashMap<>();
             fields.put("title", "New inserted document");
             fields.put("pagesQuantity", 5);

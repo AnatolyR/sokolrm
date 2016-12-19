@@ -9,6 +9,7 @@
  */
 package com.kattysoft.core.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -60,6 +61,9 @@ public class Document {
     }
 
     public Map<String, Object> getFields() {
+        if (fields == null) {
+            fields = new HashMap<>();
+        }
         return fields;
     }
 

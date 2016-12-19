@@ -132,6 +132,12 @@ public class DocumentDaoPg implements DocumentDao {
 
             List<String> fieldsNames = new ArrayList<>();
             List<String> fieldsValuesPlaceholder = new ArrayList<>();
+
+            if (!update) {
+                fieldsNames.add("type");
+                fieldsValuesPlaceholder.add("?");
+            }
+
             fields.forEach((name, value) -> {
                 String columnType = columnTypes.get(name);
 
@@ -152,6 +158,10 @@ public class DocumentDaoPg implements DocumentDao {
             prst = connection.prepareStatement(sql);
 
             int ix = 1;
+
+            if (!update) {
+                prst.setString(ix++, document.getType());
+            }
 
             for (String name : fields.keySet()) {
                 Object value = fields.get(name);

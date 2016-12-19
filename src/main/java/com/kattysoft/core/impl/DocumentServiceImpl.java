@@ -58,12 +58,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void saveDocument(Document document) {
+    public String saveDocument(Document document) {
         //todo проверка прав на поля
 
         fillTitleFields(document);
 
-        documentDao.saveDocument(document);
+        return documentDao.saveDocument(document);
     }
 
     private void fillTitleFields(Document document) {

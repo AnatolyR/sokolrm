@@ -33,7 +33,7 @@ $.widget('sokol.app', {
         );
     },
 
-    open:function(id) {
+    open:function(id, mode) {
         this.updateHash(id);
 
         if (this.container) {
@@ -46,12 +46,23 @@ $.widget('sokol.app', {
         if (id.startsWith('lists/')) {
             this.createListWithNavigation(id)
         } else if (id.startsWith('document/')) {
-            this.createDocumentForm(id.substring(9));
+            this.createDocumentForm(id.substring(9), mode);
+        } else if (id.startsWith('new/')) {
+            var type = id.substring(4);
+            this.createDocument(type);
         }
 
     },
-
-    createDocumentForm: function(id) {
+    createDocument: function(type) {
+        $.post('app/createdocument', {type: type},
+            $.proxy(function (id) {
+                this.open('document/' + id, "edit");
+            }, this)
+        ).fail($.proxy(function(e) {
+                $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
+            }, this));
+    },
+    createDocumentForm: function(id, mode) {
         $.getJSON('app/card', {id: id},
             $.proxy(function (data) {
                 var options = {
@@ -59,6 +70,9 @@ $.widget('sokol.app', {
                     data: data.data,
                     form: data.form
                 };
+                if (mode) {
+                    options.mode = mode;
+                }
                 options.dispatcher = this;
                 this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }, this)

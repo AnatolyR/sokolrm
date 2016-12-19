@@ -48,6 +48,15 @@ public class DocumentCardController {
         mapper.setDateFormat(dateFormat);
     }
 
+    @RequestMapping(value = "/createdocument")
+    public String createDocument(String type) {
+        Document document = new Document();
+        document.setType(type);
+        document.getFields().put("status", "Черновик");
+        String id = documentService.saveDocument(document);
+        return id;
+    }
+
     @RequestMapping(value = "/card", produces = "application/json; charset=utf-8")
     public String getDocumentCard(String id) {
         Document document = documentService.getDocument(id);
@@ -120,11 +129,21 @@ public class DocumentCardController {
                         }
                     } else if ("date".equals(type)) {
                         if (value.isTextual()) {
-                            resultFields.put(name, dateFormat.parse(value.asText()));
+                            String text = value.asText();
+                            if (StringUtils.isNotEmpty(text)) {
+                                resultFields.put(name, dateFormat.parse(value.asText()));
+                            } else {
+                                resultFields.put(name, null);
+                            }
                         }
                     } else if ("number".equals(type)) {
                         if (value.isTextual()) {
-                            resultFields.put(name, Integer.parseInt(value.asText()));
+                            String text = value.asText();
+                            if (StringUtils.isNotEmpty(text)) {
+                                resultFields.put(name, Integer.parseInt(value.asText()));
+                            } else {
+                                resultFields.put(name, null);
+                            }
                         }
                     } else if ("select".equals(type)) {
                         if (value.isTextual()) {
@@ -134,7 +153,9 @@ public class DocumentCardController {
                         if (fieldInfo.get("multiple") != null && fieldInfo.get("multiple").asBoolean()) {
                             if (value.isArray()) {
                                 List<String> values = new ArrayList<>();
-                                value.forEach(node -> {values.add(node.asText());});
+                                value.forEach(node -> {
+                                    values.add(node.asText());
+                                });
                                 resultFields.put(name, values);
                             }
                         } else {

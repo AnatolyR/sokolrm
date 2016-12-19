@@ -23,5 +23,5 @@ public interface DocumentService {
 
     Document getDocument(String id);
 
-    void saveDocument(Document document);
+    String saveDocument(Document document);
 }

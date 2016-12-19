@@ -204,8 +204,11 @@ $.widget("sokol.grid", {
                 var colType = column.type;
                 if (colType != "hidden" && this.isColumnVisible(colId)) {
                     var val = rowObj[colId];
-                    if (val) {
+                    if (val || colId == "title") {
                         if (colId == "title") {
+                            if (!val || 0 === val.length) {
+                                val = "[Заголовок не указан]";
+                            }
                             var td = $('<td><a href="#' + this.options.objectType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
                             td.appendTo(row);
                         } else if (column.render == 'datetime') {

@@ -33,7 +33,7 @@ $.widget('sokol.app', {
         );
     },
 
-    open:function(id) {
+    open:function(id, mode) {
         this.updateHash(id);
 
         if (this.container) {
@@ -46,12 +46,23 @@ $.widget('sokol.app', {
         if (id.startsWith('lists/')) {
             this.createListWithNavigation(id)
         } else if (id.startsWith('document/')) {
-            this.createDocumentForm(id.substring(9));
+            this.createDocumentForm(id.substring(9), mode);
+        } else if (id.startsWith('new/')) {
+            var type = id.substring(4);
+            this.createDocument(type);
         }
 
     },
-
-    createDocumentForm: function(id) {
+    createDocument: function(type) {
+        $.post('app/createdocument', {type: type},
+            $.proxy(function (id) {
+                this.open('document/' + id, "edit");
+            }, this)
+        ).fail($.proxy(function(e) {
+                $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
+            }, this));
+    },
+    createDocumentForm: function(id, mode) {
         $.getJSON('app/card', {id: id},
             $.proxy(function (data) {
                 var options = {
@@ -59,6 +70,9 @@ $.widget('sokol.app', {
                     data: data.data,
                     form: data.form
                 };
+                if (mode) {
+                    options.mode = mode;
+                }
                 options.dispatcher = this;
                 this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }, this)
@@ -326,26 +340,22 @@ $.widget('sokol.container', {
         this.attaches.destroy();
         this.element.detach();
     },
-    createForm: function(isNew) {
+    createForm: function() {
         var data = this.options.data;
         var form = this.options.form;
         var fields = form.fields;
-        if (isNew) {
-            this.mode = "edit";
-        } else {
-            this.mode = "read";
-        }
+
         var container = this.element;
         container.empty();
         container.addClass('container');
 
         this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
 
-        this.formButtons = $.sokol.formButtons({dispatcher: this}, $('<div></div>').prependTo(this.element));
+        this.formButtons = $.sokol.formButtons({mode: this.options.mode, dispatcher: this}, $('<div></div>').prependTo(this.element));
 
-        this.form = $.sokol.form({data: data, form: form, dispatcher: this.options.dispatcher}, $('<div></div>').appendTo(this.element));
+        this.form = $.sokol.form({mode: this.options.mode, data: data, form: form, dispatcher: this.options.dispatcher}, $('<div></div>').appendTo(this.element));
 
-        this.attaches = $.sokol.attachesGrid({documentId: data.id}, $('<div></div>').appendTo(this.element));
+        this.attaches = $.sokol.attachesGrid({mode: this.options.mode, documentId: data.id}, $('<div></div>').appendTo(this.element));
     },
 
     notify: function(message) {
@@ -423,7 +433,7 @@ $.widget('sokol.form', {
         this.element.detach();
     },
 
-    createForm: function(isNew) {
+    createForm: function() {
         var data = this.options.data;
         var form = this.options.form;
 
@@ -574,14 +584,6 @@ $.widget('sokol.form', {
             closeAfterSelect: true,
             options: options,
             load: function(query, callback) {
-                //this.selectize()[0].selectize.clear();
-                //this.selectize()[0].selectize.clearOptions();
-                //this.clear();
-                //this.clearOptions();
-                //if (!query || query.length <= 2) {
-                //    callback([]);
-                //    return;
-                //}
                 $.getJSON('app/dictionary', {
                     id: field.dictionary,
                     query: query
@@ -1031,8 +1033,11 @@ $.widget("sokol.grid", {
                 var colType = column.type;
                 if (colType != "hidden" && this.isColumnVisible(colId)) {
                     var val = rowObj[colId];
-                    if (val) {
+                    if (val || colId == "title") {
                         if (colId == "title") {
+                            if (!val || 0 === val.length) {
+                                val = "[Заголовок не указан]";
+                            }
                             var td = $('<td><a href="#' + this.options.objectType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
                             td.appendTo(row);
                         } else if (column.render == 'datetime') {

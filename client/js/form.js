@@ -14,7 +14,7 @@ $.widget('sokol.form', {
         this.element.detach();
     },
 
-    createForm: function(isNew) {
+    createForm: function() {
         var data = this.options.data;
         var form = this.options.form;
 

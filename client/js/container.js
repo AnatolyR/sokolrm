@@ -12,26 +12,22 @@ $.widget('sokol.container', {
         this.attaches.destroy();
         this.element.detach();
     },
-    createForm: function(isNew) {
+    createForm: function() {
         var data = this.options.data;
         var form = this.options.form;
         var fields = form.fields;
-        if (isNew) {
-            this.mode = "edit";
-        } else {
-            this.mode = "read";
-        }
+
         var container = this.element;
         container.empty();
         container.addClass('container');
 
         this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
 
-        this.formButtons = $.sokol.formButtons({dispatcher: this}, $('<div></div>').prependTo(this.element));
+        this.formButtons = $.sokol.formButtons({mode: this.options.mode, dispatcher: this}, $('<div></div>').prependTo(this.element));
 
-        this.form = $.sokol.form({data: data, form: form, dispatcher: this.options.dispatcher}, $('<div></div>').appendTo(this.element));
+        this.form = $.sokol.form({mode: this.options.mode, data: data, form: form, dispatcher: this.options.dispatcher}, $('<div></div>').appendTo(this.element));
 
-        this.attaches = $.sokol.attachesGrid({documentId: data.id}, $('<div></div>').appendTo(this.element));
+        this.attaches = $.sokol.attachesGrid({mode: this.options.mode, documentId: data.id}, $('<div></div>').appendTo(this.element));
     },
 
     notify: function(message) {
