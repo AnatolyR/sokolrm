@@ -162,22 +162,14 @@ $.widget('sokol.form', {
             labelField: 'title',
             searchField: 'title',
             preload: false,
+            closeAfterSelect: true,
             options: options,
             load: function(query, callback) {
-                $.ajax({
-                    url: 'app/dictionary',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        id: field.dictionary,
-                        query: query
-                    },
-                    error: function() {
-                        callback();
-                    },
-                    success: function(res) {
-                        callback(res);
-                    }
+                $.getJSON('app/dictionary', {
+                    id: field.dictionary,
+                    query: query
+                }, callback).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные для справочника. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
                 });
             },
             create: false

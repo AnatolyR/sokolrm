@@ -185,6 +185,7 @@
                 <version>2.2</version>
                 <configuration>
                     <contextFile>./config/web-context-dev.xml</contextFile>
+                    <uriEncoding>utf-8</uriEncoding>
                     <!--<systemProperties>-->
                         <!--<dbproperties2>/Users/anatolii/Documents/sokolsed/db/db.properties</dbproperties2>-->
                     <!--</systemProperties>-->

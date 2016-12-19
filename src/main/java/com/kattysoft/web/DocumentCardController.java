@@ -13,6 +13,7 @@ import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.DocumentService;
 import com.kattysoft.core.model.Document;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
@@ -97,6 +98,7 @@ public class DocumentCardController {
             String id = data.get("id").asText();
             Document document = new Document();
             document.setId(id);
+            document.setType(typeId);
 
             JsonNode fields = data.get("fields");
             Iterator<String> fieldsNames = fields.getFieldNames();
@@ -130,14 +132,19 @@ public class DocumentCardController {
                         }
                     } else if ("dictionary".equals(type)) {
                         if (fieldInfo.get("multiple") != null && fieldInfo.get("multiple").asBoolean()) {
-                            List<String> values = new ArrayList<>();
                             if (value.isArray()) {
+                                List<String> values = new ArrayList<>();
                                 value.forEach(node -> {values.add(node.asText());});
                                 resultFields.put(name, values);
                             }
                         } else {
                             if (value.isTextual()) {
-                                resultFields.put(name, value.asText());
+                                String text = value.asText();
+                                if (StringUtils.isNotEmpty(text)) {
+                                    resultFields.put(name, text);
+                                } else {
+                                    resultFields.put(name, null);
+                                }
                             }
                         }
                     }

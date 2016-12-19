@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
     <!--<context:property-placeholder location="file:///#{systemProperties.dbproperties2}"/>-->
 
@@ -30,6 +31,22 @@
         <property name="password" value="${db.password}"/>
     </bean>
 
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="pgDb" />
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
+    <jpa:repositories base-package="com.kattysoft.core.repository"
+                      entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager"/>
+
     <bean id="documentDao" class="com.kattysoft.core.dao.DocumentDaoPg">
         <property name="dataSource" ref="pgDb" />
     </bean>
@@ -42,6 +59,14 @@
         <property name="configPath">
             <value>${app_config_path}</value>
         </property>
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.UserServiceImpl">
+
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.ContragentServiceImpl">
+
     </bean>
 
 </beans>

@@ -88,5 +88,15 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         System.out.println("----------------");
 
         assertThat(m, equalTo(2));
+
+        List<User> list2 = userRepository.findIdAndTitleByTitle("Волков%");
+        int k = 0;
+        for (User user : list2) {
+            System.out.println(user.getId() + " " + user.getTitle());
+            k++;
+        }
+        System.out.println("----------------");
+
+        assertThat(k, equalTo(2));
     }
 }

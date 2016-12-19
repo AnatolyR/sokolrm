@@ -7,16 +7,16 @@
  */
 package com.kattysoft.core;
 
-import com.kattysoft.core.model.User;
+import com.kattysoft.core.model.Contragent;
 
 import java.util.List;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
- * Date: 14.12.2016
+ * Date: 19.12.2016
  */
-public interface UserService {
-    List<User> getUsersByShortTitle(String title);
+public interface ContragentService {
+    List<Contragent> getContragentsByTitle(String title);
 
-    String getUserTitleById(String userId);
+    String getContragentTitleById(String contragentId);
 }

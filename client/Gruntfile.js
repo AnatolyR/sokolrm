@@ -14,7 +14,8 @@ module.exports = function(grunt) {
                     'vendor/bootstrap-filestyle.js',
                     'node_modules/sifter/lib/sifter.js',
                     'node_modules/microplugin/src/microplugin.js',
-                    'node_modules/selectize/dist/js/selectize.js',
+                    //'node_modules/selectize/dist/js/selectize.js',
+                    'vendor/selectize.js',
                     'node_modules/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js',
                     //'node_modules/bootstrap-notify/bootstrap-notify.js'
                     'vendor/bootstrap-notify-fixed-for-sokol.js'

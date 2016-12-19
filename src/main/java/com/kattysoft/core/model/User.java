@@ -38,6 +38,14 @@ public class User {
 
     private String lastName;
 
+    public User() {
+    }
+
+    public User(UUID id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
     public UUID getId() {
         return id;
     }

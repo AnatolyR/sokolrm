@@ -10,6 +10,7 @@
 package com.kattysoft.core.repository;
 
 import com.kattysoft.core.model.User;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -21,4 +22,7 @@ import java.util.UUID;
  */
 public interface UserRepository extends CrudRepository<User, UUID> {
     List<User> findByTitleContaining(String title);
+
+    @Query(value = "select new com.kattysoft.core.model.User(u.id, u.title) from User u where u.title like ?1")
+    List<User> findIdAndTitleByTitle(String title);
 }

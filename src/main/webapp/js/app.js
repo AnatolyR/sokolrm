@@ -520,7 +520,9 @@ $.widget('sokol.form', {
                 //});
                 $.getJSON('app/simpledictionary', {
                                 id: field.dictionary
-                            }, callback);
+                            }, callback).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные для справочника. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                });
             },
             create: false
         });
@@ -569,22 +571,22 @@ $.widget('sokol.form', {
             labelField: 'title',
             searchField: 'title',
             preload: false,
+            closeAfterSelect: true,
             options: options,
             load: function(query, callback) {
-                $.ajax({
-                    url: 'app/dic',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        id: field.dictionary,
-                        query: query
-                    },
-                    error: function() {
-                        callback();
-                    },
-                    success: function(res) {
-                        callback(res);
-                    }
+                //this.selectize()[0].selectize.clear();
+                //this.selectize()[0].selectize.clearOptions();
+                //this.clear();
+                //this.clearOptions();
+                //if (!query || query.length <= 2) {
+                //    callback([]);
+                //    return;
+                //}
+                $.getJSON('app/dictionary', {
+                    id: field.dictionary,
+                    query: query
+                }, callback).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные для справочника. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
                 });
             },
             create: false

@@ -9,12 +9,20 @@
  */
 package com.kattysoft.core.impl;
 
+import com.kattysoft.core.ConfigService;
+import com.kattysoft.core.ContragentService;
 import com.kattysoft.core.DocumentService;
+import com.kattysoft.core.UserService;
 import com.kattysoft.core.dao.DocumentDao;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.Specification;
+import org.codehaus.jackson.JsonNode;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -22,6 +30,15 @@ import java.util.List;
  */
 public class DocumentServiceImpl implements DocumentService {
     private DocumentDao documentDao;
+
+    @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ContragentService contragentService;
 
     public List<Document> listDocuments(Specification specification) {
         //todo проверка прав на поля
@@ -43,10 +60,69 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void saveDocument(Document document) {
         //todo проверка прав на поля
+
+        fillTitleFields(document);
+
         documentDao.saveDocument(document);
+    }
+
+    private void fillTitleFields(Document document) {
+        String typeId = document.getType();
+        JsonNode typeConfig = configService.getConfig("types/" + typeId + "Type");
+        Map<String, JsonNode> fieldsInfo = new HashMap<>();
+        typeConfig.get("fields").forEach(jsonNode -> fieldsInfo.put(jsonNode.get("id").asText(), jsonNode));
+
+        Map<String, Object> titleFields = new HashMap<>();
+        document.getFields().entrySet().stream().forEach(e -> {
+            String name = e.getKey();
+            Object value = e.getValue();
+            JsonNode fieldInfo = fieldsInfo.get(name);
+            String type = fieldInfo.get("type").asText();
+            if ("dictionary".equals(type)) {
+                String dictionaryName = fieldInfo.get("dictionary").asText();
+                if (fieldInfo.get("multiple") != null && fieldInfo.get("multiple").asBoolean()) {
+                    List<String> titles = ((List<String>) value).stream().map(val -> {
+                        if ("organizationPersons".equals(dictionaryName)) {
+                            String title = userService.getUserTitleById(val);
+                            return title;
+                        } if ("correspondent".equals(dictionaryName)) {
+                            String title = contragentService.getContragentTitleById(val);
+                            return title;
+                        }
+                        return "[нет значения]";
+                    }).collect(Collectors.toList());
+                    titleFields.put(name + "Title", titles);
+                } else {
+                    if (value != null) {
+                        String title = null;
+                        if ("organizationPersons".equals(dictionaryName)) {
+                            title = userService.getUserTitleById((String) value);
+                        } if ("correspondent".equals(dictionaryName)) {
+                            title = contragentService.getContragentTitleById((String) value);
+                        }
+                        titleFields.put(name + "Title", title != null ? title : "[нет значения]");
+                    } else {
+                        titleFields.put(name + "Title", null);
+                    }
+                }
+            }
+        });
+        document.getFields().putAll(titleFields);
     }
 
     public void setDocumentDao(DocumentDao documentDao) {
         this.documentDao = documentDao;
+    }
+
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public void setContragentService(ContragentService contragentService) {
+        this.contragentService = contragentService;
     }
 }
