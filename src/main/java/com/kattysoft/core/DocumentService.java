@@ -24,4 +24,6 @@ public interface DocumentService {
     Document getDocument(String id);
 
     String saveDocument(Document document);
+
+    boolean deleteDocument(String documentId);
 }

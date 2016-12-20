@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -181,6 +182,18 @@ public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
             DbUtils.closeQuietly(resultSet);
             DbUtils.closeQuietly(preparedStatement);
         }
+    }
+
+    @Test
+    @Sql("file:db/documents.sql")
+    @Sql("testDocuments.sql")
+    public void testDeleteDocument() {
+        Integer totalCount = documentDao.getTotalCount(null);
+        assertThat(totalCount, equalTo(6));
+        boolean result = documentDao.deleteDocument("10984d8e-8e18-4384-95bd-8743d1f98676");
+        assertThat(result, is(true));
+        totalCount = documentDao.getTotalCount(null);
+        assertThat(totalCount, equalTo(5));
     }
 
     public void setDataSource(DataSource dataSource) {

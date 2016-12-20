@@ -25,6 +25,12 @@ $.widget('sokol.formButtons', {
         }, this));
         cancelButton.appendTo(buttons);
 
+        var deleteButton = $('<button type="button" name="delete" style="margin-right: 5px; display: none;" class="btn btn-danger">Удалить</button>');
+        deleteButton.click($.proxy(function() {
+            this.options.dispatcher.deleteDocument();
+        }, this));
+        deleteButton.appendTo(buttons);
+
         this.manageButtons();
     },
 
@@ -38,6 +44,7 @@ $.widget('sokol.formButtons', {
         buttons.children().hide();
         if (this.options.mode == "read") {
             buttons.children('[name="edit"]').show();
+            buttons.children('[name="delete"]').show();
         } else if (this.options.mode == "edit") {
             if (!this.options.isNew) {
                 buttons.children('[name="cancel"]').show();

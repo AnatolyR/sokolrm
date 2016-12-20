@@ -391,6 +391,25 @@ $.widget('sokol.container', {
         }, this)).fail(function() {
             $.notify({message: 'Не удалось сохранить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
+    },
+
+    deleteDocument: function() {
+        $.ajax({
+            url: 'app/deletedocument?id=' + this.options.data.id,
+            type: 'DELETE',
+            success: $.proxy(function(result) {
+                if (result == "true") {
+                    this.element.empty();
+                    //$.notify({message: 'Документ удален'}, {type: 'success', delay: 0, timer: 0});
+                    $('<div class="alert alert-success" role="alert">Документ удален</div>').appendTo(this.element)
+                } else {
+                    $.notify({message: 'Не удалось удалить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this),
+            error: function() {
+                $.notify({message: 'Не удалось удалить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+            }
+        });
     }
 });
 
@@ -802,6 +821,12 @@ $.widget('sokol.formButtons', {
         }, this));
         cancelButton.appendTo(buttons);
 
+        var deleteButton = $('<button type="button" name="delete" style="margin-right: 5px; display: none;" class="btn btn-danger">Удалить</button>');
+        deleteButton.click($.proxy(function() {
+            this.options.dispatcher.deleteDocument();
+        }, this));
+        deleteButton.appendTo(buttons);
+
         this.manageButtons();
     },
 
@@ -815,6 +840,7 @@ $.widget('sokol.formButtons', {
         buttons.children().hide();
         if (this.options.mode == "read") {
             buttons.children('[name="edit"]').show();
+            buttons.children('[name="delete"]').show();
         } else if (this.options.mode == "edit") {
             if (!this.options.isNew) {
                 buttons.children('[name="cancel"]').show();

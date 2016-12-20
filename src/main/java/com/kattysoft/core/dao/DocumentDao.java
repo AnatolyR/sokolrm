@@ -23,7 +23,7 @@ public interface DocumentDao {
 
     String saveDocument(Document document);
 
-    Document deleteDocument(String documentId);
+    boolean deleteDocument(String documentId);
 
     Integer getTotalCount(Specification specification);
 }

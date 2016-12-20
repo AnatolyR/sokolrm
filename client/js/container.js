@@ -63,5 +63,24 @@ $.widget('sokol.container', {
         }, this)).fail(function() {
             $.notify({message: 'Не удалось сохранить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
+    },
+
+    deleteDocument: function() {
+        $.ajax({
+            url: 'app/deletedocument?id=' + this.options.data.id,
+            type: 'DELETE',
+            success: $.proxy(function(result) {
+                if (result == "true") {
+                    this.element.empty();
+                    //$.notify({message: 'Документ удален'}, {type: 'success', delay: 0, timer: 0});
+                    $('<div class="alert alert-success" role="alert">Документ удален</div>').appendTo(this.element)
+                } else {
+                    $.notify({message: 'Не удалось удалить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this),
+            error: function() {
+                $.notify({message: 'Не удалось удалить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+            }
+        });
     }
 });

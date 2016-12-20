@@ -118,7 +118,7 @@ modules["container"] = (function() {
         steps.push({
             step: function checkForm() {
                 assertEquals('Входящий № Б12 от 30.04.2016 (Письмо)Test document 1rtyr235577788891011Статус: Зарегистрирован', testComponent.header.element.text());
-                assertEquals('Редактировать', testComponent.formButtons.element.children(":visible").text());
+                assertEquals('РедактироватьУдалить', testComponent.formButtons.element.children(":visible").text());
                 assertEquals('Основные реквизитыЗаголовок:Test document 1rtyr235577788891011Вид документа:ПисьмоАдресаты:Середин Т. И., Власов Л. И., ' +
                     'Козлов Я. В. Корреспондент:КВАЛИТЕТ, строительная экспертизаКем подписано:Васильев (23847623785)' +
                     'Исполнитель:РоманцевИсходящий номер:455-67Исходящая дата:30.04.2016 13:44 Номер документа:Б12' +

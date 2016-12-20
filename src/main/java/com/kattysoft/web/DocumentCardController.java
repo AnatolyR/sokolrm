@@ -182,6 +182,12 @@ public class DocumentCardController {
         }
     }
 
+    @RequestMapping(value = "/deletedocument")
+    public String deleteDocument(String id) {
+        boolean result = documentService.deleteDocument(id);
+        return Boolean.toString(result);
+    }
+
     public void setDocumentService(DocumentService documentService) {
         this.documentService = documentService;
     }

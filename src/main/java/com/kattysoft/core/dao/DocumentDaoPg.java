@@ -215,8 +215,21 @@ public class DocumentDaoPg implements DocumentDao {
         }
     }
 
-    public Document deleteDocument(String documentId) {
-        return null;
+    public boolean deleteDocument(String documentId) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dataSource.getConnection();
+            preparedStatement = connection.prepareStatement("DELETE FROM documents WHERE id = ?::uuid");
+            preparedStatement.setString(1, documentId);
+            boolean result = preparedStatement.executeUpdate() == 1;
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DbUtils.closeQuietly(preparedStatement);
+            DbUtils.closeQuietly(connection);
+        }
     }
 
     public void setDataSource(DataSource dataSource) {

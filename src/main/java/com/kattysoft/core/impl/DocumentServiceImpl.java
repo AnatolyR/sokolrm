@@ -110,6 +110,12 @@ public class DocumentServiceImpl implements DocumentService {
         document.getFields().putAll(titleFields);
     }
 
+    @Override
+    public boolean deleteDocument(String documentId) {
+        boolean result = documentDao.deleteDocument(documentId);
+        return result;
+    }
+
     public void setDocumentDao(DocumentDao documentDao) {
         this.documentDao = documentDao;
     }
