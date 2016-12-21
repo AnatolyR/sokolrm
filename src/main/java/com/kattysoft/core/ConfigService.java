@@ -15,4 +15,5 @@ import org.codehaus.jackson.JsonNode;
  */
 public interface ConfigService {
     JsonNode getConfig(String configName);
+    com.fasterxml.jackson.databind.JsonNode getConfig2(String configName);
 }

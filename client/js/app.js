@@ -97,7 +97,8 @@ $.widget('sokol.app', {
                     title: data.title,
                     columnsVisible: data.columnsVisible,
                     columns: data.columns,
-                    url: 'app/documents'
+                    url: 'app/documents',
+                    id: 'documentsList'
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo("body"));
             }, this)

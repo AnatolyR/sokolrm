@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -77,19 +78,63 @@ public class DocumentDaoPg implements DocumentDao {
         }
     }
 
-    public List<Document> getDocumentsList(Specification specification) {
+    protected Object getValue(String columnType, String columnName, ResultSet resultSet) {
+        try {
+            Object result;
+            if ("timestamp".equals(columnType)) {
+                Timestamp timestamp = resultSet.getTimestamp(columnName);
+                result = timestamp != null ? new Date(timestamp.getTime()) : null;
+            } else if ("int4".equals(columnType)) {
+                result = resultSet.getInt(columnName);
+            } else if ("_varchar".equals(columnType)) {
+                Array array = resultSet.getArray(columnName);
+                result = array != null ? array.getArray() : new java.util.ArrayList();
+            } else {
+                result = resultSet.getString(columnName);
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException("[SOKOL-DAO-DOC-VAL] Can not get value from resultset", e);
+        }
+    }
+
+    public List<Document> getDocumentsList(Specification spec) {
         Connection connection = null;
         ResultSet resultSet = null;
         try {
             List<Document> documents = new ArrayList<Document>();
             connection = dataSource.getConnection();
-            resultSet = connection.createStatement().executeQuery("SELECT * FROM documents;");
+
+            Map<String, String> columnTypes = getDocumentsMetadata(connection);
+            List<String> fieldsNames = spec.getFields();
+
+            List<String> columns = new ArrayList<>();
+            if (!fieldsNames.contains("id")) {
+                columns.add("id");
+            }
+            if (!fieldsNames.contains("title")) {
+                columns.add("title");
+            }
+            columns.addAll(fieldsNames.stream().map(name -> "\"" + name + "\"").collect(Collectors.toList()));
+            String sql = "SELECT " + String.join(", ", columns) + " FROM documents;";
+
+            resultSet = connection.createStatement().executeQuery(sql);
             while (resultSet.next()) {
                 Document document = new Document();
                 String id = resultSet.getString("id");
                 document.setId(id);
                 String title = resultSet.getString("title");
                 document.setTitle(title);
+
+                final ResultSet finalResultSet = resultSet;
+                Map<String, Object> fields = new HashMap<>();
+                fieldsNames.forEach(name -> {
+                    String columnType = columnTypes.get(name);
+                    Object value = getValue(columnType, name, finalResultSet);
+                    fields.put(name, value);
+                });
+                document.setFields(fields);
+
                 documents.add(document);
             }
             return documents;

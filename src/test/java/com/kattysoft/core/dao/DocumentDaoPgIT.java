@@ -1,6 +1,7 @@
 package com.kattysoft.core.dao;
 
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.specification.Specification;
 import org.apache.commons.dbutils.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,9 +56,16 @@ public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
     @Sql("file:db/documents.sql")
     @Sql
     public void testGetDocumentsList() throws Exception {
-        List<Document> documentsList = documentDao.getDocumentsList(null);
+        Specification spec = new Specification();
+        spec.setFields(Arrays.asList("id",
+            "documentNumber",
+            "type",
+            "status",
+            "title",
+            "registrationDate"));
+        List<Document> documentsList = documentDao.getDocumentsList(spec);
         for (Document document : documentsList) {
-            System.out.println(document.getId() + " " + document.getTitle());
+            System.out.println(document.getId() + " " + document.getTitle() + " " + Arrays.toString(document.getFields().entrySet().toArray()));
         }
         assertThat(documentsList.size(), equalTo(6));
     }

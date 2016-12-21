@@ -9,6 +9,7 @@
  */
 package com.kattysoft.core.specification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -32,6 +33,9 @@ public class Specification {
     private Integer offset;
 
     public List<String> getFields() {
+        if (fields == null) {
+            fields = new ArrayList<>();
+        }
         return fields;
     }
 

@@ -23,6 +23,7 @@ import java.io.IOException;
 public class ConfigServiceImpl implements ConfigService {
     private String configPath;
     private ObjectMapper mapper = new ObjectMapper();
+    private com.fasterxml.jackson.databind.ObjectMapper mapper2 = new com.fasterxml.jackson.databind.ObjectMapper();
 
     public void setConfigPath(String configPath) {
         this.configPath = configPath;
@@ -31,8 +32,24 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public JsonNode getConfig(String configName) {
         File configFile = new File(configPath + configName + ".json");
+        if (!configFile.exists()) {
+            return null;
+        }
         try {
             return mapper.readTree(configFile);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not read config", e);
+        }
+    }
+
+    @Override
+    public com.fasterxml.jackson.databind.JsonNode getConfig2(String configName) {
+        File configFile = new File(configPath + configName + ".json");
+        if (!configFile.exists()) {
+            return null;
+        }
+        try {
+            return mapper2.readTree(configFile);
         } catch (IOException e) {
             throw new RuntimeException("Can not read config", e);
         }

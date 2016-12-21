@@ -64,7 +64,7 @@ $.widget("sokol.grid", {
     reload: function() {
         if (this.options.url) {
             $.getJSON(this.options.url, {
-                id: this.options.id,
+                listId: this.options.id,
                 size: this.options.pageSize,
                 offset: this.options.offset
             }, $.proxy(function (data) {

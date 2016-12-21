@@ -1,8 +1,11 @@
 package com.kattysoft.web;
 
 import com.kattysoft.core.DocumentService;
+import com.kattysoft.core.impl.ConfigServiceImpl;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.Specification;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -38,8 +41,12 @@ public class DocumentListControllerIT {
 
     @BeforeClass
     public void setup() {
+        ConfigServiceImpl configService = new ConfigServiceImpl();
+        configService.setConfigPath("config/");
+
         documentListController = new DocumentListController();
         MockitoAnnotations.initMocks(this);
+        documentListController.setConfigService(configService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(documentListController).build();
     }
 
@@ -50,17 +57,19 @@ public class DocumentListControllerIT {
         Document document1 = new Document();
         document1.setId("1");
         document1.setTitle("Title 1");
+        document1.getFields().put("type", "incomingDocument");
         documents.add(document1);
 
         Document document2 = new Document();
         document2.setId("2");
         document2.setTitle("Title 2");
+        document2.getFields().put("type", "notExistType");
         documents.add(document2);
 
         when(documentService.listDocuments(any(Specification.class))).thenReturn(documents);
         when(documentService.getTotalCount(any(Specification.class))).thenReturn(2);
 
-        ResultActions resultActions = this.mockMvc.perform(get("/documents").accept(MediaType.parseMediaType("application/json;charset=UTF-8")));
+        ResultActions resultActions = this.mockMvc.perform(get("/documents").param("listId", "documentsList").accept(MediaType.parseMediaType("application/json;charset=UTF-8")));
         MvcResult mvcResult = resultActions.andReturn();
         String content = mvcResult.getResponse().getContentAsString();
         System.out.println("Result: " + content);
@@ -74,5 +83,7 @@ public class DocumentListControllerIT {
             .andExpect(jsonPath("$.data[0].title").value("Title 1"))
             .andExpect(jsonPath("$.data[1].id").value("2"))
             .andExpect(jsonPath("$.data[1].title").value("Title 2"));
+
+        MatcherAssert.assertThat(content, CoreMatchers.equalTo("{\"data\":[{\"id\":\"1\",\"title\":\"Title 1\",\"type\":\"Входящий\",\"kind\":null},{\"id\":\"2\",\"title\":\"Title 2\",\"type\":\"[notExistType]\",\"kind\":null}],\"offset\":0,\"total\":2}"));
     }
 }

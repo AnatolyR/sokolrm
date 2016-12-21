@@ -97,7 +97,8 @@ $.widget('sokol.app', {
                     title: data.title,
                     columnsVisible: data.columnsVisible,
                     columns: data.columns,
-                    url: 'app/documents'
+                    url: 'app/documents',
+                    id: 'documentsList'
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo("body"));
             }, this)
@@ -919,7 +920,7 @@ $.widget("sokol.grid", {
     reload: function() {
         if (this.options.url) {
             $.getJSON(this.options.url, {
-                id: this.options.id,
+                listId: this.options.id,
                 size: this.options.pageSize,
                 offset: this.options.offset
             }, $.proxy(function (data) {
