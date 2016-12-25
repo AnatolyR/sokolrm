@@ -30,6 +30,7 @@ var assertEquals = function(expected, real, message) {
         }
 
         var e = new Error(message + " : \nExpected: [" + expected + "]\n  Actual: [" + real + "]");
+        e.ignoreDoActionTryCatch = true;
 
         expected = splice(expected, startPosition, 0, "<span style='color: white; background-color: red;'>") + "</span>";
         real = splice(real, startPosition, 0, "<span style='color: white; background-color: red;'>") + "</span>";
@@ -37,7 +38,7 @@ var assertEquals = function(expected, real, message) {
         var error = message +
             "<div style='font-family: \"Courier New\", Courier, monospace;'><span style='color: black; font-weight: bold;'>Expected:</span> [" + expected +"]</div>" +
             "<div style='font-family: \"Courier New\", Courier, monospace;'><span style='color: black; font-weight: bold;'>&nbsp;&nbsp;Actual:</span> [" + real + "]</div>";
-        $('<div class="alert alert-danger">' + error + '</div>').prependTo("body");
+        $('<div class="alert alert-danger" style="z-index: 2000; position: relative;">' + error + '</div>').prependTo("body");
 
         throw e;
     }
@@ -49,10 +50,20 @@ var doAction = function(i, steps) {
             doAction(i + 1, steps);
         } else {
             setTimeout(function executeStep() {
-                if (steps[i].step.name && steps[i].step.name != 'step') {
-                    console.info("[" + steps[i].step.name + "]");
+                var stepName = steps[i].step.name && steps[i].step.name != 'step' ? steps[i].step.name : '';
+                if (stepName) {
+                    console.info("[" + stepName + "]");
                 }
-                steps[i].step();
+                try {
+                    steps[i].step();
+                } catch(e) {
+                    if (!e.ignoreDoActionTryCatch) {
+                        var error = 'Exception in step "' + stepName + '" ' +
+                            "<div style='font-family: \"Courier New\", Courier, monospace;'><span style='color: black; font-weight: bold;'>Exception:</span> [" + e + "]</div>";
+                        $('<div class="alert alert-danger" style="z-index: 2000; position: relative;">' + error + '</div>').prependTo("body");
+                    }
+                    throw e;
+                }
                 doAction(i + 1, steps);
             }, steps[i].wait);
         }
@@ -76,7 +87,7 @@ var doTest = function(testComponent, steps, completeCallback) {
     } else {
         steps.push({
             step: function () {
-                $('<div class="alert alert-success">TEST PASSED</div>').prependTo('body');
+                $('<div class="alert alert-success" style="z-index: 2000; position: relative;">TEST PASSED</div>').prependTo('body');
             },
             wait: 500
         });

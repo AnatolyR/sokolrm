@@ -53,6 +53,7 @@ modules["grid"] = (function() {
 
     var options = {
         url: "app/gridtest",
+        title: "Grid test",
         columnsVisible: [
                 "id",
                 "documentNumber",
