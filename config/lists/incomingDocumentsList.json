@@ -1,6 +1,15 @@
 {
-  "condition": "type = 'incomingDocument' AND status <> 'Черновик'",
+  "condition": "type = 'incomingDocument' AND status IS DISTINCT FROM 'Черновик'",
   "gridConfig": {
+    "title": "Входящие документы",
+    "columnsVisible": [
+      "id",
+      "documentNumber",
+      "type",
+      "status",
+      "title",
+      "registrationDate"
+    ],
     "columns": [
       {
         "id": "id",

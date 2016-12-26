@@ -31,6 +31,7 @@ public class Specification {
     private List<Sort> sort;
     private Integer size;
     private Integer offset;
+    private String join;
 
     public List<String> getFields() {
         if (fields == null) {
@@ -73,5 +74,13 @@ public class Specification {
 
     public void setOffset(Integer offset) {
         this.offset = offset;
+    }
+
+    public String getJoin() {
+        return join;
+    }
+
+    public void setJoin(String join) {
+        this.join = join;
     }
 }

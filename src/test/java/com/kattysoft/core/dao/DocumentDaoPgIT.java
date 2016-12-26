@@ -1,7 +1,7 @@
 package com.kattysoft.core.dao;
 
 import com.kattysoft.core.model.Document;
-import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.*;
 import org.apache.commons.dbutils.DbUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -72,9 +72,64 @@ public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
 
     @Test
     @Sql("file:db/documents.sql")
+    @Sql("testDocuments.sql")
+    public void testGetDocumentsListWithCondition() throws Exception {
+        Specification spec = new Specification();
+        spec.setFields(Arrays.asList("id",
+            "documentNumber",
+            "type",
+            "status",
+            "title",
+            "registrationDate"));
+
+        String listConditionSql = "type = 'test'";
+        Condition listCondition = new SqlCondition(listConditionSql);
+        ContainerCondition condition = new ContainerCondition();
+        condition.setOperation(ContainerOperation.AND);
+        condition.getConditions().add(listCondition);
+        spec.setCondition(condition);
+
+        List<Document> documentsList = documentDao.getDocumentsList(spec);
+        for (Document document : documentsList) {
+            System.out.println(document.getId() + " " + document.getTitle() + " " + Arrays.toString(document.getFields().entrySet().toArray()));
+        }
+        assertThat(documentsList.size(), equalTo(1));
+    }
+
+    @Test
+    @Sql("file:db/documents.sql")
+    @Sql("testDocuments.sql")
+    public void testGetDocumentsListWithConditionAndLimit() throws Exception {
+        Specification spec = new Specification();
+        spec.setFields(Arrays.asList("id",
+            "documentNumber",
+            "type",
+            "status",
+            "title",
+            "registrationDate"));
+
+        String listConditionSql = "type = 'incomingDocument'";
+        Condition listCondition = new SqlCondition(listConditionSql);
+        ContainerCondition condition = new ContainerCondition();
+        condition.setOperation(ContainerOperation.AND);
+        condition.getConditions().add(listCondition);
+        spec.setCondition(condition);
+        spec.setSize(3);
+        spec.setOffset(2);
+
+        List<Document> documentsList = documentDao.getDocumentsList(spec);
+        for (Document document : documentsList) {
+            System.out.println(document.getId() + " " + document.getTitle() + " " + Arrays.toString(document.getFields().entrySet().toArray()));
+        }
+        assertThat(documentsList.size(), equalTo(3));
+    }
+
+    @Test
+    @Sql("file:db/documents.sql")
     @Sql
     public void testTotalCount() {
-        Integer totalCount = documentDao.getTotalCount(null);
+        Specification spec = new Specification();
+        Integer totalCount = documentDao.getTotalCount(spec);
         assertThat(totalCount, equalTo(6));
     }
 
@@ -196,11 +251,12 @@ public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
     @Sql("file:db/documents.sql")
     @Sql("testDocuments.sql")
     public void testDeleteDocument() {
-        Integer totalCount = documentDao.getTotalCount(null);
+        Specification spec = new Specification();
+        Integer totalCount = documentDao.getTotalCount(spec);
         assertThat(totalCount, equalTo(6));
         boolean result = documentDao.deleteDocument("10984d8e-8e18-4384-95bd-8743d1f98676");
         assertThat(result, is(true));
-        totalCount = documentDao.getTotalCount(null);
+        totalCount = documentDao.getTotalCount(spec);
         assertThat(totalCount, equalTo(5));
     }
 

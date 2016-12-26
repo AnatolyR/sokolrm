@@ -12,7 +12,7 @@ $.widget('sokol.app', {
             if (id) {
                 this.open(id);
             } else {
-                this.open("lists/documentsList");
+                this.open("lists/documents");
             }
 
         }, this));
@@ -20,7 +20,8 @@ $.widget('sokol.app', {
     },
     _destroy: function() {
         this.header.destroy();
-        this.grid.destroy();
+        //this.grid.destroy();
+        this.list.destroy();
         this.container.destroy();
     },
 
@@ -28,6 +29,7 @@ $.widget('sokol.app', {
         $.getJSON("app/appsettings", {},
             $.proxy(function (data) {
                 var options = data;
+                options.dispatcher = this;
                 this.headerObject = $.sokol.header(options, $("<nav></nav>").prependTo("body"));
             }, this)
         );
@@ -39,12 +41,13 @@ $.widget('sokol.app', {
         if (this.container) {
             this.container.destroy();
         }
-        if (this.grid) {
-            this.grid.destroy();
+
+        if (this.list) {
+            this.list.destroy();
         }
 
         if (id.startsWith('lists/')) {
-            this.createListWithNavigation(id)
+            this.createListWithNavigation(id.substring(6))
         } else if (id.startsWith('document/')) {
             this.createDocumentForm(id.substring(9), mode);
         } else if (id.startsWith('new/')) {
@@ -82,27 +85,7 @@ $.widget('sokol.app', {
     },
 
     createListWithNavigation: function(id) {
-        //$("#main").removeClass("container").addClass("container-fluid");
-        //$('<div class="row">' +
-        //    '<div class="col-md-2" id="navigation" style="padding-right: 0;"></div>' +
-        //    '<div class="col-md-10" id="central"></div>' +
-        //    '</div>').appendTo("#main");
-        //
-        //this.createNavigation();
-        //this.createList(data);
-
-        $.getJSON('app/config', {id: id},
-            $.proxy(function (data) {
-                var options = {
-                    title: data.title,
-                    columnsVisible: data.columnsVisible,
-                    columns: data.columns,
-                    url: 'app/documents',
-                    id: 'documentsList'
-                };
-                this.grid = $.sokol.grid(options, $("<div></div>").appendTo("body"));
-            }, this)
-        );
+        this.list = $.sokol.list({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
     },
 
     createNavigation: function() {
@@ -144,7 +127,7 @@ $.widget('sokol.app', {
     },
 
     updateHash: function(hash) {
-        if (location.hash == "#" + hash) {
+        if (location.hash == "#" + hash || hash.indexOf('new/') >= 0) {
             return;
         }
         if(history.pushState) {

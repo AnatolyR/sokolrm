@@ -38,6 +38,14 @@ $.widget('sokol.header', {
             if (title == "$userName") {
                 title = this.options.userName;
             }
+
+            var produceHandler = $.proxy(function produceHandler(id) {
+                return $.proxy(function handleCreateClick(e) {
+                    e.preventDefault();
+                    this.options.dispatcher.open(id);
+                }, this)
+            }, this);
+
             if (item.submenu) {
                 var submenu = $('<ul></ul>').addClass('dropdown-menu');
                 for (var j = 0; j < item.submenu.length; j++) {
@@ -45,7 +53,15 @@ $.widget('sokol.header', {
                     if (subitem.separator) {
                         submenu.append($('<li role="separator" class="divider"></li>'));
                     } else {
-                        submenu.append($('<li><a href="' + subitem.link + '">' + subitem.title + '</a></li>'));
+                        if (subitem.link) {
+                            submenu.append($('<li><a href="' + subitem.link + '">' + subitem.title + '</a></li>'));
+                        } else if (subitem.window) {
+                            submenu.append($('<li><a target="_blank" href="' + subitem.window + '">' + subitem.title + '</a></li>'));
+                        } else if (subitem.open) {
+                            var openItem = $('<li><a href="">' + subitem.title + '</a></li>');
+                            openItem.find('a').click(produceHandler(subitem.open));
+                            submenu.append(openItem);
+                        }
                     }
                 }
 

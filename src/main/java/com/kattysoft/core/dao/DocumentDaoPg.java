@@ -10,8 +10,11 @@
 package com.kattysoft.core.dao;
 
 import com.kattysoft.core.model.Document;
-import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.*;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.lang.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
  * Date: 17.07.2016
  */
 public class DocumentDaoPg implements DocumentDao {
+    private static final Logger log = LoggerFactory.getLogger(DocumentDaoPg.class);
     @Autowired
     private DataSource dataSource;
 
@@ -116,9 +120,37 @@ public class DocumentDaoPg implements DocumentDao {
                 columns.add("title");
             }
             columns.addAll(fieldsNames.stream().map(name -> "\"" + name + "\"").collect(Collectors.toList()));
-            String sql = "SELECT " + String.join(", ", columns) + " FROM documents;";
 
-            resultSet = connection.createStatement().executeQuery(sql);
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT");
+            sql.append(" ");
+            sql.append(String.join(", ", columns));
+            sql.append(" FROM documents d ");
+            if (spec.getJoin() != null) {
+                sql.append(spec.getJoin());
+                sql.append(" ");
+            }
+            if (spec.getCondition() != null) {
+                Condition condition = spec.getCondition();
+                String conditionSql = conditionToSql(condition);
+                sql.append("WHERE ");
+                sql.append(conditionSql);
+            }
+            if (spec.getSize() != null) {
+                sql.append(" LIMIT ");
+                sql.append(spec.getSize());
+            }
+            if (spec.getOffset() != null) {
+                sql.append(" OFFSET ");
+                sql.append(spec.getOffset());
+            }
+            sql.append(";");
+
+
+            String sqlStr = sql.toString();
+            log.info("LIST SQL: {}", sqlStr);
+
+            resultSet = connection.createStatement().executeQuery(sqlStr);
             while (resultSet.next()) {
                 Document document = new Document();
                 String id = resultSet.getString("id");
@@ -146,12 +178,46 @@ public class DocumentDaoPg implements DocumentDao {
         }
     }
 
-    public Integer getTotalCount(Specification specification) {
+    private String conditionToSql(Condition condition) {
+        if (condition instanceof ContainerCondition) {
+            List<String> subconditions = new ArrayList<>();
+            ((ContainerCondition) condition).getConditions().forEach(c -> {
+                subconditions.add("(" + conditionToSql(c) + ")");
+            });
+            String str = String.join(" " + ((ContainerCondition) condition).getOperation().toString() + " ", subconditions);
+            return str;
+        } else if (condition instanceof ValueCondition) {
+            throw new NotImplementedException("ValueCondition");
+        } else if (condition instanceof SqlCondition) {
+            return ((SqlCondition) condition).getSql();
+        }
+        return "";
+    }
+
+    public Integer getTotalCount(Specification spec) {
         Connection connection = null;
         ResultSet resultSet = null;
         try {
             connection = dataSource.getConnection();
-            resultSet = connection.createStatement().executeQuery("SELECT count(*) FROM documents;");
+
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT");
+            sql.append(" ");
+            sql.append("count(*)");
+            sql.append(" FROM documents d ");
+            if (spec.getJoin() != null) {
+                sql.append(spec.getJoin());
+                sql.append(" ");
+            }
+            if (spec.getCondition() != null) {
+                Condition condition = spec.getCondition();
+                String conditionSql = conditionToSql(condition);
+                sql.append("WHERE ");
+                sql.append(conditionSql);
+            }
+            sql.append(";");
+
+            resultSet = connection.createStatement().executeQuery(sql.toString());
             if (resultSet.next()) {
                 return resultSet.getInt(1);
             }

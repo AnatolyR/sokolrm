@@ -1,7 +1,7 @@
 {
   "condition": "status IS DISTINCT FROM 'Черновик'",
   "gridConfig": {
-    "title": "Test",
+    "title": "Документы",
     "columnsVisible": [
       "id",
       "documentNumber",

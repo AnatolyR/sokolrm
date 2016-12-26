@@ -9,6 +9,7 @@
  */
 package com.kattysoft.core.specification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,11 +20,17 @@ public class ContainerCondition extends Condition {
     private List<Condition> conditions;
     private ContainerOperation operation;
 
+    public ContainerCondition() {
+    }
+
     public ContainerCondition(ContainerOperation operation, Condition... condition) {
 
     }
 
     public List<Condition> getConditions() {
+        if (conditions == null) {
+            conditions = new ArrayList<>();
+        }
         return conditions;
     }
 

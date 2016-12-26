@@ -1,6 +1,15 @@
 {
-  "condition": "type = 'internalDocument' AND status <> 'Черновик'",
+  "condition": "type = 'internalDocument' AND status IS DISTINCT FROM 'Черновик'",
   "gridConfig": {
+    "title": "Внутренние документы",
+    "columnsVisible": [
+      "id",
+      "documentNumber",
+      "type",
+      "status",
+      "title",
+      "registrationDate"
+    ],
     "columns": [
       {
         "id": "id",

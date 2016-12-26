@@ -12,7 +12,7 @@ $.widget('sokol.app', {
             if (id) {
                 this.open(id);
             } else {
-                this.open("lists/documentsList");
+                this.open("lists/documents");
             }
 
         }, this));
@@ -20,7 +20,8 @@ $.widget('sokol.app', {
     },
     _destroy: function() {
         this.header.destroy();
-        this.grid.destroy();
+        //this.grid.destroy();
+        this.list.destroy();
         this.container.destroy();
     },
 
@@ -28,6 +29,7 @@ $.widget('sokol.app', {
         $.getJSON("app/appsettings", {},
             $.proxy(function (data) {
                 var options = data;
+                options.dispatcher = this;
                 this.headerObject = $.sokol.header(options, $("<nav></nav>").prependTo("body"));
             }, this)
         );
@@ -39,12 +41,15 @@ $.widget('sokol.app', {
         if (this.container) {
             this.container.destroy();
         }
-        if (this.grid) {
-            this.grid.destroy();
+        //if (this.grid) {
+        //    this.grid.destroy();
+        //}
+        if (this.list) {
+            this.list.destroy();
         }
 
         if (id.startsWith('lists/')) {
-            this.createListWithNavigation(id)
+            this.createListWithNavigation(id.substring(6))
         } else if (id.startsWith('document/')) {
             this.createDocumentForm(id.substring(9), mode);
         } else if (id.startsWith('new/')) {
@@ -91,18 +96,19 @@ $.widget('sokol.app', {
         //this.createNavigation();
         //this.createList(data);
 
-        $.getJSON('app/config', {id: id},
-            $.proxy(function (data) {
-                var options = {
-                    title: data.title,
-                    columnsVisible: data.columnsVisible,
-                    columns: data.columns,
-                    url: 'app/documents',
-                    id: 'documentsList'
-                };
-                this.grid = $.sokol.grid(options, $("<div></div>").appendTo("body"));
-            }, this)
-        );
+        //$.getJSON('app/config', {id: 'lists/' + id + 'List'},
+        //    $.proxy(function (data) {
+        //        var options = {
+        //            title: data.title,
+        //            columnsVisible: data.columnsVisible,
+        //            columns: data.columns,
+        //            url: 'app/documents',
+        //            id: id
+        //        };
+        //        this.grid = $.sokol.grid(options, $("<div></div>").appendTo("body"));
+        //    }, this)
+        //);
+        this.list = $.sokol.list({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
     },
 
     createNavigation: function() {
@@ -144,7 +150,7 @@ $.widget('sokol.app', {
     },
 
     updateHash: function(hash) {
-        if (location.hash == "#" + hash) {
+        if (location.hash == "#" + hash || hash.indexOf('new/') >= 0) {
             return;
         }
         if(history.pushState) {
@@ -884,7 +890,6 @@ $.widget("sokol.grid", {
     createList: function() {
         var central = this.element;
         central.empty();
-        central.addClass('container');
 
         var pagination = this.createPagination(central);
         this.createColumnsSelector(pagination);
@@ -1173,6 +1178,14 @@ $.widget('sokol.header', {
             if (title == "$userName") {
                 title = this.options.userName;
             }
+
+            var produceHandler = $.proxy(function produceHandler(id) {
+                return $.proxy(function handleCreateClick(e) {
+                    e.preventDefault();
+                    this.options.dispatcher.open(id);
+                }, this)
+            }, this);
+
             if (item.submenu) {
                 var submenu = $('<ul></ul>').addClass('dropdown-menu');
                 for (var j = 0; j < item.submenu.length; j++) {
@@ -1180,7 +1193,15 @@ $.widget('sokol.header', {
                     if (subitem.separator) {
                         submenu.append($('<li role="separator" class="divider"></li>'));
                     } else {
-                        submenu.append($('<li><a href="' + subitem.link + '">' + subitem.title + '</a></li>'));
+                        if (subitem.link) {
+                            submenu.append($('<li><a href="' + subitem.link + '">' + subitem.title + '</a></li>'));
+                        } else if (subitem.window) {
+                            submenu.append($('<li><a target="_blank" href="' + subitem.window + '">' + subitem.title + '</a></li>'));
+                        } else if (subitem.open) {
+                            var openItem = $('<li><a href="">' + subitem.title + '</a></li>');
+                            openItem.find('a').click(produceHandler(subitem.open));
+                            submenu.append(openItem);
+                        }
                     }
                 }
 
@@ -1197,6 +1218,78 @@ $.widget('sokol.header', {
     },
     _setOptions: function (options) {
         this._super(options);
+    }
+});
+$.widget('sokol.list', {
+    options: {
+
+    },
+    _create: function () {
+        var row = $('<div class="row"></div>').appendTo(this.element);
+        var sidebar = $('<div class="col-sm-3 col-md-2 sidebar"></div>').appendTo(row);
+        var main = $('<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2"></div>').appendTo(row);
+        this.main = main;
+        this.sidebar = sidebar;
+        var currentNode = null;
+
+        var produceHandler = $.proxy(function produceHandler(item) {
+            return $.proxy(function handleCategoryClick(e) {
+                e.preventDefault();
+                this.createGrid(item.id);
+            }, this)
+        }, this);
+        $.getJSON('app/config', {id: 'navigation/main'}, $.proxy(function(data) {
+            data.items.forEach($.proxy(function (item) {
+                if (item.type == 'header') {
+                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                    currentNode = header;
+                    header.find("a").click(produceHandler(item));
+                } else {
+                    var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
+                    category.find("a").click(produceHandler(item));
+                }
+            }, this));
+                if (this.options.id) {
+                    setTimeout($.proxy(function () {
+                        this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
+                    }, this), 0);
+                }
+        }, this));
+        if (this.options.id) {
+            this.createGrid(this.options.id);
+        }
+    },
+
+    createGrid: function(id) {
+        var fullId = 'lists/' + id + 'List';
+        if (this.grid) {
+            this.grid.destroy();
+        }
+        this.sidebar.find('li').removeClass('active');
+        setTimeout($.proxy(function() {
+            this.sidebar.find('[name="category_' + id + '"]').addClass('active');
+        }, this), 0);
+        $.getJSON('app/config', {id: fullId},
+            $.proxy(function (data) {
+                var options = {
+                    title: data.title,
+                    columnsVisible: data.columnsVisible,
+                    columns: data.columns,
+                    url: 'app/documents',
+                    id: id
+                };
+                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+                if (this.options.dispatcher) {
+                    this.options.dispatcher.updateHash('lists/' + id);
+                }
+            }, this)
+        ).fail(function failLoadList() {
+            $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+        });
+    },
+
+    _destroy: function() {
+        this.element.detach();
     }
 });
 //# sourceMappingURL=app.js.map

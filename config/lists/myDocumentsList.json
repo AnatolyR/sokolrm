@@ -1,6 +1,15 @@
 {
-  "condition": "author = '$currentUser'",
+  "condition": "author IS NULL",
   "gridConfig": {
+    "title": "Мои документы",
+    "columnsVisible": [
+      "id",
+      "documentNumber",
+      "type",
+      "status",
+      "title",
+      "registrationDate"
+    ],
     "columns": [
       {
         "id": "id",

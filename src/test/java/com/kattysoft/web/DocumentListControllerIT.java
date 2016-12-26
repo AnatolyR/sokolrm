@@ -69,7 +69,7 @@ public class DocumentListControllerIT {
         when(documentService.listDocuments(any(Specification.class))).thenReturn(documents);
         when(documentService.getTotalCount(any(Specification.class))).thenReturn(2);
 
-        ResultActions resultActions = this.mockMvc.perform(get("/documents").param("listId", "documentsList").accept(MediaType.parseMediaType("application/json;charset=UTF-8")));
+        ResultActions resultActions = this.mockMvc.perform(get("/documents").param("listId", "documents").accept(MediaType.parseMediaType("application/json;charset=UTF-8")));
         MvcResult mvcResult = resultActions.andReturn();
         String content = mvcResult.getResponse().getContentAsString();
         System.out.println("Result: " + content);

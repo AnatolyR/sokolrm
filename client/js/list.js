@@ -27,6 +27,11 @@ $.widget('sokol.list', {
                     category.find("a").click(produceHandler(item));
                 }
             }, this));
+            if (this.options.id) {
+                setTimeout($.proxy(function () {
+                    this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
+                }, this), 0);
+            }
         }, this));
         if (this.options.id) {
             this.createGrid(this.options.id);
@@ -49,11 +54,16 @@ $.widget('sokol.list', {
                     columnsVisible: data.columnsVisible,
                     columns: data.columns,
                     url: 'app/documents',
-                    id: 'documentsList'
+                    id: id
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+                if (this.options.dispatcher) {
+                    this.options.dispatcher.updateHash('lists/' + id);
+                }
             }, this)
-        );
+        ).fail(function failLoadList() {
+            $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+        });
     },
 
     _destroy: function() {

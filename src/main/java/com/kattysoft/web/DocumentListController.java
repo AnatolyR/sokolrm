@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.DocumentService;
 import com.kattysoft.core.model.Document;
-import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,7 +53,7 @@ public class DocumentListController {
             size =  DEFAULT_PAGE_SIZE;
         }
 
-        JsonNode config = configService.getConfig2("lists/" + listId);
+        JsonNode config = configService.getConfig2("lists/" + listId + "List");
 
         Specification spec = new Specification();
         spec.setOffset(offset);
@@ -69,6 +69,18 @@ public class DocumentListController {
             }
         });
         final Map<String, String> typeTitleCash = new HashMap<>();
+
+        ContainerCondition condition = new ContainerCondition();
+        String listConditionSql = config.get("condition").asText();
+        condition.setOperation(ContainerOperation.AND);
+        Condition listCondition = new SqlCondition(listConditionSql);
+        condition.getConditions().add(listCondition);
+        spec.setCondition(condition);
+
+        if (config.get("join") != null) {
+            String join = config.get("join").asText();
+            spec.setJoin(join);
+        }
 
         List<Document> documents = documentService.listDocuments(spec);
         Integer total = documentService.getTotalCount(spec);

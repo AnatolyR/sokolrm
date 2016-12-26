@@ -11,16 +11,20 @@ package com.kattysoft.core.specification;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
- * Date: 20.07.2016
+ * Date: 26.12.2016
  */
-public abstract class Condition {
-    boolean not;
+public class SqlCondition extends Condition {
+    private String sql;
 
-    public boolean isNot() {
-        return not;
+    public SqlCondition(String sql) {
+        this.sql = sql;
     }
 
-    public void setNot(boolean not) {
-        this.not = not;
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

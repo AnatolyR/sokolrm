@@ -1,7 +1,18 @@
 {
   "query": ["select * from documents d",
   "left join favorites f on d.id = f.documentId::uuid where f.userId = '$currentUser'; "],
+  "join": "left join favorites f on d.id = f.documentId::uuid",
+  "condition": "f.userId = 'user1'",
   "gridConfig": {
+    "title": "Избранное",
+    "columnsVisible": [
+      "id",
+      "documentNumber",
+      "type",
+      "status",
+      "title",
+      "registrationDate"
+    ],
     "columns": [
       {
         "id": "id",

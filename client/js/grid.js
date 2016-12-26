@@ -28,7 +28,6 @@ $.widget("sokol.grid", {
     createList: function() {
         var central = this.element;
         central.empty();
-        central.addClass('container');
 
         var pagination = this.createPagination(central);
         this.createColumnsSelector(pagination);
