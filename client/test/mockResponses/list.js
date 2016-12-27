@@ -1,4 +1,5 @@
 var mockResponses = mockResponses || [];
+var configResponses = configResponses || [];
 (function() {
     var sidebarData = {
         "items": [
@@ -112,14 +113,14 @@ var mockResponses = mockResponses || [];
         ]
     };
 
-    mockResponses['app/config'] = function(params, callback) {
-        if (params.id == 'lists/documentsList' || params.id == 'lists/incomingDocumentsList') {
-            callback(gridSettings);
-        } else if (params.id == 'navigation/main') {
-            callback(sidebarData);
-        } else {
-            console.error("No response for " + params.id);
-        }
+    configResponses['lists/documentsList'] = function(params, callback) {
+        callback(gridSettings);
+    };
+    configResponses['lists/incomingDocumentsList'] = function(params, callback) {
+        callback(gridSettings);
+    };
+    configResponses['navigation/main'] = function(params, callback) {
+        callback(sidebarData);
     };
 
     var documents = [];

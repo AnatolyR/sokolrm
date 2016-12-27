@@ -1,4 +1,4 @@
-var mockResponses = mockResponses || [];
+var configResponses = configResponses || [];
 (function() {
     var documentKindsResponse = [ {
         "id" : 1,
@@ -26,9 +26,7 @@ var mockResponses = mockResponses || [];
         "title" : "Решение"
     } ];
 
-    mockResponses['app/config'] = function(params, callback) {
-        if (params.id == 'dictionaries/documentKind') {
-            callback(documentKindsResponse);
-        }
+    configResponses['dictionaries/documentKind'] = function(params, callback) {
+        callback(documentKindsResponse);
     };
 })();

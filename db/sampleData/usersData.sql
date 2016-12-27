@@ -1,7 +1,7 @@
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
   ('580f62b3-7b96-4109-a321-dc7d24109a1a', 'Поляков И. В.', null, null, 'Иван', 'Вячеславович', 'Поляков');
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
-  ('722b151c-f9d7-4222-b541-cfc554695510', 'Ивашов В. Н.', null, null, 'Виктор', 'Николаевич', 'Ивашов');
+  ('722b151c-f9d7-4222-b541-cfc554695510', 'Ивашов В. Н.', 'login1', '0df36e68fe2cf9ad2f0113981878514e', 'Виктор', 'Николаевич', 'Ивашов');
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
   ('dc175f6e-b18d-495f-aca9-58c956e48a42', 'Беломестов Г. В.', null, null, 'Густав', 'Валерьевич', 'Беломестов');
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES

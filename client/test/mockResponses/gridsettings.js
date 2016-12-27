@@ -1,4 +1,4 @@
-var mockResponses = mockResponses || [];
+var configResponses = configResponses || [];
 (function() {
     var gridSettings = {
         title: 'Test',
@@ -41,7 +41,10 @@ var mockResponses = mockResponses || [];
         ]
     };
 
-    mockResponses['app/config'] = function(params, callback) {
+    configResponses['lists/documentsList'] = function(params, callback) {
+        callback(gridSettings);
+    };
+    configResponses['lists/incomingDocumentsList'] = function(params, callback) {
         callback(gridSettings);
     };
 })();

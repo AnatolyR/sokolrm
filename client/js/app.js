@@ -26,7 +26,7 @@ $.widget('sokol.app', {
     },
 
     showHeader: function() {
-        $.getJSON("app/appsettings", {},
+        $.getJSON('app/config', {id: 'appSettings'},
             $.proxy(function (data) {
                 var options = data;
                 options.dispatcher = this;

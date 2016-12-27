@@ -23,6 +23,7 @@ import java.io.InputStream;
  * Date: 06.12.2016
  */
 @RestController
+@Deprecated
 public class AppSettingsController {
 //    ObjectMapper mapper = new ObjectMapper();
 

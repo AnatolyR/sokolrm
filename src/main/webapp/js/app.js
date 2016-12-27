@@ -26,7 +26,7 @@ $.widget('sokol.app', {
     },
 
     showHeader: function() {
-        $.getJSON("app/appsettings", {},
+        $.getJSON('app/config', {id: 'appSettings'},
             $.proxy(function (data) {
                 var options = data;
                 options.dispatcher = this;
@@ -41,9 +41,7 @@ $.widget('sokol.app', {
         if (this.container) {
             this.container.destroy();
         }
-        //if (this.grid) {
-        //    this.grid.destroy();
-        //}
+
         if (this.list) {
             this.list.destroy();
         }
@@ -87,27 +85,6 @@ $.widget('sokol.app', {
     },
 
     createListWithNavigation: function(id) {
-        //$("#main").removeClass("container").addClass("container-fluid");
-        //$('<div class="row">' +
-        //    '<div class="col-md-2" id="navigation" style="padding-right: 0;"></div>' +
-        //    '<div class="col-md-10" id="central"></div>' +
-        //    '</div>').appendTo("#main");
-        //
-        //this.createNavigation();
-        //this.createList(data);
-
-        //$.getJSON('app/config', {id: 'lists/' + id + 'List'},
-        //    $.proxy(function (data) {
-        //        var options = {
-        //            title: data.title,
-        //            columnsVisible: data.columnsVisible,
-        //            columns: data.columns,
-        //            url: 'app/documents',
-        //            id: id
-        //        };
-        //        this.grid = $.sokol.grid(options, $("<div></div>").appendTo("body"));
-        //    }, this)
-        //);
         this.list = $.sokol.list({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
     },
 
@@ -1249,11 +1226,11 @@ $.widget('sokol.list', {
                     category.find("a").click(produceHandler(item));
                 }
             }, this));
-                if (this.options.id) {
-                    setTimeout($.proxy(function () {
-                        this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
-                    }, this), 0);
-                }
+            if (this.options.id) {
+                setTimeout($.proxy(function () {
+                    this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
+                }, this), 0);
+            }
         }, this));
         if (this.options.id) {
             this.createGrid(this.options.id);

@@ -10,7 +10,10 @@
 package com.kattysoft.web;
 
 import com.kattysoft.core.ConfigService;
+import com.kattysoft.core.UserService;
+import com.kattysoft.core.model.User;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,16 +30,28 @@ public class ConfigController {
     @Autowired
     private ConfigService configService;
 
+    @Autowired
+    private UserService userService;
+
     @RequestMapping(value = "/config", produces = "application/json; charset=utf-8")
     public String getConfig(String id) {
         JsonNode config = configService.getConfig(id);
         if (id.startsWith("lists/")) {
             config = config.get("gridConfig");
         }
+        if (id.equals("appSettings")) {
+            User user = userService.getCurrentUser();
+            String userTitle = user.getTitle();
+            ((ObjectNode) config).put("userName", userTitle);
+        }
         return config.toString();
     }
 
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

@@ -14,17 +14,25 @@ import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 15.12.2016
  */
 public class UserServiceImpl implements UserService {
+    public static final String PASS_SALT = "_sdf345sf34";
 
     @Autowired
     private UserRepository userRepository;
+
+    private Map<Long, User> usersPerThread = new ConcurrentHashMap<>();
 
     @Override
     public List<User> getUsersByShortTitle(String title) {
@@ -38,7 +46,48 @@ public class UserServiceImpl implements UserService {
         return user != null ? user.getTitle() : null;
     }
 
+    @Override
+    public User getUserByLoginAndPassword(String login, String password) {
+        try {
+            String hashedPass = md5(md5(md5(password) + login) + PASS_SALT);
+            User user = userRepository.findByLoginAndPassword(login, hashedPass);
+            return user;
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            throw new RuntimeException("Can not get user by login and pass", e);
+        }
+    }
+
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public static String md5(String input) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        byte[] md5s = MessageDigest.getInstance("MD5").digest(input.getBytes("utf-8"));
+        String output = byteArrayToHex(md5s);
+        return output;
+    }
+
+    public static String byteArrayToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder(a.length * 2);
+        for(byte b: a)
+            sb.append(String.format("%02x", b & 0xff));
+        return sb.toString();
+    }
+
+    @Override
+    public void setCurrentUser(User user) {
+        long id = Thread.currentThread().getId();
+        if (user != null) {
+            usersPerThread.put(id, user);
+        } else {
+            usersPerThread.remove(id);
+        }
+    }
+
+    @Override
+    public User getCurrentUser() {
+        long id = Thread.currentThread().getId();
+        User user = usersPerThread.get(id);
+        return user;
     }
 }

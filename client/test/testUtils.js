@@ -97,9 +97,16 @@ var doTest = function(testComponent, steps, completeCallback) {
 };
 
 var mockResponses = mockResponses || [];
+var configResponses = configResponses || [];
 $.getJSON = function(url, params, callback) {
     setTimeout(function() {
-        if (mockResponses[url]) {
+        if (url == 'app/config') {
+            if (configResponses[params.id]) {
+                configResponses[params.id](params, callback);
+            } else {
+                throw new Error('Not response for config "' + params.id + '"');
+            }
+        } else if (mockResponses[url]) {
             mockResponses[url](params, callback);
         } else {
             throw new Error('Not response for "' + url + '"');

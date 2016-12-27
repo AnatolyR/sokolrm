@@ -1,4 +1,5 @@
-var mockResponses = mockResponses || [];
+var configResponses = configResponses || [];
+
 (function() {
     var appSettings = {
         userName: "Test User",
@@ -61,7 +62,8 @@ var mockResponses = mockResponses || [];
         ]
     };
 
-    mockResponses['app/appsettings'] = function(params, callback) {
+    configResponses['appSettings'] = function(params, callback) {
         callback(appSettings);
     };
+
 })();

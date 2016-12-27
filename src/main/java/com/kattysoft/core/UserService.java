@@ -19,4 +19,10 @@ public interface UserService {
     List<User> getUsersByShortTitle(String title);
 
     String getUserTitleById(String userId);
+
+    User getUserByLoginAndPassword(String login, String password);
+
+    void setCurrentUser(User user);
+
+    User getCurrentUser();
 }

@@ -21,9 +21,15 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static com.kattysoft.core.impl.UserServiceImpl.md5;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -98,5 +104,20 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         System.out.println("----------------");
 
         assertThat(k, equalTo(2));
+    }
+
+    @Test
+    @Sql("file:db/users.sql")
+    @Sql("file:db/sampleData/usersData.sql")
+    public void testFindByLoginAndPassword() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+
+        String login = "login1";
+        String pass = "pass1";
+        String salt = "_sdf345sf34";
+        String hashedPass = md5(md5(md5(pass) + login) + salt);
+        System.out.println(">>> " + hashedPass);
+
+        User user = userRepository.findByLoginAndPassword(login, hashedPass);
+        assertThat(user.getTitle(), equalTo("Ивашов В. Н."));
     }
 }

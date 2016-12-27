@@ -25,4 +25,6 @@ public interface UserRepository extends CrudRepository<User, UUID> {
 
     @Query(value = "select new com.kattysoft.core.model.User(u.id, u.title) from User u where u.title like ?1")
     List<User> findIdAndTitleByTitle(String title);
+
+    User findByLoginAndPassword(String login, String password);
 }

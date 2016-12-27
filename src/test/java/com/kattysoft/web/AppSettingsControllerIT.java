@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 06.12.2016
  */
+@Deprecated
 public class AppSettingsControllerIT {
     private MockMvc mockMvc;
 
@@ -28,7 +29,7 @@ public class AppSettingsControllerIT {
         this.mockMvc = MockMvcBuilders.standaloneSetup(appSettingsController).build();
     }
 
-    @Test
+    //@Test
     public void testGetAppSettings() throws Exception {
         ResultActions resultActions = this.mockMvc.perform(get("/appsettings").accept(MediaType.parseMediaType("application/json;charset=UTF-8")));
         MvcResult mvcResult = resultActions.andReturn();
