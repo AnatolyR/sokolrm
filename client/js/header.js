@@ -9,11 +9,11 @@ $.widget('sokol.header', {
         this.createMenu(leftMenu, this.options.leftMenu);
         this.createMenu(rightMenu, this.options.rightMenu);
 
-        var search = $('<form class="nav navbar-form navbar-right" role="search"></form>')
-            .append($('<div class="input-group"></div>')
-                .append($('<input type="text" class="form-control" placeholder="Поиск" name="srch-term" id="srch-term">'))
-                .append($('<div class="input-group-btn"></div>')
-                    .append('<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>')));
+        //var search = $('<form class="nav navbar-form navbar-right" role="search"></form>')
+        //    .append($('<div class="input-group"></div>')
+        //        .append($('<input type="text" class="form-control" placeholder="Поиск" name="srch-term" id="srch-term">'))
+        //        .append($('<div class="input-group-btn"></div>')
+        //            .append('<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>')));
 
         this.element.addClass('navbar navbar-inverse navbar-fixed-top')
             .append($('<div></div>').addClass('container')
@@ -27,8 +27,8 @@ $.widget('sokol.header', {
                     .append($('<a href="">Сокол СЭД</a>').addClass('navbar-brand')))
                 .append($('<div id="navbar"></div>').addClass('navbar-collapse collapse')
                     .append(leftMenu)
-                    .append(rightMenu)
-                    .append(search))
+                    .append(rightMenu))
+                    //.append(search))
         );
     },
     createMenu: function (node, menu) {

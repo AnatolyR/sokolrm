@@ -1,4 +1,4 @@
-$.widget('sokol.list', {
+$.widget('sokol.dictionaries', {
     options: {
 
     },
@@ -13,10 +13,10 @@ $.widget('sokol.list', {
         var produceHandler = $.proxy(function produceHandler(item) {
             return $.proxy(function handleCategoryClick(e) {
                 e.preventDefault();
-                this.createGrid(item.id);
+                //this.createGrid(item.id);
             }, this)
         }, this);
-        $.getJSON('app/config', {id: 'navigation/main'}, $.proxy(function(data) {
+        $.getJSON('app/config', {id: 'navigation/dictionaries'}, $.proxy(function(data) {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
                     var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
@@ -36,9 +36,9 @@ $.widget('sokol.list', {
                 }, this), 0);
             }
         }, this));
-        if (this.options.id) {
-            this.createGrid(this.options.id);
-        }
+        //if (this.options.id) {
+        //    this.createGrid(this.options.id);
+        //}
     },
 
     createGrid: function(id) {

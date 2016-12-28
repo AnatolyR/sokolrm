@@ -5,10 +5,6 @@ var configResponses = configResponses || [];
         userName: "Test User",
         leftMenu: [
             {
-                title: "Главная",
-                link: ""
-            },
-            {
                 title: "Создать",
                 submenu: [
                     {
@@ -32,6 +28,14 @@ var configResponses = configResponses || [];
             {
                 title: "Архив",
                 link: "#archive"
+            },
+            {
+                "title": "Справочники",
+                "link": "#dictionaries"
+            },
+            {
+                "title": "Поиск",
+                "link": "#search"
             }
         ],
         rightMenu: [

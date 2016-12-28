@@ -53,6 +53,19 @@ $.widget('sokol.app', {
         } else if (id.startsWith('new/')) {
             var type = id.substring(4);
             this.createDocument(type);
+        } else if (id == 'reports') {
+            this.container = $('<div>Раздел Отчеты в разработке</div>').appendTo('body');
+            this.container.destroy = this.container.remove;
+        } else if (id == 'search') {
+            this.container = $('<div>Раздел Поиск в разработке</div>').appendTo('body');
+            this.container.destroy = this.container.remove;
+        } else if (id == 'archive') {
+            this.container = $('<div>Раздел Архив в разработке</div>').appendTo('body');
+            this.container.destroy = this.container.remove;
+        } else if (id.startsWith('dictionaries')) {
+            this.container = $.sokol.dictionaries({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
+        } else if (id.startsWith('admin')) {
+            this.container = $.sokol.admin({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
         }
 
     },
