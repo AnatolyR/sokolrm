@@ -13,7 +13,7 @@ $.widget('sokol.dictionaries', {
         var produceHandler = $.proxy(function produceHandler(item) {
             return $.proxy(function handleCategoryClick(e) {
                 e.preventDefault();
-                //this.createGrid(item.id);
+                this.createGrid(item.id);
             }, this)
         }, this);
         $.getJSON('app/config', {id: 'navigation/dictionaries'}, $.proxy(function(data) {
@@ -30,19 +30,20 @@ $.widget('sokol.dictionaries', {
                     category.find("a").click(produceHandler(item));
                 }
             }, this));
-            if (this.options.id) {
+            if (this.options.id && this.options.id.startsWith("dictionaries/")) {
                 setTimeout($.proxy(function () {
-                    this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
+                    this.sidebar.find('[name="category_' + this.options.id.substring(13) + '"]').addClass('active');
                 }, this), 0);
             }
         }, this));
-        //if (this.options.id) {
-        //    this.createGrid(this.options.id);
-        //}
+        if (this.options.id) {
+            if (this.options.id.startsWith("dictionaries/")) {
+                this.createGrid(this.options.id.substring(13));
+            }
+        }
     },
 
     createGrid: function(id) {
-        var fullId = 'lists/' + id + 'List';
         if (this.grid) {
             this.grid.destroy();
         }
@@ -50,18 +51,25 @@ $.widget('sokol.dictionaries', {
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
-        $.getJSON('app/config', {id: fullId},
+        $.getJSON('app/dictionaryinfo', {id: id},
             $.proxy(function (data) {
+                var preparedData = [];
+                data.data.forEach(function(item) {
+                    preparedData.push({
+                        id: item,
+                        value: item
+                    });
+                });
                 var options = {
                     title: data.title,
-                    columnsVisible: data.columnsVisible,
-                    columns: data.columns,
-                    url: 'app/documents',
+                    columnsVisible: data.gridConfig.columnsVisible,
+                    columns: data.gridConfig.columns,
+                    data: preparedData,
                     id: id
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {
-                    this.options.dispatcher.updateHash('lists/' + id);
+                    this.options.dispatcher.updateHash('dictionaries/' + id);
                 }
             }, this)
         ).fail(function failLoadList() {

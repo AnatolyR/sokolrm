@@ -29,13 +29,16 @@ $.widget("sokol.grid", {
         var central = this.element;
         central.empty();
 
-        var pagination = this.createPagination(central);
-        this.createColumnsSelector(pagination);
+        if (!this.options.data) {
+            var pagination = this.createPagination(central);
+            this.createColumnsSelector(pagination);
+        }
 
         this.renderTablePanel();
         this.reload();
-
-        this.createPagination(central);
+        if (!this.options.data) {
+            this.createPagination(central);
+        }
     },
 
     setPage: function(page) {
@@ -57,7 +60,9 @@ $.widget("sokol.grid", {
     refresh: function () {
         this.renderTableHeader();
         this.renderRows();
-        this.updatePagination();
+        if (this.options.url) {
+            this.updatePagination();
+        }
     },
 
     reload: function() {

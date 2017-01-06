@@ -17,6 +17,12 @@ $.widget('sokol.app', {
 
         }, this));
         $(window).trigger('hashchange');
+
+        $(document).ajaxError(function(event, jqxhr, settings, exception) {
+            if (jqxhr.status == 401) {
+                $.notify({message: 'Не выполнен вход.'},{type: 'warning', delay: 0, timer: 0});
+            }
+        });
     },
     _destroy: function() {
         this.header.destroy();

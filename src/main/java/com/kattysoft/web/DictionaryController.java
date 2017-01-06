@@ -9,13 +9,16 @@
  */
 package com.kattysoft.web;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.ContragentService;
+import com.kattysoft.core.DictionaryService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.Contragent;
 import com.kattysoft.core.model.User;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -37,6 +39,12 @@ public class DictionaryController {
 
     @Autowired
     private ContragentService contragentService;
+
+    @Autowired
+    private DictionaryService dictionaryService;
+
+    @Autowired
+    private ConfigService configService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -66,11 +74,37 @@ public class DictionaryController {
         return "[]";
     }
 
+    @RequestMapping(value = "/dictionaryinfo", produces = "application/json; charset=utf-8")
+    public String getConfig(String id) {
+        String fullId = "dictionaries/" + id;
+        JsonNode config = configService.getConfig2(fullId);
+
+        List<String> titles = dictionaryService.getValuesTitlesForDictionaryId(id);
+
+        ArrayNode data = mapper.createArrayNode();
+
+        titles.forEach(t -> {
+            data.add(t);
+        });
+
+        ((ObjectNode) config).set("data", data);
+
+        return config.toString();
+    }
+
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
     public void setContragentService(ContragentService contragentService) {
         this.contragentService = contragentService;
+    }
+
+    public void setDictionaryService(DictionaryService dictionaryService) {
+        this.dictionaryService = dictionaryService;
+    }
+
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
     }
 }

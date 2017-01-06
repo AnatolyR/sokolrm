@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "id": "users",
+      "title": "Сотрудники"
+    },
+    {
+      "id": "contragents",
+      "title": "Контрагенты"
+    },
+    {
+      "id": "documentKind",
+      "title": "Виды документов"
+    },
+    {
+      "id": "titles",
+      "title": "Заголовки документов"
+    }
+  ]
+}

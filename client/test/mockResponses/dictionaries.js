@@ -11,7 +11,7 @@ var configResponses = configResponses || [];
                 "title": "Контрагенты"
             },
             {
-                "id": "documentkinds",
+                "id": "documentKind",
                 "title": "Виды документов"
             },
             {
@@ -23,6 +23,26 @@ var configResponses = configResponses || [];
 
     configResponses['navigation/dictionaries'] = function(params, callback) {
         callback(dictionariesData);
+    };
+
+    var simpleDictionaryData = {
+        "title": "Вид документа",
+        "gridConfig": {
+            "title": "Вид документа",
+            "columnsVisible": [
+                "value"
+            ],
+            "columns": [
+                {
+                    "id": "value",
+                    "title": "Значение"
+                }
+            ]
+        }
+    };
+
+    configResponses['dictionaries/documentKind'] = function(params, callback) {
+        callback(simpleDictionaryData);
     };
 
 })();

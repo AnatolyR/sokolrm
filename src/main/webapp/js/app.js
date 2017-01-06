@@ -1,3 +1,78 @@
+$.widget('sokol.admin', {
+    options: {
+
+    },
+    _create: function () {
+        var row = $('<div class="row"></div>').appendTo(this.element);
+        var sidebar = $('<div class="col-sm-3 col-md-2 sidebar"></div>').appendTo(row);
+        var main = $('<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2"></div>').appendTo(row);
+        this.main = main;
+        this.sidebar = sidebar;
+        var currentNode = null;
+
+        var produceHandler = $.proxy(function produceHandler(item) {
+            return $.proxy(function handleCategoryClick(e) {
+                e.preventDefault();
+                //this.createGrid(item.id);
+            }, this)
+        }, this);
+        $.getJSON('app/config', {id: 'navigation/admin'}, $.proxy(function(data) {
+            data.items.forEach($.proxy(function (item) {
+                if (item.type == 'header') {
+                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                    currentNode = header;
+                    header.find("a").click(produceHandler(item));
+                } else {
+                    if (!currentNode) {
+                        currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                    }
+                    var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
+                    category.find("a").click(produceHandler(item));
+                }
+            }, this));
+            if (this.options.id) {
+                setTimeout($.proxy(function () {
+                    this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
+                }, this), 0);
+            }
+        }, this));
+        //if (this.options.id) {
+        //    this.createGrid(this.options.id);
+        //}
+    },
+
+    createGrid: function(id) {
+        var fullId = 'lists/' + id + 'List';
+        if (this.grid) {
+            this.grid.destroy();
+        }
+        this.sidebar.find('li').removeClass('active');
+        setTimeout($.proxy(function() {
+            this.sidebar.find('[name="category_' + id + '"]').addClass('active');
+        }, this), 0);
+        $.getJSON('app/config', {id: fullId},
+            $.proxy(function (data) {
+                var options = {
+                    title: data.title,
+                    columnsVisible: data.columnsVisible,
+                    columns: data.columns,
+                    url: 'app/documents',
+                    id: id
+                };
+                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+                if (this.options.dispatcher) {
+                    this.options.dispatcher.updateHash('lists/' + id);
+                }
+            }, this)
+        ).fail(function failLoadList() {
+            $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+        });
+    },
+
+    _destroy: function() {
+        this.element.detach();
+    }
+});
 $.widget('sokol.app', {
     options: {
 
@@ -17,6 +92,12 @@ $.widget('sokol.app', {
 
         }, this));
         $(window).trigger('hashchange');
+
+        $(document).ajaxError(function(event, jqxhr, settings, exception) {
+            if (jqxhr.status == 401) {
+                $.notify({message: 'Не выполнен вход.'},{type: 'warning', delay: 0, timer: 0});
+            }
+        });
     },
     _destroy: function() {
         this.header.destroy();
@@ -53,6 +134,19 @@ $.widget('sokol.app', {
         } else if (id.startsWith('new/')) {
             var type = id.substring(4);
             this.createDocument(type);
+        } else if (id == 'reports') {
+            this.container = $('<div>Раздел Отчеты в разработке</div>').appendTo('body');
+            this.container.destroy = this.container.remove;
+        } else if (id == 'search') {
+            this.container = $('<div>Раздел Поиск в разработке</div>').appendTo('body');
+            this.container.destroy = this.container.remove;
+        } else if (id == 'archive') {
+            this.container = $('<div>Раздел Архив в разработке</div>').appendTo('body');
+            this.container.destroy = this.container.remove;
+        } else if (id.startsWith('dictionaries')) {
+            this.container = $.sokol.dictionaries({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
+        } else if (id.startsWith('admin')) {
+            this.container = $.sokol.admin({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
         }
 
     },
@@ -416,6 +510,89 @@ $.widget('sokol.containerHeader', {
             '<div>Статус: ' + (data.status ? data.status : '') + '</div>'
             ).appendTo(this.element);
     },
+    _destroy: function() {
+        this.element.detach();
+    }
+});
+$.widget('sokol.dictionaries', {
+    options: {
+
+    },
+    _create: function () {
+        var row = $('<div class="row"></div>').appendTo(this.element);
+        var sidebar = $('<div class="col-sm-3 col-md-2 sidebar"></div>').appendTo(row);
+        var main = $('<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2"></div>').appendTo(row);
+        this.main = main;
+        this.sidebar = sidebar;
+        var currentNode = null;
+
+        var produceHandler = $.proxy(function produceHandler(item) {
+            return $.proxy(function handleCategoryClick(e) {
+                e.preventDefault();
+                this.createGrid(item.id);
+            }, this)
+        }, this);
+        $.getJSON('app/config', {id: 'navigation/dictionaries'}, $.proxy(function(data) {
+            data.items.forEach($.proxy(function (item) {
+                if (item.type == 'header') {
+                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                    currentNode = header;
+                    header.find("a").click(produceHandler(item));
+                } else {
+                    if (!currentNode) {
+                        currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                    }
+                    var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
+                    category.find("a").click(produceHandler(item));
+                }
+            }, this));
+            if (this.options.id && this.options.id.startsWith("dictionaries/")) {
+                setTimeout($.proxy(function () {
+                    this.sidebar.find('[name="category_' + this.options.id.substring(13) + '"]').addClass('active');
+                }, this), 0);
+            }
+        }, this));
+        if (this.options.id) {
+            if (this.options.id.startsWith("dictionaries/")) {
+                this.createGrid(this.options.id.substring(13));
+            }
+        }
+    },
+
+    createGrid: function(id) {
+        if (this.grid) {
+            this.grid.destroy();
+        }
+        this.sidebar.find('li').removeClass('active');
+        setTimeout($.proxy(function() {
+            this.sidebar.find('[name="category_' + id + '"]').addClass('active');
+        }, this), 0);
+        $.getJSON('app/dictionaryinfo', {id: id},
+            $.proxy(function (data) {
+                var preparedData = [];
+                data.data.forEach(function(item) {
+                    preparedData.push({
+                        id: item,
+                        value: item
+                    });
+                });
+                var options = {
+                    title: data.title,
+                    columnsVisible: data.gridConfig.columnsVisible,
+                    columns: data.gridConfig.columns,
+                    data: preparedData,
+                    id: id
+                };
+                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+                if (this.options.dispatcher) {
+                    this.options.dispatcher.updateHash('dictionaries/' + id);
+                }
+            }, this)
+        ).fail(function failLoadList() {
+            $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+        });
+    },
+
     _destroy: function() {
         this.element.detach();
     }
@@ -868,13 +1045,16 @@ $.widget("sokol.grid", {
         var central = this.element;
         central.empty();
 
-        var pagination = this.createPagination(central);
-        this.createColumnsSelector(pagination);
+        if (!this.options.data) {
+            var pagination = this.createPagination(central);
+            this.createColumnsSelector(pagination);
+        }
 
         this.renderTablePanel();
         this.reload();
-
-        this.createPagination(central);
+        if (!this.options.data) {
+            this.createPagination(central);
+        }
     },
 
     setPage: function(page) {
@@ -896,7 +1076,9 @@ $.widget("sokol.grid", {
     refresh: function () {
         this.renderTableHeader();
         this.renderRows();
-        this.updatePagination();
+        if (this.options.url) {
+            this.updatePagination();
+        }
     },
 
     reload: function() {
@@ -1126,11 +1308,11 @@ $.widget('sokol.header', {
         this.createMenu(leftMenu, this.options.leftMenu);
         this.createMenu(rightMenu, this.options.rightMenu);
 
-        var search = $('<form class="nav navbar-form navbar-right" role="search"></form>')
-            .append($('<div class="input-group"></div>')
-                .append($('<input type="text" class="form-control" placeholder="Поиск" name="srch-term" id="srch-term">'))
-                .append($('<div class="input-group-btn"></div>')
-                    .append('<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>')));
+        //var search = $('<form class="nav navbar-form navbar-right" role="search"></form>')
+        //    .append($('<div class="input-group"></div>')
+        //        .append($('<input type="text" class="form-control" placeholder="Поиск" name="srch-term" id="srch-term">'))
+        //        .append($('<div class="input-group-btn"></div>')
+        //            .append('<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>')));
 
         this.element.addClass('navbar navbar-inverse navbar-fixed-top')
             .append($('<div></div>').addClass('container')
@@ -1144,8 +1326,8 @@ $.widget('sokol.header', {
                     .append($('<a href="">Сокол СЭД</a>').addClass('navbar-brand')))
                 .append($('<div id="navbar"></div>').addClass('navbar-collapse collapse')
                     .append(leftMenu)
-                    .append(rightMenu)
-                    .append(search))
+                    .append(rightMenu))
+                    //.append(search))
         );
     },
     createMenu: function (node, menu) {
@@ -1222,6 +1404,9 @@ $.widget('sokol.list', {
                     currentNode = header;
                     header.find("a").click(produceHandler(item));
                 } else {
+                    if (!currentNode) {
+                        currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                    }
                     var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
                     category.find("a").click(produceHandler(item));
                 }
