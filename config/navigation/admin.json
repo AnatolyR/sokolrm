@@ -2,23 +2,11 @@
   "items": [
     {
       "id": "users",
-      "title": "Сотрудники"
+      "title": "Пользователи"
     },
     {
       "id": "groups",
       "title": "Группы"
-    },
-    {
-      "id": "contragents",
-      "title": "Контрагенты"
-    },
-    {
-      "id": "documentkinds",
-      "title": "Виды документов"
-    },
-    {
-      "id": "titles",
-      "title": "Заголовки документов"
     }
   ]
 }

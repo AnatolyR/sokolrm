@@ -325,6 +325,64 @@ modules["grid"] = (function() {
             action: function() {
                 $.sokol.grid(optionsC, $("<div></div>").appendTo("body"));
             }
+        },
+        showAllColumns: {
+            title: "Видимость всех колонок без настройки",
+            action: function() {
+                var optionsD = {
+                    columnsVisible: null,
+                    title: "All columns",
+                    "columns": optionsC.columns,
+                    "data" : optionsC.data
+                };
+                $.sokol.grid(optionsD, $("<div></div>").appendTo("body"));
+            }
+        },
+        showCheckboxes: {
+            title: "С возможностью выбора",
+            action: function () {
+                var deleteAction = function(data) {
+                    var ids = data.map(function(e) {return e.id});
+                    //alert();
+                    $.post('app/deleteDictionaryValues',
+                        {ids: ids},
+                        $.proxy(function(response){
+                            if (response === 'true') {
+                                $.notify({
+                                    message: 'Элементы удалены'
+                                },{
+                                    type: 'success',
+                                    delay: 1000,
+                                    timer: 1000
+                                });
+                            } else {
+                                $.notify({message: 'Не удалось удалить эелементы'},{type: 'danger', delay: 0, timer: 0});
+                            }
+                        }, this)
+                    );
+                };
+                var deleteMethod = function(grid, objects) {
+                    var titles = objects.map(function(e) {return e.title});
+
+                    $.sokol.smodal({
+                        title: 'Подтверждение удаления',
+                        body: titles.join(),
+                        confirmButtonTitle: 'Удалить',
+                        confirmAction: deleteAction,
+                        data: objects
+                    });
+                };
+                var optionsD = {
+                    columnsVisible: null,
+                    title: "All columns",
+                    "columns": optionsC.columns,
+                    "data": optionsC.data,
+                    selectable: true,
+                    deletable: true,
+                    deleteMethod: deleteMethod
+                };
+                $.sokol.grid(optionsD, $("<div></div>").appendTo("body"));
+            }
         }
     }
 }());

@@ -18,12 +18,14 @@ import com.kattysoft.core.ContragentService;
 import com.kattysoft.core.DictionaryService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.Contragent;
+import com.kattysoft.core.model.DictionaryValue;
 import com.kattysoft.core.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,17 +81,26 @@ public class DictionaryController {
         String fullId = "dictionaries/" + id;
         JsonNode config = configService.getConfig2(fullId);
 
-        List<String> titles = dictionaryService.getValuesTitlesForDictionaryId(id);
+        List<DictionaryValue> values = dictionaryService.getValuesForDictionaryId(id);
 
         ArrayNode data = mapper.createArrayNode();
 
-        titles.forEach(t -> {
-            data.add(t);
+        values.forEach(v -> {
+            ObjectNode item = mapper.createObjectNode();
+            item.put("id", v.getId().toString());
+            item.put("title", v.getTitle());
+            data.add(item);
         });
 
         ((ObjectNode) config).set("data", data);
 
         return config.toString();
+    }
+
+    @RequestMapping("deleteDictionaryValues")
+    public String deleteDictionaryValues(String[] ids) {
+        dictionaryService.deleteDictionaryValues(Arrays.asList(ids));
+        return "true";
     }
 
     public void setUserService(UserService userService) {

@@ -5,6 +5,7 @@ $.widget('sokol.app', {
     _create: function () {
         console.debug("app.init");
         moment.locale('ru');
+        $.ajaxSetup({traditional: true}); //Do not use a[] for sending arrays to server
         this.showHeader();
 
         $(window).bind('hashchange', $.proxy(function() {

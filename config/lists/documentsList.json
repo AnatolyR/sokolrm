@@ -30,7 +30,9 @@
       },
       {
         "id": "title",
-        "title": "Заголовок"
+        "title": "Заголовок",
+        "render": "link",
+        "linkType": "document"
       },
       {
         "id": "registrationDate",

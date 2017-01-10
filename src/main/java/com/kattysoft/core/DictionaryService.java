@@ -7,6 +7,8 @@
  */
 package com.kattysoft.core;
 
+import com.kattysoft.core.model.DictionaryValue;
+
 import java.util.List;
 
 /**
@@ -15,4 +17,8 @@ import java.util.List;
  */
 public interface DictionaryService {
     List<String> getValuesTitlesForDictionaryId(String dictionaryId);
+
+    List<DictionaryValue> getValuesForDictionaryId(String dictionaryId);
+
+    void deleteDictionaryValues(List<String> ids);
 }

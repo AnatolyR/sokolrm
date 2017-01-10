@@ -2,12 +2,9 @@
   "title": "Вид документа",
   "gridConfig": {
     "title": "Вид документа",
-    "columnsVisible": [
-      "value"
-    ],
     "columns": [
       {
-        "id": "value",
+        "id": "title",
         "title": "Заголовок"
       }
     ]

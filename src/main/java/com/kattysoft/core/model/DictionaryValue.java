@@ -34,6 +34,13 @@ public class DictionaryValue {
 
     private String title;
 
+    public DictionaryValue() {
+    }
+
+    public DictionaryValue(UUID id) {
+        this.id = id;
+    }
+
     public UUID getId() {
         return id;
     }

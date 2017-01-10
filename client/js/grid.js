@@ -8,8 +8,12 @@ $.widget("sokol.grid", {
         currentPage: 1,
         total: 0,
         title: "",
-        columnsVisible: [],
-        objectType: 'document'
+        columnsVisible: null,
+        objectType: null,
+        linkColumn: null,
+        selectable: false,
+        deletable: false,
+        deleteMethod: null
     },
 
     _create: function () {
@@ -29,15 +33,24 @@ $.widget("sokol.grid", {
         var central = this.element;
         central.empty();
 
+        var topBar = this.createButtonsBar(central);
         if (!this.options.data) {
-            var pagination = this.createPagination(central);
-            this.createColumnsSelector(pagination);
+            var pagination = this.createPagination(topBar);
+        } else {
+            $('<span style="margin-right: 10px;">Найдено: <span name="gridItemsCount">' + this.options.data.length + '</span></span>').appendTo(topBar);
+        }
+        if (this.options.columnsVisible) {
+            this.createColumnsSelector(topBar);
+        }
+        if (this.options.deletable) {
+            this.createDeleteButton(topBar);
         }
 
         this.renderTablePanel();
         this.reload();
         if (!this.options.data) {
-            this.createPagination(central);
+            var bottomBar = this.createButtonsBar(central);
+            this.createPagination(bottomBar);
         }
     },
 
@@ -85,8 +98,12 @@ $.widget("sokol.grid", {
         }
     },
 
-    createPagination: function(container) {
-        var div = $('<div style="text-align1: center; margin-bottom: 10px;"></div>').appendTo(container);
+    createButtonsBar: function(container) {
+        var div = $('<div style="margin-bottom: 10px;"></div>').appendTo(container);
+        return div;
+    },
+
+    createPagination: function(div) {
         $(
             '<span style="margin-right: 10px;">Найдено: <span name="gridItemsCount">0</span></span>' +
             '<button name="preview" class="btn btn-default" href = "#" disabled1="disable">' +
@@ -158,6 +175,9 @@ $.widget("sokol.grid", {
         var columns = this.options.columns;
         var header = $("<tr></tr>");
         header.appendTo(thead);
+        if (this.options.selectable) {
+            $('<th style="width: 40px;"></th>').appendTo(header);
+        }
         for (var i = 0; i < columns.length; i++) {
             var col = columns[i];
             var colType = columns[i].type;
@@ -191,7 +211,7 @@ $.widget("sokol.grid", {
     },
 
     isColumnVisible: function(columnId) {
-        return this.options.columnsVisible.indexOf(columnId) >= 0;
+        return !this.options.columnsVisible || this.options.columnsVisible.indexOf(columnId) >= 0;
     },
 
     renderRows: function() {
@@ -202,6 +222,23 @@ $.widget("sokol.grid", {
         for (var j = 0; j < rowsData.length; j++) {
             var row = $("<tr></tr>");
             var rowObj = rowsData[j];
+            if (this.options.selectable) {
+                var td = $('<td></td>');
+                var checkbox = $('<input type="checkbox" dataId="' + rowObj.id + '">');
+                checkbox.click($.proxy(function(e) {
+                    this.updateButtons();
+                    e.stopPropagation();
+                }, this));
+                checkbox.appendTo(td);
+                td.appendTo(row);
+
+                td.click(function(){
+                    var cb = $(this).find('input[type=checkbox]');
+                    var checked = cb.prop('checked');
+                    cb.prop('checked', checked ? '' : 'checked');
+                });
+
+            }
             for (var k = 0; k < columns.length; k++) {
                 var column = columns[k];
                 var colId = column.id;
@@ -209,11 +246,12 @@ $.widget("sokol.grid", {
                 if (colType != "hidden" && this.isColumnVisible(colId)) {
                     var val = rowObj[colId];
                     if (val || colId == "title") {
-                        if (colId == "title") {
+                        if (colId == this.options.linkColumn || column.render == 'link') {
                             if (!val || 0 === val.length) {
                                 val = "[Заголовок не указан]";
                             }
-                            var td = $('<td><a href="#' + this.options.objectType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
+                            var linkType = column.linkType ? column.linkType : this.options.objectType;
+                            var td = $('<td><a href="#' + linkType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
                             td.appendTo(row);
                         } else if (column.render == 'datetime') {
                             val = moment(val).format('L LT');
@@ -233,9 +271,36 @@ $.widget("sokol.grid", {
         }
     },
 
+    updateButtons: function() {
+        if (this.element.find('tbody input:checked').length > 0) {
+            this.deleteButton.attr("disabled", false);
+        } else {
+            this.deleteButton.attr("disabled", true);
+        }
+    },
+
+    createDeleteButton: function(element) {
+        var deleteButton = $('<button type="button" disabled="disabled" name="delete" style="margin-right: 5px;" class="btn btn-danger">Удалить</button>');
+        deleteButton.click($.proxy(function() {
+            var ids = this.element.find('tbody input:checked').map(function (i, el) {
+                return $(el).attr('dataId');
+            }).toArray();
+
+            var objects = this.options.data.filter(function(element) {
+                return ids.indexOf(element.id) >= 0;
+            });
+
+            if (this.options.deleteMethod && objects.length > 0) {
+                this.options.deleteMethod(this, objects);
+            }
+        }, this));
+        deleteButton.appendTo(element);
+        this.deleteButton = deleteButton;
+    },
+
     createColumnsSelector: function(element) {
         var selector = $('<div class="dropdown btn-group">'+
-            '<button type="button" class="btn btn-default btn dropdown-toggle" data-toggle="dropdown">Колонки <span class="caret"></span></button>'+
+            '<button type="button" style="margin-right: 10px;" class="btn btn-default btn dropdown-toggle" data-toggle="dropdown">Колонки <span class="caret"></span></button>'+
             '<ul name="columns" class="dropdown-menu">'+
             '</ul>'+
             '</div>');

@@ -43,7 +43,43 @@ $.widget('sokol.dictionaries', {
         }
     },
 
+    doDelete: function(data) {
+        var ids = data.map(function(e) {return e.id});
+        $.post('app/deleteDictionaryValues',
+            {ids: ids},
+            $.proxy(function(response){
+                if (response === 'true') {
+                    $.notify({
+                        message: 'Элементы удалены'
+                    },{
+                        type: 'success',
+                        delay: 1000,
+                        timer: 1000
+                    });
+                    if (this.options.id.startsWith("dictionaries/")) {
+                        this.createGrid(this.options.id.substring(13));
+                    }
+                } else {
+                    $.notify({message: 'Не удалось удалить эелементы'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this)
+        );
+    },
+
+    doDeleteWithConfirm: function(grid, objects) {
+        var titles = objects.map(function(e) {return e.title});
+
+        $.sokol.smodal({
+            title: 'Подтверждение удаления',
+            body: titles.join(', '),
+            confirmButtonTitle: 'Удалить',
+            confirmAction: $.proxy(this.doDelete, this),
+            data: objects
+        });
+    },
+
     createGrid: function(id) {
+        this.options.id = "dictionaries/" + id;
         if (this.grid) {
             this.grid.destroy();
         }
@@ -56,8 +92,8 @@ $.widget('sokol.dictionaries', {
                 var preparedData = [];
                 data.data.forEach(function(item) {
                     preparedData.push({
-                        id: item,
-                        value: item
+                        id: item.id,
+                        title: item.title
                     });
                 });
                 var options = {
@@ -65,7 +101,10 @@ $.widget('sokol.dictionaries', {
                     columnsVisible: data.gridConfig.columnsVisible,
                     columns: data.gridConfig.columns,
                     data: preparedData,
-                    id: id
+                    id: id,
+                    selectable: true,
+                    deletable: true,
+                    deleteMethod: $.proxy(this.doDeleteWithConfirm, this)
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {

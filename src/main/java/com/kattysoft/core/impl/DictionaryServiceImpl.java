@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -31,6 +33,18 @@ public class DictionaryServiceImpl implements DictionaryService {
         List<DictionaryValue> dictionaryValues = dictionaryValueRepository.findByDictionaryId(dictionaryId, new Sort("title"));
         List<String> titles = dictionaryValues.stream().map(DictionaryValue::getTitle).collect(Collectors.toList());
         return titles;
+    }
+
+    @Override
+    public List<DictionaryValue> getValuesForDictionaryId(String dictionaryId) {
+        List<DictionaryValue> dictionaryValues = dictionaryValueRepository.findByDictionaryId(dictionaryId, new Sort("title"));
+        return dictionaryValues;
+    }
+
+    @Override
+    public void deleteDictionaryValues(List<String> ids) {
+        List<DictionaryValue> values = ids.stream().map(id -> new DictionaryValue(UUID.fromString(id))).collect(Collectors.toList());
+        dictionaryValueRepository.delete(values);
     }
 
     public void setDictionaryValueRepository(DictionaryValueRepository dictionaryValueRepository) {
