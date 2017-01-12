@@ -1,7 +1,7 @@
 {
   "items": [
     {
-      "id": "users",
+      "id": "organizationPersons",
       "title": "Сотрудники"
     },
     {
@@ -9,11 +9,14 @@
       "title": "Контрагенты"
     },
     {
+      "type": "header"
+    },
+    {
       "id": "documentKind",
       "title": "Виды документов"
     },
     {
-      "id": "titles",
+      "id": "documentTitles",
       "title": "Заголовки документов"
     }
   ]

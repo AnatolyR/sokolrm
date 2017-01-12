@@ -19,9 +19,14 @@ $.widget('sokol.dictionaries', {
         $.getJSON('app/config', {id: 'navigation/dictionaries'}, $.proxy(function(data) {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
-                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
-                    currentNode = header;
-                    header.find("a").click(produceHandler(item));
+                    if (item.title) {
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        currentNode = header;
+                        header.find("a").click(produceHandler(item));
+                    } else {
+                        var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                        currentNode = block;
+                    }
                 } else {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
@@ -78,6 +83,46 @@ $.widget('sokol.dictionaries', {
         });
     },
 
+    doAdd: function(data, callback) {
+        var obj = {};
+
+        data.forEach(function(e) {
+            obj[e.id] = e.value;
+        });
+
+        if (!obj['title'] || obj['title'].length === 0 || !obj['title'].trim()) {
+            $.notify({message: 'Значение словаря не может быть пустым.'},{type: 'warning', delay: 1000, timer: 1000});
+            return;
+        }
+        var id = this.options.id.substring(13);
+        $.post('app/addDictionaryValue',
+            {
+                dictionaryId: id,
+                data: JSON.stringify(obj)
+            },
+            $.proxy(function(response){
+                if (response) {
+                    $.notify({
+                        message: 'Элемент добавлен'
+                    },{
+                        type: 'success',
+                        delay: 1000,
+                        timer: 1000
+                    });
+                    callback(response);
+                } else {
+                    $.notify({message: 'Не удалось добавить эелемент'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this)
+        ).fail(function(e) {
+            if (e.responseJSON && e.responseJSON.error) {
+                $.notify({message: 'Значение словаря уже существует.'},{type: 'warning', delay: 1000, timer: 1000});
+            } else {
+                $.notify({message: 'Не удалось добавить эелемент. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+            }
+        });
+    },
+
     createGrid: function(id) {
         this.options.id = "dictionaries/" + id;
         if (this.grid) {
@@ -87,6 +132,10 @@ $.widget('sokol.dictionaries', {
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
+        if (id == 'organizationPersons') {
+            this.createOrganizationPersonGrid();
+            return;
+        }
         $.getJSON('app/dictionaryinfo', {id: id},
             $.proxy(function (data) {
                 var preparedData = [];
@@ -104,7 +153,9 @@ $.widget('sokol.dictionaries', {
                     id: id,
                     selectable: true,
                     deletable: true,
-                    deleteMethod: $.proxy(this.doDeleteWithConfirm, this)
+                    deleteMethod: $.proxy(this.doDeleteWithConfirm, this),
+                    addable: true,
+                    addMethod: $.proxy(this.doAdd, this)
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {
@@ -114,6 +165,13 @@ $.widget('sokol.dictionaries', {
         ).fail(function failLoadList() {
             $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
+    },
+
+    createOrganizationPersonGrid: function() {
+
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('dictionaries/organizationPersons');
+        }
     },
 
     _destroy: function() {

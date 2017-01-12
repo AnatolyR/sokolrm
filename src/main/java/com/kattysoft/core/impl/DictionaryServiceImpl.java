@@ -47,6 +47,31 @@ public class DictionaryServiceImpl implements DictionaryService {
         dictionaryValueRepository.delete(values);
     }
 
+    @Override
+    public boolean isValueExist(String dictionaryId, String title) {
+        if (dictionaryId == null || dictionaryId.isEmpty()) {
+            throw new RuntimeException("dictionaryId is null");
+        }
+        return dictionaryValueRepository.findByDictionaryIdAndTitle(dictionaryId, title).size() > 0;
+    }
+
+    @Override
+    public String addDictionaryValue(DictionaryValue value) {
+        if (value.getDictionaryId() == null || value.getDictionaryId().isEmpty()) {
+            throw new RuntimeException("dictionaryId is null");
+        }
+        UUID id = UUID.randomUUID();
+        value.setId(id);
+
+        dictionaryValueRepository.save(value);
+        return id.toString();
+    }
+
+    @Override
+    public DictionaryValue getDictionaryValue(String id) {
+        return dictionaryValueRepository.findOne(UUID.fromString(id));
+    }
+
     public void setDictionaryValueRepository(DictionaryValueRepository dictionaryValueRepository) {
         this.dictionaryValueRepository = dictionaryValueRepository;
     }

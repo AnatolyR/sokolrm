@@ -80,7 +80,7 @@ $.widget('sokol.app', {
     _create: function () {
         console.debug("app.init");
         moment.locale('ru');
-        $.ajaxSetup({traditional: true});
+        $.ajaxSetup({traditional: true}); //Do not use a[] for sending arrays to server
         this.showHeader();
 
         $(window).bind('hashchange', $.proxy(function() {
@@ -536,9 +536,14 @@ $.widget('sokol.dictionaries', {
         $.getJSON('app/config', {id: 'navigation/dictionaries'}, $.proxy(function(data) {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
-                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
-                    currentNode = header;
-                    header.find("a").click(produceHandler(item));
+                    if (item.title) {
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        currentNode = header;
+                        header.find("a").click(produceHandler(item));
+                    } else {
+                        var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                        currentNode = block;
+                    }
                 } else {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
@@ -595,6 +600,46 @@ $.widget('sokol.dictionaries', {
         });
     },
 
+    doAdd: function(data, callback) {
+        var obj = {};
+
+        data.forEach(function(e) {
+            obj[e.id] = e.value;
+        });
+
+        if (!obj['title'] || obj['title'].length === 0 || !obj['title'].trim()) {
+            $.notify({message: 'Значение словаря не может быть пустым.'},{type: 'warning', delay: 1000, timer: 1000});
+            return;
+        }
+        var id = this.options.id.substring(13);
+        $.post('app/addDictionaryValue',
+            {
+                dictionaryId: id,
+                data: JSON.stringify(obj)
+            },
+            $.proxy(function(response){
+                if (response) {
+                    $.notify({
+                        message: 'Элемент добавлен'
+                    },{
+                        type: 'success',
+                        delay: 1000,
+                        timer: 1000
+                    });
+                    callback(response);
+                } else {
+                    $.notify({message: 'Не удалось добавить эелемент'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this)
+        ).fail(function(e) {
+            if (e.responseJSON && e.responseJSON.error) {
+                $.notify({message: 'Значение словаря уже существует.'},{type: 'warning', delay: 1000, timer: 1000});
+            } else {
+                $.notify({message: 'Не удалось добавить эелемент. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+            }
+        });
+    },
+
     createGrid: function(id) {
         this.options.id = "dictionaries/" + id;
         if (this.grid) {
@@ -604,6 +649,10 @@ $.widget('sokol.dictionaries', {
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
+        if (id == 'organizationPersons') {
+            this.createOrganizationPersonGrid();
+            return;
+        }
         $.getJSON('app/dictionaryinfo', {id: id},
             $.proxy(function (data) {
                 var preparedData = [];
@@ -621,7 +670,9 @@ $.widget('sokol.dictionaries', {
                     id: id,
                     selectable: true,
                     deletable: true,
-                    deleteMethod: $.proxy(this.doDeleteWithConfirm, this)
+                    deleteMethod: $.proxy(this.doDeleteWithConfirm, this),
+                    addable: true,
+                    addMethod: $.proxy(this.doAdd, this)
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {
@@ -631,6 +682,12 @@ $.widget('sokol.dictionaries', {
         ).fail(function failLoadList() {
             $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
+    },
+
+    createOrganizationPersonGrid: function() {
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('dictionaries/organizationPersons');
+        }
     },
 
     _destroy: function() {
@@ -1069,7 +1126,9 @@ $.widget("sokol.grid", {
         linkColumn: null,
         selectable: false,
         deletable: false,
-        deleteMethod: null
+        deleteMethod: null,
+        addable: false,
+        addMethod: null
     },
 
     _create: function () {
@@ -1100,6 +1159,9 @@ $.widget("sokol.grid", {
         }
         if (this.options.deletable) {
             this.createDeleteButton(topBar);
+        }
+        if (this.options.addable) {
+            this.createAddButton(topBar);
         }
 
         this.renderTablePanel();
@@ -1155,7 +1217,7 @@ $.widget("sokol.grid", {
     },
 
     createButtonsBar: function(container) {
-        var div = $('<div style="text-align1: center; margin-bottom: 10px;"></div>').appendTo(container);
+        var div = $('<div style="margin-bottom: 10px;"></div>').appendTo(container);
         return div;
     },
 
@@ -1270,59 +1332,63 @@ $.widget("sokol.grid", {
         return !this.options.columnsVisible || this.options.columnsVisible.indexOf(columnId) >= 0;
     },
 
+    renderRow: function(row, rowObj) {
+        var columns = this.options.columns;
+        if (this.options.selectable) {
+            var td = $('<td></td>');
+            var checkbox = $('<input type="checkbox" dataId="' + rowObj.id + '">');
+            checkbox.click($.proxy(function(e) {
+                this.updateButtons();
+                e.stopPropagation();
+            }, this));
+            checkbox.appendTo(td);
+            td.appendTo(row);
+
+            td.click(function(){
+                var cb = $(this).find('input[type=checkbox]');
+                var checked = cb.prop('checked');
+                cb.prop('checked', checked ? '' : 'checked');
+            });
+
+        }
+        for (var k = 0; k < columns.length; k++) {
+            var column = columns[k];
+            var colId = column.id;
+            var colType = column.type;
+            if (colType != "hidden" && this.isColumnVisible(colId)) {
+                var val = rowObj[colId];
+                if (val || colId == "title") {
+                    if (colId == this.options.linkColumn || column.render == 'link') {
+                        if (!val || 0 === val.length) {
+                            val = "[Заголовок не указан]";
+                        }
+                        var linkType = column.linkType ? column.linkType : this.options.objectType;
+                        var td = $('<td><a href="#' + linkType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
+                        td.appendTo(row);
+                    } else if (column.render == 'datetime') {
+                        val = moment(val).format('L LT');
+
+                        var td = $('<td>' + (val ? val : '') + '</td>');
+                        td.appendTo(row);
+                    } else {
+                        var td = $('<td>' + (val ? val : '') + '</td>');
+                        td.appendTo(row);
+                    }
+                } else {
+                    row.append($('<td></td>'));
+                }
+            }
+        }
+    },
+
     renderRows: function() {
         var tbody = this.element.find('tbody');
         tbody.empty();
         var rowsData = this.options.data;
-        var columns = this.options.columns;
         for (var j = 0; j < rowsData.length; j++) {
             var row = $("<tr></tr>");
             var rowObj = rowsData[j];
-            if (this.options.selectable) {
-                var td = $('<td></td>');
-                var checkbox = $('<input type="checkbox" dataId="' + rowObj.id + '">');
-                checkbox.click($.proxy(function(e) {
-                    this.updateButtons();
-                    e.stopPropagation();
-                }, this));
-                checkbox.appendTo(td);
-                td.appendTo(row);
-
-                td.click(function(){
-                    var cb = $(this).find('input[type=checkbox]');
-                    var checked = cb.prop('checked');
-                    cb.prop('checked', checked ? '' : 'checked');
-                });
-
-            }
-            for (var k = 0; k < columns.length; k++) {
-                var column = columns[k];
-                var colId = column.id;
-                var colType = column.type;
-                if (colType != "hidden" && this.isColumnVisible(colId)) {
-                    var val = rowObj[colId];
-                    if (val || colId == "title") {
-                        if (colId == this.options.linkColumn || column.render == 'link') {
-                            if (!val || 0 === val.length) {
-                                val = "[Заголовок не указан]";
-                            }
-                            var linkType = column.linkType ? column.linkType : this.options.objectType;
-                            var td = $('<td><a href="#' + linkType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
-                            td.appendTo(row);
-                        } else if (column.render == 'datetime') {
-                            val = moment(val).format('L LT');
-
-                            var td = $('<td>' + (val ? val : '') + '</td>');
-                            td.appendTo(row);
-                        } else {
-                            var td = $('<td>' + (val ? val : '') + '</td>');
-                            td.appendTo(row);
-                        }
-                    } else {
-                        row.append($('<td></td>'));
-                    }
-                }
-            }
+            this.renderRow(row, rowObj);
             row.appendTo(tbody);
         }
     },
@@ -1352,6 +1418,68 @@ $.widget("sokol.grid", {
         }, this));
         deleteButton.appendTo(element);
         this.deleteButton = deleteButton;
+    },
+
+    createAddButton: function(buttonBar) {
+        var addButton = $('<button type="button" name="delete" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
+        addButton.click($.proxy(function() {
+            this.renderAddNewRow();
+        }, this));
+        addButton.appendTo(buttonBar);
+    },
+
+    doAddElement: function(row) {
+        row = this.element.find('tbody tr').first();
+        var values = row.find("input").map(function(i, e) {
+            var ee = $(e);
+            return {
+                id: ee.attr('name'),
+                value: ee.val()
+            }
+        }).toArray();
+
+        if (this.options.addMethod) {
+            this.options.addMethod(values, $.proxy(function(reloadValue) {
+                var tbody = this.element.find('tbody');
+                row.remove();
+                row = $('<tr></tr>').prependTo(tbody);
+                this.options.data.push(reloadValue);
+                this.renderRow(row, reloadValue);
+            }, this));
+        }
+    },
+
+    renderAddNewRow: function() {
+        var tbody = this.element.find('tbody');
+        var columns = this.options.columns;
+        var row = $("<tr></tr>");
+        if (this.options.selectable) {
+            $('<td></td>').appendTo(row);
+        }
+        for (var k = 0; k < columns.length; k++) {
+            var column = columns[k];
+            var colId = column.id;
+            var colType = column.type;
+            var editor = column.editor;
+            if (colType != "hidden" && this.isColumnVisible(colId)) {
+                if (editor == "text") {
+                    var td = $('<td></td>');
+                    var input = $('<input name="' + colId + '" type="text">').appendTo(td);
+
+                    input.bind("keypress", $.proxy(function(event) {
+                        if(event.which == 13) {
+                            event.preventDefault();
+                            this.doAddElement(row);
+                        }
+                    }, this));
+
+                    td.appendTo(row);
+                } else {
+                    row.append($('<td></td>'));
+                }
+            }
+        }
+        row.prependTo(tbody);
     },
 
     createColumnsSelector: function(element) {
@@ -1505,9 +1633,14 @@ $.widget('sokol.list', {
         $.getJSON('app/config', {id: 'navigation/main'}, $.proxy(function(data) {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
-                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
-                    currentNode = header;
-                    header.find("a").click(produceHandler(item));
+                    if (item.title) {
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        currentNode = header;
+                        header.find("a").click(produceHandler(item));
+                    } else {
+                        var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                        currentNode = block;
+                    }
                 } else {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);

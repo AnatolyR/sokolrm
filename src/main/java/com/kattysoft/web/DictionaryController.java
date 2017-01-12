@@ -13,10 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.ContragentService;
-import com.kattysoft.core.DictionaryService;
-import com.kattysoft.core.UserService;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Contragent;
 import com.kattysoft.core.model.DictionaryValue;
 import com.kattysoft.core.model.User;
@@ -27,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -101,6 +99,31 @@ public class DictionaryController {
     public String deleteDictionaryValues(String[] ids) {
         dictionaryService.deleteDictionaryValues(Arrays.asList(ids));
         return "true";
+    }
+
+    @RequestMapping("addDictionaryValue")
+    public DictionaryValue addDictionaryValue(String dictionaryId, String data) throws IOException {
+        if (dictionaryId == null || dictionaryId.isEmpty()) {
+            throw new RuntimeException("dictionaryId is null");
+        }
+        JsonNode node = mapper.readTree(data);
+        String title = node.get("title").asText();
+
+        if (title.isEmpty()) {
+            throw new RuntimeException("Empty title");
+        }
+
+        if (dictionaryService.isValueExist(dictionaryId, title)) {
+            throw new SokolException("Значение уже существует");
+        }
+
+        DictionaryValue value = new DictionaryValue();
+        value.setTitle(title);
+        value.setDictionaryId(dictionaryId);
+        String id = dictionaryService.addDictionaryValue(value);
+        DictionaryValue reloadedValue = dictionaryService.getDictionaryValue(id);
+
+        return reloadedValue;
     }
 
     public void setUserService(UserService userService) {

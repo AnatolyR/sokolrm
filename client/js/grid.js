@@ -13,7 +13,9 @@ $.widget("sokol.grid", {
         linkColumn: null,
         selectable: false,
         deletable: false,
-        deleteMethod: null
+        deleteMethod: null,
+        addable: false,
+        addMethod: null
     },
 
     _create: function () {
@@ -44,6 +46,9 @@ $.widget("sokol.grid", {
         }
         if (this.options.deletable) {
             this.createDeleteButton(topBar);
+        }
+        if (this.options.addable) {
+            this.createAddButton(topBar);
         }
 
         this.renderTablePanel();
@@ -214,59 +219,63 @@ $.widget("sokol.grid", {
         return !this.options.columnsVisible || this.options.columnsVisible.indexOf(columnId) >= 0;
     },
 
+    renderRow: function(row, rowObj) {
+        var columns = this.options.columns;
+        if (this.options.selectable) {
+            var td = $('<td></td>');
+            var checkbox = $('<input type="checkbox" dataId="' + rowObj.id + '">');
+            checkbox.click($.proxy(function(e) {
+                this.updateButtons();
+                e.stopPropagation();
+            }, this));
+            checkbox.appendTo(td);
+            td.appendTo(row);
+
+            td.click(function(){
+                var cb = $(this).find('input[type=checkbox]');
+                var checked = cb.prop('checked');
+                cb.prop('checked', checked ? '' : 'checked');
+            });
+
+        }
+        for (var k = 0; k < columns.length; k++) {
+            var column = columns[k];
+            var colId = column.id;
+            var colType = column.type;
+            if (colType != "hidden" && this.isColumnVisible(colId)) {
+                var val = rowObj[colId];
+                if (val || colId == "title") {
+                    if (colId == this.options.linkColumn || column.render == 'link') {
+                        if (!val || 0 === val.length) {
+                            val = "[Заголовок не указан]";
+                        }
+                        var linkType = column.linkType ? column.linkType : this.options.objectType;
+                        var td = $('<td><a href="#' + linkType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
+                        td.appendTo(row);
+                    } else if (column.render == 'datetime') {
+                        val = moment(val).format('L LT');
+
+                        var td = $('<td>' + (val ? val : '') + '</td>');
+                        td.appendTo(row);
+                    } else {
+                        var td = $('<td>' + (val ? val : '') + '</td>');
+                        td.appendTo(row);
+                    }
+                } else {
+                    row.append($('<td></td>'));
+                }
+            }
+        }
+    },
+
     renderRows: function() {
         var tbody = this.element.find('tbody');
         tbody.empty();
         var rowsData = this.options.data;
-        var columns = this.options.columns;
         for (var j = 0; j < rowsData.length; j++) {
             var row = $("<tr></tr>");
             var rowObj = rowsData[j];
-            if (this.options.selectable) {
-                var td = $('<td></td>');
-                var checkbox = $('<input type="checkbox" dataId="' + rowObj.id + '">');
-                checkbox.click($.proxy(function(e) {
-                    this.updateButtons();
-                    e.stopPropagation();
-                }, this));
-                checkbox.appendTo(td);
-                td.appendTo(row);
-
-                td.click(function(){
-                    var cb = $(this).find('input[type=checkbox]');
-                    var checked = cb.prop('checked');
-                    cb.prop('checked', checked ? '' : 'checked');
-                });
-
-            }
-            for (var k = 0; k < columns.length; k++) {
-                var column = columns[k];
-                var colId = column.id;
-                var colType = column.type;
-                if (colType != "hidden" && this.isColumnVisible(colId)) {
-                    var val = rowObj[colId];
-                    if (val || colId == "title") {
-                        if (colId == this.options.linkColumn || column.render == 'link') {
-                            if (!val || 0 === val.length) {
-                                val = "[Заголовок не указан]";
-                            }
-                            var linkType = column.linkType ? column.linkType : this.options.objectType;
-                            var td = $('<td><a href="#' + linkType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
-                            td.appendTo(row);
-                        } else if (column.render == 'datetime') {
-                            val = moment(val).format('L LT');
-
-                            var td = $('<td>' + (val ? val : '') + '</td>');
-                            td.appendTo(row);
-                        } else {
-                            var td = $('<td>' + (val ? val : '') + '</td>');
-                            td.appendTo(row);
-                        }
-                    } else {
-                        row.append($('<td></td>'));
-                    }
-                }
-            }
+            this.renderRow(row, rowObj);
             row.appendTo(tbody);
         }
     },
@@ -296,6 +305,68 @@ $.widget("sokol.grid", {
         }, this));
         deleteButton.appendTo(element);
         this.deleteButton = deleteButton;
+    },
+
+    createAddButton: function(buttonBar) {
+        var addButton = $('<button type="button" name="delete" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
+        addButton.click($.proxy(function() {
+            this.renderAddNewRow();
+        }, this));
+        addButton.appendTo(buttonBar);
+    },
+
+    doAddElement: function(row) {
+        row = this.element.find('tbody tr').first();
+        var values = row.find("input").map(function(i, e) {
+            var ee = $(e);
+            return {
+                id: ee.attr('name'),
+                value: ee.val()
+            }
+        }).toArray();
+
+        if (this.options.addMethod) {
+            this.options.addMethod(values, $.proxy(function(reloadValue) {
+                var tbody = this.element.find('tbody');
+                row.remove();
+                row = $('<tr></tr>').prependTo(tbody);
+                this.options.data.push(reloadValue);
+                this.renderRow(row, reloadValue);
+            }, this));
+        }
+    },
+
+    renderAddNewRow: function() {
+        var tbody = this.element.find('tbody');
+        var columns = this.options.columns;
+        var row = $("<tr></tr>");
+        if (this.options.selectable) {
+            $('<td></td>').appendTo(row);
+        }
+        for (var k = 0; k < columns.length; k++) {
+            var column = columns[k];
+            var colId = column.id;
+            var colType = column.type;
+            var editor = column.editor;
+            if (colType != "hidden" && this.isColumnVisible(colId)) {
+                if (editor == "text") {
+                    var td = $('<td></td>');
+                    var input = $('<input name="' + colId + '" type="text">').appendTo(td);
+
+                    input.bind("keypress", $.proxy(function(event) {
+                        if(event.which == 13) {
+                            event.preventDefault();
+                            this.doAddElement(row);
+                        }
+                    }, this));
+
+                    td.appendTo(row);
+                } else {
+                    row.append($('<td></td>'));
+                }
+            }
+        }
+        row.prependTo(tbody);
     },
 
     createColumnsSelector: function(element) {

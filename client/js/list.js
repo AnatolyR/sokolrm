@@ -19,9 +19,14 @@ $.widget('sokol.list', {
         $.getJSON('app/config', {id: 'navigation/main'}, $.proxy(function(data) {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
-                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
-                    currentNode = header;
-                    header.find("a").click(produceHandler(item));
+                    if (item.title) {
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        currentNode = header;
+                        header.find("a").click(produceHandler(item));
+                    } else {
+                        var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                        currentNode = block;
+                    }
                 } else {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);

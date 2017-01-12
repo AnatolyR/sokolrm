@@ -20,4 +20,5 @@ import java.util.UUID;
  */
 public interface DictionaryValueRepository extends CrudRepository<DictionaryValue, UUID> {
     List<DictionaryValue> findByDictionaryId(String dictionaryId, Sort sort);
+    List<DictionaryValue> findByDictionaryIdAndTitle(String dictionaryId, String title);
 }

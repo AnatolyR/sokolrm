@@ -82,7 +82,8 @@ modules["grid"] = (function() {
             },
             {
                 "id": "title",
-                "title": "Заголовок"
+                "title": "Заголовок",
+                "editor": "text"
             },
             {
                 "id": "registrationDate",
@@ -122,7 +123,8 @@ modules["grid"] = (function() {
             },
             {
                 "id": "title",
-                "title": "Заголовок"
+                "title": "Заголовок",
+                "editor": "text"
             },
             {
                 "id": "registrationDate",
@@ -380,6 +382,50 @@ modules["grid"] = (function() {
                     selectable: true,
                     deletable: true,
                     deleteMethod: deleteMethod
+                };
+                $.sokol.grid(optionsD, $("<div></div>").appendTo("body"));
+            }
+        },
+        showAddable: {
+            title: "С возможностью добавления",
+            action: function () {
+                var addAction = function(data, callback) {
+                    console.log("data >>>> ", data);
+
+                    var obj = {};
+
+                    data.forEach(function(e) {
+                        obj[e.id] = e.value;
+                    });
+
+                    obj.id = "test";
+
+                    callback(obj);
+                    //$.post('app/addDictionaryValues',
+                    //    {value: data},
+                    //    $.proxy(function(response){
+                    //        if (response === 'true') {
+                    //            $.notify({
+                    //                message: 'Элемент добавлен'
+                    //            },{
+                    //                type: 'success',
+                    //                delay: 1000,
+                    //                timer: 1000
+                    //            });
+                    //        } else {
+                    //            $.notify({message: 'Не удалось добавить эелемент'},{type: 'danger', delay: 0, timer: 0});
+                    //        }
+                    //    }, this)
+                    //);
+                };
+                var optionsD = {
+                    columnsVisible: null,
+                    title: "All columns",
+                    "columns": optionsC.columns,
+                    "data": optionsC.data,
+                    selectable: true,
+                    addable: true,
+                    addMethod: addAction
                 };
                 $.sokol.grid(optionsD, $("<div></div>").appendTo("body"));
             }

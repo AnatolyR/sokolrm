@@ -30,6 +30,15 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <filter>
+        <filter-name>errorFilter</filter-name>
+        <filter-class>com.kattysoft.web.ErrorFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>errorFilter</filter-name>
+        <url-pattern>/app/*</url-pattern>
+    </filter-mapping>
+
     <!-- Initializing root Spring context from applicationContext.xml, not possible to route web requests-->
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>

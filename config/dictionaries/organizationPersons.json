@@ -1,0 +1,23 @@
+{
+  "title": "Сотрудники",
+  "gridConfig": {
+    "columns": [
+      {
+        "id": "lastName",
+        "title": "Фамилия"
+      },
+      {
+        "id": "firstName",
+        "title": "Имя"
+      },
+      {
+        "id": "middleName",
+        "title": "Отчество"
+      },
+      {
+        "id": "title",
+        "title": "Сокращенное имя"
+      }
+    ]
+  }
+}

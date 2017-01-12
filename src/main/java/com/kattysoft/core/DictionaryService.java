@@ -21,4 +21,10 @@ public interface DictionaryService {
     List<DictionaryValue> getValuesForDictionaryId(String dictionaryId);
 
     void deleteDictionaryValues(List<String> ids);
+
+    boolean isValueExist(String dictionaryId, String title);
+
+    String addDictionaryValue(DictionaryValue value);
+
+    DictionaryValue getDictionaryValue(String id);
 }
