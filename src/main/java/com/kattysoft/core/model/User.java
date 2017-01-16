@@ -9,11 +9,10 @@
  */
 package com.kattysoft.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
 
 /**
@@ -28,6 +27,9 @@ public class User {
     private UUID id;
 
     private String login;
+
+    @JsonIgnore
+    @Basic(fetch = FetchType.LAZY)
     private String password;
 
     private String title;

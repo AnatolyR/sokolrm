@@ -1,7 +1,7 @@
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
   ('580f62b3-7b96-4109-a321-dc7d24109a1a', 'Поляков И. В.', null, null, 'Иван', 'Вячеславович', 'Поляков');
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
-  ('722b151c-f9d7-4222-b541-cfc554695510', 'Ивашов В. Н.', 'login1', '0df36e68fe2cf9ad2f0113981878514e', 'Виктор', 'Николаевич', 'Ивашов');
+  ('722b151c-f9d7-4222-b541-cfc554695510', 'Ивашов В. Н.', 'test', '749bc613e059779cc5e4c22e8fa7bba9', 'Виктор', 'Николаевич', 'Ивашов');
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
   ('dc175f6e-b18d-495f-aca9-58c956e48a42', 'Беломестов Г. В.', null, null, 'Густав', 'Валерьевич', 'Беломестов');
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
@@ -38,3 +38,44 @@ INSERT INTO users (id, title, login, password, firstname, middlename, lastname) 
   ('5809dcc7-2903-4dfa-bea9-eb3d30035d51', 'Балашова Д. М.', null, null, 'Дарья', 'Михайловна', 'Балашова');
 INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
   ('f179d503-c3fe-4b31-b596-fb36aa58f364', 'Гарина В. М.', null, null, 'Валентина', 'Михайловна', 'Гарина');
+
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('5be7fed3-fde0-4aa9-8a3a-498d5026a3a2', 'Беломестов И. М.', null, null, 'Иван', 'Максимович', 'Беломестов');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('5ca6d548-afa3-4c26-a72e-f0f19100e701', 'Луков Б. П.', null, null, 'Бронислав', 'Петрович', 'Луков');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('a36d1e1d-a00b-41f7-b0a4-12c63646d384', 'Карандашов Б. С.', null, null, 'Бронислав', 'Сергеевич', 'Карандашов');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('5d729b02-4d8c-4abd-80cc-c7497d1945cf', 'Луков В. А.', null, null, 'Виктор', 'Алексеевич', 'Луков');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('00fb33e6-061c-46d5-a5c9-22053eef30c4', 'Грибов Б. В.', null, null, 'Борис', 'Валерьевич', 'Грибов');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('1b025ff2-948d-4f7f-8261-6456f8f8c19e', 'Зверев Б. А.', null, null, 'Бронислав', 'Алексеевич', 'Зверев');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('c58f8de5-4431-4c1b-a62e-55c804ba914f', 'Грибов К. С.', null, null, 'Карл', 'Сергеевич', 'Грибов');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('fc947860-1a91-4a23-a275-82dec5bb5c96', 'Болотников К. Н.', null, null, 'Карл', 'Николаевич', 'Болотников');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('d259e840-0b34-4512-bc2e-5b5498dc4171', 'Карандашов К. Н.', null, null, 'Карл', 'Николаевич', 'Карандашов');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('7fa705ee-ac8e-40df-8c83-4024aedc0421', 'Виноградов К. В.', null, null, 'Карл', 'Валерьевич', 'Виноградов');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('721f2b0b-91d1-4703-bff0-05a130a3b114', 'Зверева А. А.', null, null, 'Антонина', 'Аркадьевна', 'Зверева');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('9bb42bab-8965-49d2-b134-cec0d1505cc3', 'Ивашова А. Е.', null, null, 'Анна', 'Егоровна', 'Ивашова');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('c90b9c9f-ca1a-4b7c-bc77-3557c908f8d7', 'Енотина А. В.', null, null, 'Анна', 'Вячеславовна', 'Енотина');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('39d3f6ae-ca8b-4814-a25e-57b6f253bde3', 'Карандашова А. А.', null, null, 'Антонина', 'Аркадьевна', 'Карандашова');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('c5e87618-76c8-491f-bb25-aee010be5ab7', 'Грибова В. М.', null, null, 'Валентина', 'Михайловна', 'Грибова');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('c0d2e91b-81f6-4560-b2c3-11654c6835ef', 'Гарина А. А.', null, null, 'Анна', 'Аркадьевна', 'Гарина');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('cc1b2ba7-c245-4680-bc15-97b04be8b50e', 'Грибова А. С.', null, null, 'Антонина', 'Сергеевна', 'Грибова');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('697660a9-8bed-4548-a15e-757282776ebb', 'Карандашова А. В.', null, null, 'Анна', 'Вячеславовна', 'Карандашова');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('a4cff11c-936a-45e1-889f-f478f27fcc20', 'Зверева А. М.', null, null, 'Антонина', 'Михайловна', 'Зверева');
+INSERT INTO users (id, title, login, password, firstname, middlename, lastname) VALUES
+  ('a4fa069b-64ac-4a7e-ba5f-a3dc3e84c66e', 'Карандашова Д. Г.', null, null, 'Дарья', 'Георгиевна', 'Карандашова');

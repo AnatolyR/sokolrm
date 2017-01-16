@@ -12,6 +12,10 @@ package com.kattysoft.core.repository;
 import com.kattysoft.core.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.jdbc.Sql;
@@ -60,7 +64,6 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         user.setId(id);
         user.setTitle("Test User Title");
         user.setLogin("login1");
-        user.setPassword("password1");
         user.setFirstName("First Name");
         user.setMiddleName("Middle Name");
         user.setLastName("Last Name");
@@ -83,7 +86,7 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         }
         System.out.println("----------------");
 
-        assertThat(n, equalTo(20));
+        assertThat(n, equalTo(40));
 
         List<User> list = userRepository.findByTitleContaining("Волков");
         int m = 0;
@@ -111,8 +114,8 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
     @Sql("file:db/sampleData/usersData.sql")
     public void testFindByLoginAndPassword() throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
-        String login = "login1";
-        String pass = "pass1";
+        String login = "test";
+        String pass = "123";
         String salt = "_sdf345sf34";
         String hashedPass = md5(md5(md5(pass) + login) + salt);
         System.out.println(">>> " + hashedPass);
@@ -120,4 +123,32 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         User user = userRepository.findByLoginAndPassword(login, hashedPass);
         assertThat(user.getTitle(), equalTo("Ивашов В. Н."));
     }
+
+    @Test
+    @Sql("file:db/users.sql")
+    @Sql("file:db/sampleData/usersData.sql")
+    public void testFindAllPageable() {
+        Sort sort = new Sort("lastName");
+        PageRequest pageRequest = new PageRequest(0, 10, sort);
+        Page<User> page = userRepository.findAll(pageRequest);
+        int n = 0;
+        for (User user : page.getContent()) {
+            System.out.println(user.getId() + " " + user.getTitle());
+            n++;
+        }
+        System.out.println("Total: " + page.getTotalElements());
+        System.out.println("----------------");
+        pageRequest = new PageRequest(1, 5, sort);
+        page = userRepository.findAll(pageRequest);
+        n = 0;
+        for (User user : page.getContent()) {
+            System.out.println(user.getId() + " " + user.getTitle());
+            n++;
+        }
+        System.out.println("Total: " + page.getTotalElements());
+        System.out.println("----------------");
+
+        assertThat(n, equalTo(5));
+    }
+
 }

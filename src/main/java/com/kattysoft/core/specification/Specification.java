@@ -29,7 +29,7 @@ public class Specification {
     private List<String> fields;
     private Condition condition;
     private List<Sort> sort;
-    private Integer size;
+    private Integer size = 20; //default page size
     private Integer offset;
     private String join;
 

@@ -10,6 +10,9 @@
 package com.kattysoft.core.repository;
 
 import com.kattysoft.core.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -27,4 +30,6 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     List<User> findIdAndTitleByTitle(String title);
 
     User findByLoginAndPassword(String login, String password);
+
+    Page<User> findAll(Pageable pageable);
 }

@@ -650,7 +650,7 @@ $.widget('sokol.dictionaries', {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
         if (id == 'organizationPersons') {
-            this.createOrganizationPersonGrid();
+            this.createOrganizationPersonsGrid();
             return;
         }
         $.getJSON('app/dictionaryinfo', {id: id},
@@ -684,10 +684,45 @@ $.widget('sokol.dictionaries', {
         });
     },
 
-    createOrganizationPersonGrid: function() {
-        if (this.options.dispatcher) {
-            this.options.dispatcher.updateHash('dictionaries/organizationPersons');
-        }
+    createOrganizationPersonsGrid: function() {
+        //var options = {
+        //    title: 'Сотрудники организации',
+        //    columnsVisible: [
+        //        'lastName',
+        //        'firstName',
+        //        'middleName',
+        //        'title'
+        //    ],
+        //    columns: [
+        //        {
+        //            'id': 'lastName',
+        //            'title': 'Фамилия'
+        //        },
+        //        {
+        //            'id': 'firstName',
+        //            'title': 'Имя'
+        //        },
+        //        {
+        //            'id': 'middleName',
+        //            'title': 'Отчество'
+        //        },
+        //        {
+        //            'id': 'title',
+        //            'title': 'Сокращенное имя'
+        //        }
+        //    ],
+        //    id: 'organizationPersons',
+        //    url: 'app/users'
+        //};
+
+        $.getJSON('app/config', {id: 'dictionaries/organizationPersons'}, $.proxy(function(response) {
+            var options = response.gridConfig;
+            this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+
+            if (this.options.dispatcher) {
+                this.options.dispatcher.updateHash('dictionaries/organizationPersons');
+            }
+        }, this));
     },
 
     _destroy: function() {

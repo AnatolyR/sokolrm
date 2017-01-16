@@ -10,9 +10,13 @@
 package com.kattysoft.core.impl;
 
 import com.kattysoft.core.UserService;
+import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.UserRepository;
+import com.kattysoft.core.specification.Specification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -55,6 +59,19 @@ public class UserServiceImpl implements UserService {
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Can not get user by login and pass", e);
         }
+    }
+
+    public Page<User> getUsers(Specification specification) {
+        int offset = specification.getOffset();
+        int size = specification.getSize();
+        int pageNum = offset / size;
+
+        Sort sort = new Sort("lastName");
+        PageRequest pageRequest = new PageRequest(pageNum, size, sort);
+        org.springframework.data.domain.Page<User> repoPage = userRepository.findAll(pageRequest);
+
+        Page<User> page = new Page<>(repoPage.getTotalElements(), repoPage.getContent());
+        return page;
     }
 
     public void setUserRepository(UserRepository userRepository) {

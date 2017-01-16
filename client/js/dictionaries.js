@@ -133,7 +133,7 @@ $.widget('sokol.dictionaries', {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
         if (id == 'organizationPersons') {
-            this.createOrganizationPersonGrid();
+            this.createOrganizationPersonsGrid();
             return;
         }
         $.getJSON('app/dictionaryinfo', {id: id},
@@ -167,11 +167,15 @@ $.widget('sokol.dictionaries', {
         });
     },
 
-    createOrganizationPersonGrid: function() {
+    createOrganizationPersonsGrid: function() {
+        $.getJSON('app/config', {id: 'dictionaries/organizationPersons'}, $.proxy(function(response) {
+            var options = response.gridConfig;
+            this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
 
-        if (this.options.dispatcher) {
-            this.options.dispatcher.updateHash('dictionaries/organizationPersons');
-        }
+            if (this.options.dispatcher) {
+                this.options.dispatcher.updateHash('dictionaries/organizationPersons');
+            }
+        }, this));
     },
 
     _destroy: function() {

@@ -7,7 +7,9 @@
  */
 package com.kattysoft.core;
 
+import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
+import com.kattysoft.core.specification.Specification;
 
 import java.util.List;
 
@@ -25,4 +27,6 @@ public interface UserService {
     void setCurrentUser(User user);
 
     User getCurrentUser();
+
+    Page<User> getUsers(Specification specification);
 }
