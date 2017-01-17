@@ -308,11 +308,16 @@ $.widget("sokol.grid", {
     },
 
     createAddButton: function(buttonBar) {
-        var addButton = $('<button type="button" name="delete" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
-        addButton.click($.proxy(function() {
-            this.renderAddNewRow();
-        }, this));
-        addButton.appendTo(buttonBar);
+        if (this.options.addable == 'method') {
+            var addButton = $('<a type="button" name="add" target="_blank" href="#new/user" style="margin-right: 5px;" class="btn btn-success">Создать</a>');
+            addButton.appendTo(buttonBar);
+        } else {
+            var addButton = $('<button type="button" name="add" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
+            addButton.click($.proxy(function() {
+                this.renderAddNewRow();
+            }, this));
+            addButton.appendTo(buttonBar);
+        }
     },
 
     doAddElement: function(row) {

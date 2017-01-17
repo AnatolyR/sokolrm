@@ -74,6 +74,26 @@ public class UserServiceImpl implements UserService {
         return page;
     }
 
+    public User getUserById(String id) {
+        UUID uuid = UUID.fromString(id);
+        User user = userRepository.findOne(uuid);
+        return user;
+    }
+
+    public String saveUser(User user) {
+        if (user.getId() == null) {
+            UUID id = UUID.randomUUID();
+            user.setId(id);
+        }
+        userRepository.save(user);
+        return user.getId().toString();
+    }
+
+    public void deleteUser(String id) {
+        UUID uuid = UUID.fromString(id);
+        userRepository.delete(uuid);
+    }
+
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

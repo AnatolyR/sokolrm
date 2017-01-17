@@ -128,8 +128,16 @@ $.widget('sokol.app', {
             this.list.destroy();
         }
 
+        if (this.error) {
+            this.error.remove();
+        }
+
         if (id.startsWith('lists/')) {
             this.createListWithNavigation(id.substring(6))
+        } else if (id.startsWith('new/user')) {
+            this.createUserForm('new/user', 'edit');
+        } else if (id.startsWith('user/')) {
+            this.createUserForm(id.substring(5), mode);
         } else if (id.startsWith('document/')) {
             this.createDocumentForm(id.substring(9), mode);
         } else if (id.startsWith('new/')) {
@@ -151,20 +159,45 @@ $.widget('sokol.app', {
         }
 
     },
-    createDocument: function(type) {
-        $.post('app/createdocument', {type: type},
-            $.proxy(function (id) {
-                this.open('document/' + id, "edit");
+
+    createUserForm: function(id, mode) {
+        $.getJSON('app/usercard', {id: id},
+            $.proxy(function (data) {
+                var options = {
+                    id: data.data.id,
+                    data: data.data,
+                    form: data.form,
+                    containerType: 'user'
+                };
+                if (mode) {
+                    options.mode = mode;
+                }
+                options.dispatcher = this;
+                this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }, this)
         ).fail($.proxy(function(e) {
-                $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
+                this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить карточку пользователя "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
             }, this));
+    },
+
+    createDocument: function(type) {
+        if (type == 'user') {
+            this.open('document/' + id, "edit");
+        } else {
+            $.post('app/createdocument', {type: type},
+                $.proxy(function (id) {
+                    this.open('document/' + id, "edit");
+                }, this)
+            ).fail($.proxy(function(e) {
+                    this.error = $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
+                }, this));
+        }
     },
     createDocumentForm: function(id, mode) {
         $.getJSON('app/card', {id: id},
             $.proxy(function (data) {
                 var options = {
-                    id: data.id,
+                    id: data.data.id,
                     data: data.data,
                     form: data.form
                 };
@@ -175,7 +208,7 @@ $.widget('sokol.app', {
                 this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }, this)
         ).fail($.proxy(function(e) {
-                $('<div class="alert alert-danger" role="alert">Не удалось загрузить документ "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+                this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить документ "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
             }, this));
     },
 
@@ -413,10 +446,18 @@ $.widget('sokol.container', {
         this.createForm();
     },
     _destroy: function() {
-        this.header.destroy();
-        this.form.destroy();
-        this.formButtons.destroy();
-        this.attaches.destroy();
+        if (this.header) {
+            this.header.destroy();
+        }
+        if (this.form) {
+            this.form.destroy();
+        }
+        if (this.formButtons) {
+            this.formButtons.destroy();
+        }
+        if (this.attaches) {
+            this.attaches.destroy();
+        }
         this.element.detach();
     },
     createForm: function() {
@@ -428,13 +469,30 @@ $.widget('sokol.container', {
         container.empty();
         container.addClass('container');
 
-        this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
+        if (this.options.containerType == 'user') {
+            this.header = $.sokol.userHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
+        } else {
+            this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
+        }
 
-        this.formButtons = $.sokol.formButtons({mode: this.options.mode, dispatcher: this}, $('<div></div>').prependTo(this.element));
+        this.formButtons = $.sokol.formButtons({
+            mode: this.options.mode,
+            dispatcher: this,
+            containerType: this.options.containerType,
+            id: this.options.id
+        }, $('<div></div>').prependTo(this.element));
 
-        this.form = $.sokol.form({mode: this.options.mode, data: data, form: form, dispatcher: this.options.dispatcher}, $('<div></div>').appendTo(this.element));
+        this.form = $.sokol.form({
+            mode: this.options.mode,
+            data: data,
+            form: form,
+            dispatcher: this.options.dispatcher,
+            containerType: this.options.containerType
+        }, $('<div></div>').appendTo(this.element));
 
-        this.attaches = $.sokol.attachesGrid({mode: this.options.mode, documentId: data.id}, $('<div></div>').appendTo(this.element));
+        if (this.options.id) {
+            this.attaches = $.sokol.attachesGrid({mode: this.options.mode, documentId: data.id}, $('<div></div>').appendTo(this.element));
+        }
     },
 
     notify: function(message) {
@@ -464,29 +522,54 @@ $.widget('sokol.container', {
 
         var data = this.form.getData();
 
-        $.post("app/savedocument", JSON.stringify(data), $.proxy(function (id) {
+        var saveUrl;
+        var message;
+        var openType;
+        if (this.options.containerType == 'user') {
+            saveUrl = 'app/saveuser';
+            openType = 'user';
+            message = 'Не удалось сохранить карточку пользователя. Обратитесь к администратору.';
+        } else {
+            saveUrl = 'app/savedocument';
+            openType = 'document';
+            message = 'Не удалось сохранить документ. Обратитесь к администратору.';
+        }
+
+        $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
-            this.options.dispatcher.open('document/' + id);
-        }, this)).fail(function() {
-            $.notify({message: 'Не удалось сохранить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
-        });
+            this.options.dispatcher.open(openType + '/' + id);
+        }, this)).fail($.proxy(function() {
+            $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
+        }, this));
     },
 
     deleteDocument: function() {
+        var deleteUrl;
+        var errorMessage;
+        var message;
+        if (this.options.containerType == 'user') {
+            deleteUrl = 'app/deleteuser';
+            errorMessage = 'Не удалось удалить карточку пользователя. Обратитесь к администратору.';
+            message = 'Карточка пользователя удалена';
+        } else {
+            deleteUrl = 'app/deletedocument';
+            errorMessage = 'Не удалось удалить документ. Обратитесь к администратору.';
+            message = 'Документ удален';
+        }
         $.ajax({
-            url: 'app/deletedocument?id=' + this.options.data.id,
+            url: deleteUrl + '?id=' + this.options.id,
             type: 'DELETE',
             success: $.proxy(function(result) {
                 if (result == "true") {
                     this.element.empty();
                     //$.notify({message: 'Документ удален'}, {type: 'success', delay: 0, timer: 0});
-                    $('<div class="alert alert-success" role="alert">Документ удален</div>').appendTo(this.element)
+                    $('<div class="alert alert-success" role="alert">' + message + '</div>').appendTo(this.element)
                 } else {
-                    $.notify({message: 'Не удалось удалить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                    $.notify({message: errorMessage},{type: 'danger', delay: 0, timer: 0});
                 }
             }, this),
             error: function() {
-                $.notify({message: 'Не удалось удалить документ. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                $.notify({message: errorMessage},{type: 'danger', delay: 0, timer: 0});
             }
         });
     }
@@ -676,6 +759,7 @@ $.widget('sokol.dictionaries', {
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {
+                    document.title = data.title;
                     this.options.dispatcher.updateHash('dictionaries/' + id);
                 }
             }, this)
@@ -685,41 +769,13 @@ $.widget('sokol.dictionaries', {
     },
 
     createOrganizationPersonsGrid: function() {
-        //var options = {
-        //    title: 'Сотрудники организации',
-        //    columnsVisible: [
-        //        'lastName',
-        //        'firstName',
-        //        'middleName',
-        //        'title'
-        //    ],
-        //    columns: [
-        //        {
-        //            'id': 'lastName',
-        //            'title': 'Фамилия'
-        //        },
-        //        {
-        //            'id': 'firstName',
-        //            'title': 'Имя'
-        //        },
-        //        {
-        //            'id': 'middleName',
-        //            'title': 'Отчество'
-        //        },
-        //        {
-        //            'id': 'title',
-        //            'title': 'Сокращенное имя'
-        //        }
-        //    ],
-        //    id: 'organizationPersons',
-        //    url: 'app/users'
-        //};
-
         $.getJSON('app/config', {id: 'dictionaries/organizationPersons'}, $.proxy(function(response) {
             var options = response.gridConfig;
+            options.addable = 'method';
             this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
 
             if (this.options.dispatcher) {
+                document.title = options.title;
                 this.options.dispatcher.updateHash('dictionaries/organizationPersons');
             }
         }, this));
@@ -927,7 +983,8 @@ $.widget('sokol.form', {
         var formNode = this.element.find('[name="mainForm"]');
         if (formNode.length == 0) {
             formNode = $('<form name="mainForm"></form>');
-            var blockNode = this.createBlock(container, "Основные реквизиты");
+            var blockTitle = this.options.containerType == 'user' ? 'Свойства' : 'Основные реквизиты'
+            var blockNode = this.createBlock(container, blockTitle);
             formNode.appendTo(blockNode);
         } else {
             formNode.children().remove();
@@ -1108,11 +1165,13 @@ $.widget('sokol.formButtons', {
         }, this));
         editButton.appendTo(buttons);
 
-        var cancelButton = $('<button type="button" name="cancel" style="margin-right: 5px; display: none;" class="btn btn-default">Отменить</button>');
-        cancelButton.click($.proxy(function() {
-            this.options.dispatcher.goToMode("read");
-        }, this));
-        cancelButton.appendTo(buttons);
+        if (this.options.id) {
+            var cancelButton = $('<button type="button" name="cancel" style="margin-right: 5px; display: none;" class="btn btn-default">Отменить</button>');
+            cancelButton.click($.proxy(function () {
+                this.options.dispatcher.goToMode("read");
+            }, this));
+            cancelButton.appendTo(buttons);
+        }
 
         var deleteButton = $('<button type="button" name="delete" style="margin-right: 5px; display: none;" class="btn btn-danger">Удалить</button>');
         deleteButton.click($.proxy(function() {
@@ -1456,11 +1515,19 @@ $.widget("sokol.grid", {
     },
 
     createAddButton: function(buttonBar) {
-        var addButton = $('<button type="button" name="delete" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
-        addButton.click($.proxy(function() {
-            this.renderAddNewRow();
-        }, this));
-        addButton.appendTo(buttonBar);
+        if (this.options.addable == 'method') {
+            var addButton = $('<a type="button" name="add" target="_blank" href="#new/user" style="margin-right: 5px;" class="btn btn-success">Создать</a>');
+            //addButton.click($.proxy(function() {
+            //
+            //}, this));
+            addButton.appendTo(buttonBar);
+        } else {
+            var addButton = $('<button type="button" name="add" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
+            addButton.click($.proxy(function() {
+                this.renderAddNewRow();
+            }, this));
+            addButton.appendTo(buttonBar);
+        }
     },
 
     doAddElement: function(row) {
@@ -1761,6 +1828,25 @@ $.widget('sokol.smodal', {
             this.options.confirmAction(this.options.data);
         }, this));
         modal.modal();
+    }
+});
+$.widget('sokol.userHeader', {
+    options: {
+        form: null,
+        data: null
+    },
+    _create: function () {
+        var form = this.options.form;
+        var data = this.options.data;
+        this.element.addClass('panel-body');
+        $('<h3>' + (data.title ? data.title : '') +
+            '</h3>' +
+            (data.lastName ? ('<h4 class="">' + data.lastName + ' ' + data.middleName + ' ' + data.firstName + '</h4>') : '')+
+            '<div>Статус записи: ' + (data.status ? data.status : '') + '</div>'
+            ).appendTo(this.element);
+    },
+    _destroy: function() {
+        this.element.detach();
     }
 });
 //# sourceMappingURL=app.js.map

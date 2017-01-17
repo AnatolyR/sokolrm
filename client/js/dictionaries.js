@@ -159,6 +159,7 @@ $.widget('sokol.dictionaries', {
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {
+                    document.title = data.title;
                     this.options.dispatcher.updateHash('dictionaries/' + id);
                 }
             }, this)
@@ -170,9 +171,11 @@ $.widget('sokol.dictionaries', {
     createOrganizationPersonsGrid: function() {
         $.getJSON('app/config', {id: 'dictionaries/organizationPersons'}, $.proxy(function(response) {
             var options = response.gridConfig;
+            options.addable = 'method';
             this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
 
             if (this.options.dispatcher) {
+                document.title = options.title;
                 this.options.dispatcher.updateHash('dictionaries/organizationPersons');
             }
         }, this));

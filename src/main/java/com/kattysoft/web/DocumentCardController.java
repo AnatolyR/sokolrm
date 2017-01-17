@@ -11,6 +11,7 @@ package com.kattysoft.web;
 
 import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.DocumentService;
+import com.kattysoft.core.SokolException;
 import com.kattysoft.core.model.Document;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -60,6 +61,9 @@ public class DocumentCardController {
     @RequestMapping(value = "/card", produces = "application/json; charset=utf-8")
     public String getDocumentCard(String id) {
         Document document = documentService.getDocument(id);
+        if (document == null) {
+            throw new SokolException("Документ не найден");
+        }
 
         String typeId = document.getType();
         JsonNode typeConfig = configService.getConfig("types/" + typeId + "Type");

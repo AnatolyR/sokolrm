@@ -10,7 +10,9 @@
     "columns": [
       {
         "id": "title",
-        "title": "Сокращенное имя"
+        "title": "Сокращенное имя",
+        "render": "link",
+        "linkType": "user"
       },
       {
         "id": "lastName",

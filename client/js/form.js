@@ -196,7 +196,8 @@ $.widget('sokol.form', {
         var formNode = this.element.find('[name="mainForm"]');
         if (formNode.length == 0) {
             formNode = $('<form name="mainForm"></form>');
-            var blockNode = this.createBlock(container, "Основные реквизиты");
+            var blockTitle = this.options.containerType == 'user' ? 'Свойства' : 'Основные реквизиты';
+            var blockNode = this.createBlock(container, blockTitle);
             formNode.appendTo(blockNode);
         } else {
             formNode.children().remove();

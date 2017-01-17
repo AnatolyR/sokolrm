@@ -19,11 +19,13 @@ $.widget('sokol.formButtons', {
         }, this));
         editButton.appendTo(buttons);
 
-        var cancelButton = $('<button type="button" name="cancel" style="margin-right: 5px; display: none;" class="btn btn-default">Отменить</button>');
-        cancelButton.click($.proxy(function() {
-            this.options.dispatcher.goToMode("read");
-        }, this));
-        cancelButton.appendTo(buttons);
+        if (this.options.id) {
+            var cancelButton = $('<button type="button" name="cancel" style="margin-right: 5px; display: none;" class="btn btn-default">Отменить</button>');
+            cancelButton.click($.proxy(function () {
+                this.options.dispatcher.goToMode("read");
+            }, this));
+            cancelButton.appendTo(buttons);
+        }
 
         var deleteButton = $('<button type="button" name="delete" style="margin-right: 5px; display: none;" class="btn btn-danger">Удалить</button>');
         deleteButton.click($.proxy(function() {

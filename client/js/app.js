@@ -43,6 +43,7 @@ $.widget('sokol.app', {
     },
 
     open:function(id, mode) {
+        document.title = 'Сокол СЭД'; //Reset title
         this.updateHash(id);
 
         if (this.container) {
@@ -53,8 +54,16 @@ $.widget('sokol.app', {
             this.list.destroy();
         }
 
+        if (this.error) {
+            this.error.remove();
+        }
+
         if (id.startsWith('lists/')) {
             this.createListWithNavigation(id.substring(6))
+        } else if (id.startsWith('new/user')) {
+            this.createUserForm('new/user', 'edit');
+        } else if (id.startsWith('user/')) {
+            this.createUserForm(id.substring(5), mode);
         } else if (id.startsWith('document/')) {
             this.createDocumentForm(id.substring(9), mode);
         } else if (id.startsWith('new/')) {
@@ -76,6 +85,27 @@ $.widget('sokol.app', {
         }
 
     },
+
+    createUserForm: function(id, mode) {
+        $.getJSON('app/usercard', {id: id},
+            $.proxy(function (data) {
+                var options = {
+                    id: data.data.id,
+                    data: data.data,
+                    form: data.form,
+                    containerType: 'user'
+                };
+                if (mode) {
+                    options.mode = mode;
+                }
+                options.dispatcher = this;
+                this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
+            }, this)
+        ).fail($.proxy(function(e) {
+                this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить карточку пользователя "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+            }, this));
+    },
+
     createDocument: function(type) {
         $.post('app/createdocument', {type: type},
             $.proxy(function (id) {
@@ -89,7 +119,7 @@ $.widget('sokol.app', {
         $.getJSON('app/card', {id: id},
             $.proxy(function (data) {
                 var options = {
-                    id: data.id,
+                    id: data.data.id,
                     data: data.data,
                     form: data.form
                 };
@@ -100,7 +130,7 @@ $.widget('sokol.app', {
                 this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }, this)
         ).fail($.proxy(function(e) {
-                $('<div class="alert alert-danger" role="alert">Не удалось загрузить документ "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+                this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить документ "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
             }, this));
     },
 

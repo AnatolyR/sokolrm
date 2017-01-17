@@ -1,0 +1,27 @@
+{
+  "fields": [
+    {
+      "id": "title",
+      "title": "Сокращенное имя",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "lastName",
+      "title": "Фамилия",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "firstName",
+      "title": "Имя",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "middleName",
+      "title": "Отчество",
+      "type": "string"
+    }
+  ]
+}

@@ -9,17 +9,25 @@
  */
 package com.kattysoft.web;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.kattysoft.core.ConfigService;
+import com.kattysoft.core.SokolException;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.specification.Specification;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +40,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ConfigService configService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -61,7 +72,56 @@ public class UserController {
         return page;
     }
 
+    @RequestMapping(value = "/usercard")
+    public ObjectNode getUserCard(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new SokolException("Empty user id");
+        }
+        User user = id.equals("new/user") ? new User() : userService.getUserById(id);
+        if (user == null) {
+            throw new SokolException("Карточка пользователя не найдена");
+        }
+
+        JsonNode formConfig = configService.getConfig2("forms/userForm");
+
+        ObjectNode card = mapper.createObjectNode();
+        card.set("form", formConfig);
+        ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(user);
+        card.set("data", data);
+        card.put("containerType", "user");
+
+        return card;
+    }
+
+    @RequestMapping(value = "/saveuser")
+    public String saveUser(Reader reader) throws IOException {
+        String requestBody = IOUtils.toString(reader);
+        ObjectNode data = (ObjectNode) mapper.readTree(requestBody);
+        UUID uuid = data.has("id") && !data.get("id").asText().isEmpty() && !data.get("id").isNull() ? UUID.fromString(data.get("id").asText()) : null;
+        ObjectNode fields = (ObjectNode) data.get("fields");
+
+        User user = mapper.treeToValue(fields, User.class);
+        user.setId(uuid);
+
+        String id = userService.saveUser(user);
+
+        return id;
+    }
+
+    @RequestMapping(value = "/deleteuser")
+    public String deleteUser(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new SokolException("User id is empty");
+        }
+        userService.deleteUser(id);
+        return "true";
+    }
+
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
     }
 }
