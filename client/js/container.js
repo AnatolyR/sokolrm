@@ -31,6 +31,11 @@ $.widget('sokol.container', {
 
         if (this.options.containerType == 'user') {
             this.header = $.sokol.userHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
+        } else if (this.options.containerType == 'contragent') {
+            this.header = $.sokol.titleHeader({
+                title: data.title,
+                subtitle: data.fullName
+            }, $('<div></div>').appendTo(this.element));
         } else {
             this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
         }
@@ -89,6 +94,10 @@ $.widget('sokol.container', {
             saveUrl = 'app/saveuser';
             openType = 'user';
             message = 'Не удалось сохранить карточку пользователя. Обратитесь к администратору.';
+        } else if (this.options.containerType == 'contragent') {
+            saveUrl = 'app/savecontragent';
+            openType = 'contragent';
+            message = 'Не удалось сохранить карточку контрагента. Обратитесь к администратору.';
         } else {
             saveUrl = 'app/savedocument';
             openType = 'document';
@@ -104,6 +113,15 @@ $.widget('sokol.container', {
     },
 
     deleteDocument: function() {
+        $.sokol.smodal({
+            title: 'Подтверждение удаления',
+            body: 'Удалить "' + this.options.data.title + '" ?',
+            confirmButtonTitle: 'Удалить',
+            confirmAction: $.proxy(this.doDeleteDocument, this)
+        });
+    },
+
+    doDeleteDocument: function() {
         var deleteUrl;
         var errorMessage;
         var message;
@@ -111,6 +129,10 @@ $.widget('sokol.container', {
             deleteUrl = 'app/deleteuser';
             errorMessage = 'Не удалось удалить карточку пользователя. Обратитесь к администратору.';
             message = 'Карточка пользователя удалена';
+        } else if (this.options.containerType == 'contragent') {
+            deleteUrl = 'app/deletecontragent';
+            errorMessage = 'Не удалось удалить карточку контрагента. Обратитесь к администратору.';
+            message = 'Карточка контрагента удалена';
         } else {
             deleteUrl = 'app/deletedocument';
             errorMessage = 'Не удалось удалить документ. Обратитесь к администратору.';
@@ -122,7 +144,6 @@ $.widget('sokol.container', {
             success: $.proxy(function(result) {
                 if (result == "true") {
                     this.element.empty();
-                    //$.notify({message: 'Документ удален'}, {type: 'success', delay: 0, timer: 0});
                     $('<div class="alert alert-success" role="alert">' + message + '</div>').appendTo(this.element)
                 } else {
                     $.notify({message: errorMessage},{type: 'danger', delay: 0, timer: 0});

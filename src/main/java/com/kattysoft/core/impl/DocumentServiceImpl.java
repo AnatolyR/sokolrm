@@ -9,10 +9,7 @@
  */
 package com.kattysoft.core.impl;
 
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.ContragentService;
-import com.kattysoft.core.DocumentService;
-import com.kattysoft.core.UserService;
+import com.kattysoft.core.*;
 import com.kattysoft.core.dao.DocumentDao;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.Specification;
@@ -60,6 +57,9 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public String saveDocument(Document document) {
         //todo проверка прав на поля
+        if (document.getId() != null && documentDao.getDocument(document.getId(), null) == null) {
+            throw new SokolException("Document not found");
+        }
 
         fillTitleFields(document);
 

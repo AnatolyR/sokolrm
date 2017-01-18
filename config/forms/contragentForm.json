@@ -1,0 +1,25 @@
+{
+  "fields": [
+    {
+      "id": "title",
+      "title": "Сокращенное имя",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "fullName",
+      "title": "Полное наименование",
+      "type": "string"
+    },
+    {
+      "id": "address",
+      "title": "Адрес",
+      "type": "string"
+    },
+    {
+      "id": "phone",
+      "title": "Телефон",
+      "type": "string"
+    }
+  ]
+}

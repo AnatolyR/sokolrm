@@ -26,7 +26,14 @@ public class Contragent {
     @Id
     @Type(type = "pg-uuid")
     private UUID id;
+
     private String title;
+
+    private String fullName;
+
+    private String address;
+
+    private String phone;
 
     public UUID getId() {
         return id;
@@ -42,5 +49,29 @@ public class Contragent {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

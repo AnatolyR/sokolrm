@@ -60,40 +60,55 @@ $.widget('sokol.app', {
 
         if (id.startsWith('lists/')) {
             this.createListWithNavigation(id.substring(6))
+
         } else if (id.startsWith('new/user')) {
-            this.createUserForm('new/user', 'edit');
+            this.createForm('user', 'new/user', 'edit', 'Не удалось загрузить карточку пользователя');
         } else if (id.startsWith('user/')) {
-            this.createUserForm(id.substring(5), mode);
+            this.createForm('user', id.substring(5), mode, 'Не удалось загрузить карточку пользователя');
+
+        } else if (id.startsWith('new/contragent')) {
+            this.createForm('contragent', 'new/contragent', 'edit', 'Не удалось загрузить карточку контрагента');
+        } else if (id.startsWith('contragent/')) {
+            this.createForm('contragent', id.substring(11), mode, 'Не удалось загрузить карточку контрагента');
+
         } else if (id.startsWith('document/')) {
             this.createDocumentForm(id.substring(9), mode);
         } else if (id.startsWith('new/')) {
             var type = id.substring(4);
             this.createDocument(type);
+
         } else if (id == 'reports') {
             this.container = $('<div>Раздел Отчеты в разработке</div>').appendTo('body');
             this.container.destroy = this.container.remove;
+
         } else if (id == 'search') {
             this.container = $('<div>Раздел Поиск в разработке</div>').appendTo('body');
             this.container.destroy = this.container.remove;
+
         } else if (id == 'archive') {
             this.container = $('<div>Раздел Архив в разработке</div>').appendTo('body');
             this.container.destroy = this.container.remove;
+
         } else if (id.startsWith('dictionaries')) {
             this.container = $.sokol.dictionaries({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
+
         } else if (id.startsWith('admin')) {
             this.container = $.sokol.admin({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
+
+        } else {
+            this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить объект "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
         }
 
     },
 
-    createUserForm: function(id, mode) {
-        $.getJSON('app/usercard', {id: id},
+    createForm: function(type, id, mode, errorMessage) {
+        $.getJSON('app/' + type + 'card', {id: id},
             $.proxy(function (data) {
                 var options = {
                     id: data.data.id,
                     data: data.data,
                     form: data.form,
-                    containerType: 'user'
+                    containerType: type
                 };
                 if (mode) {
                     options.mode = mode;
@@ -102,7 +117,7 @@ $.widget('sokol.app', {
                 this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
             }, this)
         ).fail($.proxy(function(e) {
-                this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить карточку пользователя "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+                this.error = $('<div class="alert alert-danger" role="alert">' + errorMessage + ' "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
             }, this));
     },
 

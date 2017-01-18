@@ -9,6 +9,7 @@
  */
 package com.kattysoft.core.impl;
 
+import com.kattysoft.core.SokolException;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
@@ -84,6 +85,10 @@ public class UserServiceImpl implements UserService {
         if (user.getId() == null) {
             UUID id = UUID.randomUUID();
             user.setId(id);
+        } else {
+            if (userRepository.findOne(user.getId()) == null) {
+                throw new SokolException("User not found");
+            }
         }
         userRepository.save(user);
         return user.getId().toString();

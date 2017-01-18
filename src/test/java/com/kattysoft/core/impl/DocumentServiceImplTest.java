@@ -69,9 +69,8 @@ public class DocumentServiceImplTest {
     }
 
     @Test
-    public void testSaveDocument() throws Exception {
+    public void testCreateDocument() throws Exception {
         Document document = new Document();
-        document.setId("testId");
         document.setType("incomingDocument");
         Map<String, Object> fields = new HashMap<>();
         fields.put("addressee", Arrays.asList("580f62b3-7b96-4109-a321-dc7d24109a1a", "722b151c-f9d7-4222-b541-cfc554695510", "dc175f6e-b18d-495f-aca9-58c956e48a42"));
@@ -94,9 +93,8 @@ public class DocumentServiceImplTest {
     }
 
     @Test
-    public void testSaveDocumentWithOneDictionaryValue() throws Exception {
+    public void testCreateDocumentWithOneDictionaryValue() throws Exception {
         Document document = new Document();
-        document.setId("testId");
         document.setType("incomingDocument");
         Map<String, Object> fields = new HashMap<>();
         fields.put("addressee", Collections.singletonList("580f62b3-7b96-4109-a321-dc7d24109a1a"));

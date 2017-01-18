@@ -8,6 +8,8 @@
 package com.kattysoft.core;
 
 import com.kattysoft.core.model.Contragent;
+import com.kattysoft.core.model.Page;
+import com.kattysoft.core.specification.Specification;
 
 import java.util.List;
 
@@ -19,4 +21,12 @@ public interface ContragentService {
     List<Contragent> getContragentsByTitle(String title);
 
     String getContragentTitleById(String contragentId);
+
+    Page<Contragent> getContragents(Specification spec);
+
+    Contragent getContragentById(String id);
+
+    String saveContragent(Contragent contragent);
+
+    void deleteContragent(String id);
 }

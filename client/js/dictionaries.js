@@ -44,6 +44,8 @@ $.widget('sokol.dictionaries', {
         if (this.options.id) {
             if (this.options.id.startsWith("dictionaries/")) {
                 this.createGrid(this.options.id.substring(13));
+            } else {
+                this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите справочник</div></div>').appendTo(this.main);
             }
         }
     },
@@ -128,12 +130,15 @@ $.widget('sokol.dictionaries', {
         if (this.grid) {
             this.grid.destroy();
         }
+        if (this.info) {
+            this.info.remove();
+        }
         this.sidebar.find('li').removeClass('active');
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
-        if (id == 'organizationPersons') {
-            this.createOrganizationPersonsGrid();
+        if (id == 'organizationPersons' || id == 'contragents') {
+            this.createPagedGrid(id);
             return;
         }
         $.getJSON('app/dictionaryinfo', {id: id},
@@ -168,15 +173,15 @@ $.widget('sokol.dictionaries', {
         });
     },
 
-    createOrganizationPersonsGrid: function() {
-        $.getJSON('app/config', {id: 'dictionaries/organizationPersons'}, $.proxy(function(response) {
+    createPagedGrid: function(id) {
+        $.getJSON('app/config', {id: 'dictionaries/' + id}, $.proxy(function(response) {
             var options = response.gridConfig;
-            options.addable = 'method';
+            options.addable = 'link';
             this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
 
             if (this.options.dispatcher) {
                 document.title = options.title;
-                this.options.dispatcher.updateHash('dictionaries/organizationPersons');
+                this.options.dispatcher.updateHash('dictionaries/' + id);
             }
         }, this));
     },

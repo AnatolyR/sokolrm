@@ -38,6 +38,8 @@ $.widget('sokol.admin', {
         }, this));
         //if (this.options.id) {
         //    this.createGrid(this.options.id);
+        //}else {
+        //    this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите раздел</div></div>').appendTo(this.main);
         //}
     },
 

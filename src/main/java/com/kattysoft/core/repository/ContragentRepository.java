@@ -8,6 +8,7 @@
 package com.kattysoft.core.repository;
 
 import com.kattysoft.core.model.Contragent;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
@@ -20,4 +21,6 @@ import java.util.UUID;
  */
 public interface ContragentRepository extends CrudRepository<Contragent, UUID> {
     List<Contragent> findByTitleContaining(String title, Pageable page);
+
+    Page<Contragent> findAll(Pageable pageable);
 }
