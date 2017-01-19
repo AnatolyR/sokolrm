@@ -73,4 +73,8 @@
 
     </bean>
 
+    <bean class="com.kattysoft.core.impl.AttachServiceImpl">
+
+    </bean>
+
 </beans>

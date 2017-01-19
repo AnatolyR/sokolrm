@@ -17,9 +17,9 @@ $.widget('sokol.attachesGrid', {
     },
 
     getAttachesList: function() {
-        var documentId = this.options.documentId;
-        $.getJSON("app/attaches",{documentId: documentId}, $.proxy(function (listData) {
-            this.createAttachesList(listData, documentId);
+        var id = this.options.id;
+        $.getJSON("app/attaches",{id: id}, $.proxy(function (listData) {
+            this.createAttachesList(listData, id);
         }, this));
     },
 
@@ -63,7 +63,7 @@ $.widget('sokol.attachesGrid', {
         if (edit) {
             $("<th></th>").appendTo(header);
         }
-        var rowsData = listData.data;
+        var rowsData = listData;
         for (var j = 0; j < rowsData.length; j++) {
             var row = $("<tr></tr>");
             var rowObj = rowsData[j];
@@ -134,7 +134,7 @@ $.widget('sokol.attachesGrid', {
             var form_data = new FormData();
             form_data.append('file', file_data);
             $.ajax({
-                url: 'upload?objectId=' + data.id, // point to server-side PHP script
+                url: 'upload?objectId=' + this.options.id, // point to server-side PHP script
                 dataType: 'text',  // what to expect back from the PHP script, if anything
                 cache: false,
                 contentType: false,
@@ -142,9 +142,9 @@ $.widget('sokol.attachesGrid', {
                 data: form_data,
                 type: 'post',
                 success: $.proxy(function(response){
-                    this.notify("Вложение сохранено");
+                    $.notify({message: 'Вложение сохранено'}, {type: 'success', delay: 1000, timer: 1000});
                     $("#attachField").filestyle('clear');
-                    this.getAttachesList(panel, data.id);
+                    this.getAttachesList();
                 }, this)
             });
         }, this));
