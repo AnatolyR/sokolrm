@@ -6,7 +6,7 @@ modules = modules || {};
 modules["attachesGrid"] = (function() {
 
     var options = {
-        documentId: 'testAttaches'
+        id: 'testAttaches'
     };
 
     var testComponent = null;

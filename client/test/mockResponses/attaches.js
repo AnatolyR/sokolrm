@@ -39,10 +39,10 @@ var mockResponses = mockResponses || [];
     };
 
     mockResponses['app/attaches'] = function(params, callback) {
-        if (params.documentId == 'testAttaches') {
-            callback(attachesResponse2);
+        if (params.id == 'testAttaches') {
+            callback(attachesResponse2.data);
         } else {
-            callback(attachesResponse1);
+            callback(attachesResponse1.data);
         }
     };
 
