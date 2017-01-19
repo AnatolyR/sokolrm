@@ -14,7 +14,8 @@ var configResponses = configResponses || [];
         "columns": [
             {
                 "id": "id",
-                "type": "hidden"
+                "type": "hidden",
+                "title": "ИД"
             },
             {
                 "id": "documentNumber",

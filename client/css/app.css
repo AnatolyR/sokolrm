@@ -30,3 +30,15 @@ body {
     color: #fff;
     background-color: #428bca;
 }
+
+.controlElementLeftMargin {
+    margin-left: 5px !important;
+}
+
+.tableCell {
+    display: table-cell !important;
+}
+
+.activeFilterButton {
+    font-weight: bold;
+}

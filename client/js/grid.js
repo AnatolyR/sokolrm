@@ -47,6 +47,9 @@ $.widget("sokol.grid", {
         if (this.options.deletable) {
             this.createDeleteButton(topBar);
         }
+        if (this.options.filterable) {
+            this.createFilterButton(topBar);
+        }
         if (this.options.addable) {
             this.createAddButton(topBar);
         }
@@ -88,7 +91,8 @@ $.widget("sokol.grid", {
             $.getJSON(this.options.url, {
                 listId: this.options.id,
                 size: this.options.pageSize,
-                offset: this.options.offset
+                offset: this.options.offset,
+                conditions: (this.filter && this.filter.conditions) ? JSON.stringify(this.filter.conditions) : null
             }, $.proxy(function (data) {
                 this.options.data = data.data;
                 this.options.total = data.total;
@@ -307,9 +311,27 @@ $.widget("sokol.grid", {
         this.deleteButton = deleteButton;
     },
 
+    createFilterButton: function(buttonBar) {
+        this.filter = $.sokol.filter({
+            columns: this.options.columns,
+            parent: this
+        }, $('<div></div>').appendTo(this.element));
+
+        var filterButton = $('<button type="button" name="filter" style="" class="btn btn-default controlElementLeftMargin">Фильтр</button>');
+        filterButton.click($.proxy(function() {
+            this.filter.element.slideToggle();
+            if (this.filter.conditions && this.filter.conditions.length > 0) {
+                filterButton.addClass('activeFilterButton');
+            } else {
+                filterButton.removeClass('activeFilterButton');
+            }
+        }, this));
+        filterButton.appendTo(buttonBar);
+    },
+
     createAddButton: function(buttonBar) {
         if (this.options.addable == 'link') {
-            var addButton = $('<a type="button" name="add" target="_blank" href="#new/' + this.options.addableType + '" style="margin-right: 5px;" class="btn btn-success">Создать</a>');
+            var addButton = $('<a type="button" name="add" target="_blank" href="#new/' + this.options.addableType + '" style="margin-right: 5px;" class="btn btn-success controlElementLeftMargin">Создать</a>');
             addButton.appendTo(buttonBar);
         } else {
             var addButton = $('<button type="button" name="add" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
@@ -376,7 +398,7 @@ $.widget("sokol.grid", {
 
     createColumnsSelector: function(element) {
         var selector = $('<div class="dropdown btn-group">'+
-            '<button type="button" style="margin-right: 10px;" class="btn btn-default btn dropdown-toggle" data-toggle="dropdown">Колонки <span class="caret"></span></button>'+
+            '<button type="button" style="" class="btn btn-default btn dropdown-toggle" data-toggle="dropdown">Колонки <span class="caret"></span></button>'+
             '<ul name="columns" class="dropdown-menu">'+
             '</ul>'+
             '</div>');

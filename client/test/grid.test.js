@@ -429,6 +429,19 @@ modules["grid"] = (function() {
                 };
                 $.sokol.grid(optionsD, $("<div></div>").appendTo("body"));
             }
+        },
+        showWithFilter: {
+            title: "Таблица с фильтром",
+            action: function() {
+                var optionsD = {
+                    columnsVisible: null,
+                    title: "Filterable",
+                    "columns": optionsC.columns,
+                    "data" : optionsC.data,
+                    filterable: true
+                };
+                $.sokol.grid(optionsD, $("<div></div>").appendTo("body"));
+            }
         }
     }
 }());
