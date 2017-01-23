@@ -11,6 +11,7 @@ package com.kattysoft.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.DocumentService;
@@ -45,7 +46,7 @@ public class DocumentListController {
     private ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "/documents")
-    public Object listDocuments(String listId, Integer offset, Integer size) throws IOException {
+    public Object listDocuments(String listId, Integer offset, Integer size, String conditions) throws IOException {
         if (offset == null) {
             offset = 0;
         }
@@ -54,6 +55,13 @@ public class DocumentListController {
         }
 
         JsonNode config = configService.getConfig2("lists/" + listId + "List");
+
+        if (conditions == null || conditions.isEmpty()) {
+            conditions = "[]";
+        }
+        JsonNode clientConditionsNode = mapper.readTree(conditions);
+        Condition clientCondition = SpecificationUtil.read((ArrayNode) clientConditionsNode);
+
 
         Specification spec = new Specification();
         spec.setOffset(offset);
@@ -75,6 +83,9 @@ public class DocumentListController {
         condition.setOperation(ContainerOperation.AND);
         Condition listCondition = new SqlCondition(listConditionSql);
         condition.getConditions().add(listCondition);
+        if (clientCondition != null) {
+            condition.getConditions().add(clientCondition);
+        }
         spec.setCondition(condition);
 
         if (config.get("join") != null) {

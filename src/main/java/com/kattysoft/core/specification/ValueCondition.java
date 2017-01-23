@@ -41,4 +41,13 @@ public class ValueCondition extends Condition {
     public void setValue(Object value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "ValueCondition{" +
+            "field='" + field + '\'' +
+            ", operation=" + operation +
+            ", value=" + value +
+            '}';
+    }
 }

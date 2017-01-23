@@ -45,4 +45,12 @@ public class ContainerCondition extends Condition {
     public void setOperation(ContainerOperation operation) {
         this.operation = operation;
     }
+
+    @Override
+    public String toString() {
+        return "ContainerCondition{" +
+            "conditions=" + conditions +
+            ", operation=" + operation +
+            '}';
+    }
 }

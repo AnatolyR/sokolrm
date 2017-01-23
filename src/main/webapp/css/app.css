@@ -36,7 +36,9 @@ body {
 }
 
 .tableCell {
-    display: table-cell !important;
+    /*display: table-cell;*/
+    margin-right: 5px;
+    float: left !important;
 }
 
 .activeFilterButton {

@@ -879,13 +879,13 @@ $.widget('sokol.filter', {
         }
 
         //var delButton = $('<button type="button" class="form-control btn btn-danger btn-sm tableCell" style="width: 50px;border: 2px solide red;"><span class="glyphicon glyphicon-trash"></span></button>').appendTo(condition);
-        var delButton = $('<div class="btn-group tableCell" style="width: 30px;"><button type="button" class="form-control btn btn-danger btn-sm" >' +
+        var delButton = $('<div class="btn-group tableCell" style="width1: 30px;"><button type="button" class="form-control btn btn-danger btn-sm" >' +
             '<span class="glyphicon glyphicon-trash" ></span>' +
             '</button></div>').appendTo(condition);
         delButton.click(function() {
             condition.remove();
         });
-        var addButton = $('<div class="btn-group tableCell" style="width: 30px;"><button type="button" class="form-control btn btn-success btn-sm" >' +
+        var addButton = $('<div class="btn-group tableCell" style="width1: 30px;"><button type="button" class="form-control btn btn-success btn-sm" >' +
             '<span class="glyphicon glyphicon-plus" ></span>' +
             '</button></div>').appendTo(condition);
         addButton.click($.proxy(function() {
@@ -894,14 +894,26 @@ $.widget('sokol.filter', {
 
         var conditionSelector = $('<select name="conditionSelector" class="selectpicker tableCell"></select>').appendTo(condition);
         conditionSelector.append($('<option value="">&nbsp;</option>'));
-        conditionSelector.append($('<option value="and">И</option>'));
-        conditionSelector.append($('<option value="or">ИЛИ</option>'));
+        //conditionSelector.append($('<option value="and">И</option>'));
+        //conditionSelector.append($('<option value="or">ИЛИ</option>'));
         conditionSelector.append($('<option value="and_block">И (</option>'));
         conditionSelector.append($('<option value="or_block">ИЛИ (</option>'));
-        conditionSelector.append($('<option value="block">(</option>'));
+        //conditionSelector.append($('<option value="block">(</option>'));
         conditionSelector.append($('<option value="end_block">)</option>'));
         conditionSelector.selectpicker({
             width: 'auto'
+        });
+        conditionSelector.on('change', function(event){
+            var condition = $(this).find("option:selected").val();
+            if (condition) {
+                fieldSelector.selectpicker('hide');
+                operationSelector.selectpicker('hide');
+                input.hide();
+            } else {
+                fieldSelector.selectpicker('show');
+                operationSelector.selectpicker('show');
+                input.show();
+            }
         });
 
         var fieldSelector = $('<select name="columnSelector" class="selectpicker tableCell"></select>').appendTo(condition);
@@ -932,7 +944,7 @@ $.widget('sokol.filter', {
             width: 'auto'
         });
 
-        var input = $('<input type="text" name="valueBox" class="form-control tableCell" style="width: 100%;">').appendTo(condition);
+        var input = $('<div style="padding-left: 500px;"><input type="text" name="valueBox" class="form-control" style="width: 100%;"></div>').appendTo(condition);
 
     },
 

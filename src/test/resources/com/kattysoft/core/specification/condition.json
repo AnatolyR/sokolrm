@@ -1,0 +1,26 @@
+[
+  {
+    "condition": "",
+    "column": "documentNumber",
+    "operation": "GREAT",
+    "value": "111"
+  },
+  {
+    "condition": "",
+    "column": "status",
+    "operation": "LIKE",
+    "value": "222"
+  },
+  {
+    "condition": "",
+    "column": "author",
+    "operation": "EQUAL",
+    "value": "333"
+  },
+  {
+    "condition": "",
+    "column": "documentKind",
+    "operation": "STARTS",
+    "value": "444"
+  }
+]
