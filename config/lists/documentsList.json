@@ -38,6 +38,26 @@
         "id": "registrationDate",
         "title": "Дата регистрации",
         "render": "datetime"
+      },
+      {
+        "id": "pagesQuantity",
+        "title": "Кол. стр."
+      },
+      {
+        "id": "addressee",
+        "title": "Адресаты (ИД)"
+      },
+      {
+        "id": "addresseeTitle",
+        "title": "Адресаты"
+      },
+      {
+        "id": "correspondent",
+        "title": "Корреспондент (ИД)"
+      },
+      {
+        "id": "correspondentTitle",
+        "title": "Корреспондент"
       }
     ]
   }

@@ -96,7 +96,7 @@ $.widget('sokol.filter', {
         }
         fieldSelector.selectpicker({
             //noneSelectedText: '',
-            width: 'auto'
+            width: '250px'
         });
 
         var operationSelector = $('<select name="operationSelector" class="selectpicker tableCell"></select>').appendTo(condition);
@@ -114,7 +114,7 @@ $.widget('sokol.filter', {
             width: 'auto'
         });
 
-        var input = $('<div style="padding-left: 500px;"><input type="text" name="valueBox" class="form-control" style="width: 100%;"></div>').appendTo(condition);
+        var input = $('<div style="padding-left: 587px;"><input type="text" name="valueBox" class="form-control" style="width: 100%;"></div>').appendTo(condition);
 
     },
 

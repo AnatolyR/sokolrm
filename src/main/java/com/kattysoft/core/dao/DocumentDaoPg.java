@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -31,6 +33,9 @@ public class DocumentDaoPg implements DocumentDao {
     private static final Logger log = LoggerFactory.getLogger(DocumentDaoPg.class);
     @Autowired
     private DataSource dataSource;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    private SimpleDateFormat correctionalDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 
     public Document getDocument(String documentId, List<String> fieldsNames) {
         Connection connection = null;
@@ -126,13 +131,14 @@ public class DocumentDaoPg implements DocumentDao {
             sql.append(" ");
             sql.append(String.join(", ", columns));
             sql.append(" FROM documents d ");
+            List<Object> paramsValues = new ArrayList<>();
             if (spec.getJoin() != null) {
                 sql.append(spec.getJoin());
                 sql.append(" ");
             }
             if (spec.getCondition() != null) {
                 Condition condition = spec.getCondition();
-                String conditionSql = conditionToSql(condition);
+                String conditionSql = conditionToSql(condition, paramsValues, columnTypes);
                 sql.append("WHERE ");
                 sql.append(conditionSql);
             }
@@ -150,7 +156,13 @@ public class DocumentDaoPg implements DocumentDao {
             String sqlStr = sql.toString();
             log.info("LIST SQL: {}", sqlStr);
 
-            resultSet = connection.createStatement().executeQuery(sqlStr);
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlStr);
+            int i = 1;
+            for (Object paramsValue : paramsValues) {
+                preparedStatement.setObject(i++, paramsValue);
+            }
+            resultSet = preparedStatement.executeQuery();
+
             while (resultSet.next()) {
                 Document document = new Document();
                 String id = resultSet.getString("id");
@@ -178,20 +190,120 @@ public class DocumentDaoPg implements DocumentDao {
         }
     }
 
-    private String conditionToSql(Condition condition) {
+    private String conditionToSql(Condition condition, List<Object> paramsValues, Map<String, String> columnTypes) {
         if (condition instanceof ContainerCondition) {
             List<String> subconditions = new ArrayList<>();
             ((ContainerCondition) condition).getConditions().forEach(c -> {
-                subconditions.add("(" + conditionToSql(c) + ")");
+                String sql = conditionToSql(c, paramsValues, columnTypes);
+                if (sql != null && !sql.isEmpty()) {
+                    subconditions.add("(" + sql + ")");
+                }
             });
             String str = String.join(" " + ((ContainerCondition) condition).getOperation().toString() + " ", subconditions);
             return str;
         } else if (condition instanceof ValueCondition) {
-            throw new NotImplementedException("ValueCondition");
+            return valueConditionToString((ValueCondition) condition, paramsValues, columnTypes);
         } else if (condition instanceof SqlCondition) {
             return ((SqlCondition) condition).getSql();
         }
         return "";
+    }
+
+    private String valueConditionToString(ValueCondition valueCondition, List<Object> paramsValues, Map<String, String> columnTypes) {
+        String columnType = columnTypes.get(valueCondition.getField());
+        if (columnType == null || valueCondition.getOperation() == null) {
+            return null;
+        }
+        String field = "\"" + valueCondition.getField() + "\"";
+        Object value = valueCondition.getValue();
+
+        if (value == null || value.toString().isEmpty()) {
+            if (valueCondition.getOperation() == Operation.EQUAL) {
+                String sql = field + " IS NULL ";
+                if ("varchar".equals(columnType)) {
+                    sql += "OR " + field + " = ''";
+                }
+                return sql;
+            } else if (valueCondition.getOperation() == Operation.NOT_EQUAL) {
+                String sql = field + " IS NOT NULL ";
+                if ("varchar".equals(columnType)) {
+                    sql += "AND " + field + " != ''";
+                }
+                return sql;
+            } else {
+                return null;
+            }
+        }
+
+        if ("timestamp".equals(columnType)) {
+            try {
+                value = new Timestamp(dateFormat.parse((String) value).getTime());
+            } catch (ParseException e) {
+                return null;
+            }
+        } else if ("int4".equals(columnType)) {
+            try {
+                value = new Integer((String) value);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        } else if ("_varchar".equals(columnType)) {
+            if (valueCondition.getOperation() ==  Operation.LIKE) {
+                String sql = field + " @> ARRAY[?] ";
+                paramsValues.add(value);
+                return sql;
+            } else {
+                return null;
+            }
+        }
+
+        if ((valueCondition.getOperation() ==  Operation.LIKE
+            || valueCondition.getOperation() ==  Operation.STARTS
+            || valueCondition.getOperation() ==  Operation.ENDS) && !(value instanceof String)) {
+            return null;
+        }
+
+        String operation;
+        if (valueCondition.getOperation() ==  Operation.LIKE) {
+            value = "%" + value + "%";
+            operation = "LIKE";
+        } else if (valueCondition.getOperation() == Operation.STARTS) {
+            value = value + "%";
+            operation = "LIKE";
+        } else if (valueCondition.getOperation() == Operation.ENDS) {
+            value = "%" + value;
+            operation = "LIKE";
+        } else if (valueCondition.getOperation() == Operation.EQUAL) {
+            operation = "=";
+            if (value instanceof Timestamp) {
+                try {
+                    Timestamp value2 = new Timestamp(correctionalDateFormat.parse(valueCondition.getValue() + ":59.999").getTime());
+
+                    String sql = " (" + field + " >= ? AND " + field + " < ?)";
+                    paramsValues.add(value);
+                    paramsValues.add(value2);
+                    return sql;
+                } catch (ParseException e) {
+                    return null;
+                }
+            }
+        } else if (valueCondition.getOperation() == Operation.GREAT) {
+            operation = ">";
+        } else if (valueCondition.getOperation() == Operation.GREAT_OR_EQUAL) {
+            operation = ">=";
+        } else if (valueCondition.getOperation() == Operation.LESS) {
+            operation = "<";
+        } else if (valueCondition.getOperation() == Operation.LESS_OR_EQUAL) {
+            operation = "<=";
+        } else if (valueCondition.getOperation() == Operation.NOT_EQUAL) {
+            operation = "!=";
+        } else {
+            return null;
+        }
+
+        String sql = field + " " + operation + " ? ";
+        paramsValues.add(value);
+        return sql;
     }
 
     public Integer getTotalCount(Specification spec) {
@@ -199,25 +311,34 @@ public class DocumentDaoPg implements DocumentDao {
         ResultSet resultSet = null;
         try {
             connection = dataSource.getConnection();
+            Map<String, String> columnTypes = getDocumentsMetadata(connection);
 
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT");
             sql.append(" ");
             sql.append("count(*)");
             sql.append(" FROM documents d ");
+            List<Object> paramsValues = new ArrayList<>();
             if (spec.getJoin() != null) {
                 sql.append(spec.getJoin());
                 sql.append(" ");
             }
             if (spec.getCondition() != null) {
                 Condition condition = spec.getCondition();
-                String conditionSql = conditionToSql(condition);
+                String conditionSql = conditionToSql(condition, paramsValues, columnTypes);
                 sql.append("WHERE ");
                 sql.append(conditionSql);
             }
             sql.append(";");
 
-            resultSet = connection.createStatement().executeQuery(sql.toString());
+            String sqlStr = sql.toString();
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlStr);
+            int i = 1;
+            for (Object paramsValue : paramsValues) {
+                preparedStatement.setObject(i++, paramsValue);
+            }
+            resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
                 return resultSet.getInt(1);
             }
