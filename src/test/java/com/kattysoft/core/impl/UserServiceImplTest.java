@@ -144,7 +144,7 @@ public class UserServiceImplTest {
                 return null;
             }
         };
-        when(userRepository.findAll(argThat(new Matcher<Pageable>() {
+        when(userRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), argThat(new Matcher<Pageable>() {
             @Override
             public boolean matches(Object o) {
                 return o instanceof Pageable && ((Pageable) o).getPageSize() == 2 && ((Pageable) o).getOffset() == 2;

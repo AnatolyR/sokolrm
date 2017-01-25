@@ -14,11 +14,20 @@ import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.UserRepository;
+import com.kattysoft.core.specification.SortOrder;
 import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.SpecificationUtil;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.SingularAttribute;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -67,9 +76,22 @@ public class UserServiceImpl implements UserService {
         int size = specification.getSize();
         int pageNum = offset / size;
 
-        Sort sort = new Sort("lastName");
+        Sort sort;
+        if (specification.getSort() != null && specification.getSort().size() > 0) {
+            sort = new Sort(specification.getSort().get(0).getOrder() == SortOrder.ASC
+                ? Sort.Direction.ASC : Sort.Direction.DESC, specification.getSort().get(0).getField());
+        } else {
+            sort = new Sort("lastName");
+        }
+
         PageRequest pageRequest = new PageRequest(pageNum, size, sort);
-        org.springframework.data.domain.Page<User> repoPage = userRepository.findAll(pageRequest);
+
+        org.springframework.data.jpa.domain.Specification<User> spec = null;
+        if (specification.getCondition() != null) {
+            spec = SpecificationUtil.conditionToSpringSpecification(specification.getCondition(), User.class);
+        }
+
+        org.springframework.data.domain.Page<User> repoPage = userRepository.findAll(spec, pageRequest);
 
         Page<User> page = new Page<>(repoPage.getTotalElements(), repoPage.getContent());
         return page;

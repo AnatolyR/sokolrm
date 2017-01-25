@@ -10,12 +10,15 @@
 package com.kattysoft.core.repository;
 
 import com.kattysoft.core.model.User;
+import com.kattysoft.core.specification.*;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.jdbc.Sql;
@@ -24,14 +27,18 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.SingularAttribute;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.kattysoft.core.impl.UserServiceImpl.md5;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -151,4 +158,30 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         assertThat(n, equalTo(5));
     }
 
+    @Test
+    @Sql("file:db/users.sql")
+    @Sql("file:db/sampleData/usersData.sql")
+    public void testCriteria() {
+        ContainerCondition condition = new ContainerCondition();
+        ContainerCondition subcondition = new ContainerCondition();
+
+        condition.setOperation(ContainerOperation.AND);
+        condition.getConditions().add(new ValueCondition("lastName", Operation.EQUAL, "Ивашов"));
+        condition.getConditions().add(subcondition);
+
+        subcondition.setOperation(ContainerOperation.OR);
+        subcondition.getConditions().add(new ValueCondition("firstName", Operation.EQUAL, "Виктор"));
+        subcondition.getConditions().add(new ValueCondition("firstName", Operation.EQUAL, "Никита"));
+
+        org.springframework.data.jpa.domain.Specification<User> specification = SpecificationUtil.conditionToSpringSpecification(condition, User.class);
+
+        List<User> users = userRepository.findAll(specification);
+        for (User user : users) {
+            System.out.println(user.getId() + " " + user.getLastName() + " " + user.getFirstName());
+        }
+        assertThat(users.get(0).getLastName(), equalTo("Ивашов"));
+        assertThat(users.get(0).getFirstName(), equalTo("Виктор"));
+        assertThat(users.get(1).getLastName(), equalTo("Ивашов"));
+        assertThat(users.get(1).getFirstName(), equalTo("Никита"));
+    }
 }

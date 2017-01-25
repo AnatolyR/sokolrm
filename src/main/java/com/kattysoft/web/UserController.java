@@ -12,13 +12,14 @@ package com.kattysoft.web;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.SokolException;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
-import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.*;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,7 +49,7 @@ public class UserController {
     private ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "/users")
-    public ObjectNode getUsers(Integer offset, Integer size) {
+    public ObjectNode getUsers(Integer offset, Integer size, String conditions, String sort, String sortAsc) throws IOException {
         if (offset == null) {
             offset = 0;
         }
@@ -55,9 +57,26 @@ public class UserController {
             size =  DEFAULT_PAGE_SIZE;
         }
 
+        if (conditions == null || conditions.isEmpty()) {
+            conditions = "[]";
+        }
+        JsonNode clientConditionsNode = mapper.readTree(conditions);
+        Condition clientCondition = SpecificationUtil.read((ArrayNode) clientConditionsNode);
+
         Specification spec = new Specification();
+        if (sort != null && !sort.isEmpty()) {
+            Sort sortObject = new Sort();
+            sortObject.setField(sort);
+            sortObject.setOrder("true".equals(sortAsc) ? SortOrder.ASC : SortOrder.DESC);
+            spec.setSort(Collections.singletonList(sortObject));
+        }
+
         spec.setOffset(offset);
         spec.setSize(size);
+
+        if (clientCondition != null) {
+            spec.setCondition(clientCondition);
+        }
 
         Page<User> users = userService.getUsers(spec);
         List<ObjectNode> userNodes = users.getContent().stream().map(user ->

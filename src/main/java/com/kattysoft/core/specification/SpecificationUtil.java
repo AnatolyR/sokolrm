@@ -12,7 +12,15 @@ package com.kattysoft.core.specification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.kattysoft.core.model.User;
+import org.joda.time.LocalDate;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -76,5 +84,51 @@ public class SpecificationUtil {
         } else {
             return null;
         }
+    }
+
+    public static <T> org.springframework.data.jpa.domain.Specification<T> conditionToSpringSpecification(Condition condition, Class<T> c) {
+        org.springframework.data.jpa.domain.Specification<T> specification = (root, query, criteriaBuilder) ->
+            conditionToPredicate(condition, root, criteriaBuilder);
+        return specification;
+    }
+
+    public static Predicate conditionToPredicate(Condition condition, Root root, CriteriaBuilder criteriaBuilder) {
+        if (condition instanceof ContainerCondition) {
+            List<Predicate> subconditions = new ArrayList<>();
+            ((ContainerCondition) condition).getConditions().forEach(c -> {
+                Predicate p = conditionToPredicate(c, root, criteriaBuilder);
+                if (p != null) {
+                    subconditions.add(p);
+                }
+            });
+            if (subconditions.size() == 0) {
+                return null;
+            }
+            if (((ContainerCondition) condition).getOperation() == ContainerOperation.AND) {
+                return criteriaBuilder.and(subconditions.toArray(new Predicate[subconditions.size()]));
+            } else {
+                return criteriaBuilder.or(subconditions.toArray(new Predicate[subconditions.size()]));
+            }
+        } else if (condition instanceof ValueCondition) {
+            ValueCondition valueCondition = (ValueCondition) condition;
+            Attribute attr = root.getModel().getAttribute(valueCondition.getField());
+            Path path = root.get((SingularAttribute) attr);
+            Predicate predicate;
+            if (valueCondition.getOperation() ==  Operation.EQUAL) {
+                predicate = criteriaBuilder.equal(path, valueCondition.getValue());
+            } else if (valueCondition.getOperation() == Operation.NOT_EQUAL) {
+                predicate = criteriaBuilder.notEqual(path, valueCondition.getValue());
+            } else if (valueCondition.getOperation() == Operation.LIKE && valueCondition.getValue() instanceof String) {
+                predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue() + "%");
+            } else if (valueCondition.getOperation() == Operation.STARTS && valueCondition.getValue() instanceof String) {
+                predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue());
+            } else if (valueCondition.getOperation() == Operation.ENDS && valueCondition.getValue() instanceof String) {
+                predicate = criteriaBuilder.like(path, valueCondition.getValue() + "%");
+            } else {
+                return null;
+            }
+            return predicate;
+        }
+        return null;
     }
 }

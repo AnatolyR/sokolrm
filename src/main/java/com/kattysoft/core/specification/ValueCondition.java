@@ -18,6 +18,15 @@ public class ValueCondition extends Condition {
     private Operation operation;
     private Object value;
 
+    public ValueCondition() {
+    }
+
+    public ValueCondition(String field, Operation operation, Object value) {
+        this.field = field;
+        this.operation = operation;
+        this.value = value;
+    }
+
     public String getField() {
         return field;
     }

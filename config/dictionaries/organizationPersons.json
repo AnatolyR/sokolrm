@@ -1,6 +1,8 @@
 {
   "gridConfig": {
     "title": "Сотрудники организации",
+    "addableType": "user",
+    "sortable": true,
     "columnsVisible": [
       "lastName",
       "firstName",
@@ -28,6 +30,7 @@
       }
     ],
     "id": "organizationPersons",
-    "url": "app/users"
+    "url": "app/users",
+    "filterable": true
   }
 }

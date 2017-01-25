@@ -141,6 +141,9 @@ $.widget('sokol.dictionaries', {
             this.createPagedGrid(id);
             return;
         }
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('dictionaries/' + id);
+        }
         $.getJSON('app/dictionaryinfo', {id: id},
             $.proxy(function (data) {
                 var preparedData = [];
@@ -163,10 +166,7 @@ $.widget('sokol.dictionaries', {
                     addMethod: $.proxy(this.doAdd, this)
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-                if (this.options.dispatcher) {
-                    document.title = data.title;
-                    this.options.dispatcher.updateHash('dictionaries/' + id);
-                }
+                document.title = data.title;
             }, this)
         ).fail(function failLoadList() {
             $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
@@ -174,15 +174,14 @@ $.widget('sokol.dictionaries', {
     },
 
     createPagedGrid: function(id) {
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('dictionaries/' + id);
+        }
         $.getJSON('app/config', {id: 'dictionaries/' + id}, $.proxy(function(response) {
             var options = response.gridConfig;
             options.addable = 'link';
             this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-
-            if (this.options.dispatcher) {
-                document.title = options.title;
-                this.options.dispatcher.updateHash('dictionaries/' + id);
-            }
+            document.title = options.title;
         }, this));
     },
 

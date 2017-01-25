@@ -14,7 +14,9 @@ import com.kattysoft.core.SokolException;
 import com.kattysoft.core.model.Contragent;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.repository.ContragentRepository;
+import com.kattysoft.core.specification.SortOrder;
 import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.SpecificationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -43,14 +45,27 @@ public class ContragentServiceImpl implements ContragentService {
         return contragent != null ? contragent.getTitle() : null;
     }
 
-    public Page<Contragent> getContragents(Specification spec) {
-        int offset = spec.getOffset();
-        int size = spec.getSize();
+    public Page<Contragent> getContragents(Specification specification) {
+        int offset = specification.getOffset();
+        int size = specification.getSize();
         int pageNum = offset / size;
 
-        Sort sort = new Sort("title");
+        Sort sort;
+        if (specification.getSort() != null && specification.getSort().size() > 0) {
+            sort = new Sort(specification.getSort().get(0).getOrder() == SortOrder.ASC
+                ? Sort.Direction.ASC : Sort.Direction.DESC, specification.getSort().get(0).getField());
+        } else {
+            sort = new Sort("title");
+        }
+
         PageRequest pageRequest = new PageRequest(pageNum, size, sort);
-        org.springframework.data.domain.Page<Contragent> repoPage = contragentRepository.findAll(pageRequest);
+
+        org.springframework.data.jpa.domain.Specification<Contragent> spec = null;
+        if (specification.getCondition() != null) {
+            spec = SpecificationUtil.conditionToSpringSpecification(specification.getCondition(), Contragent.class);
+        }
+
+        org.springframework.data.domain.Page<Contragent> repoPage = contragentRepository.findAll(spec, pageRequest);
 
         Page<Contragent> page = new Page<>(repoPage.getTotalElements(), repoPage.getContent());
         return page;

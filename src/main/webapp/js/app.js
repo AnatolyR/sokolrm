@@ -776,6 +776,9 @@ $.widget('sokol.dictionaries', {
             this.createPagedGrid(id);
             return;
         }
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('dictionaries/' + id);
+        }
         $.getJSON('app/dictionaryinfo', {id: id},
             $.proxy(function (data) {
                 var preparedData = [];
@@ -798,10 +801,7 @@ $.widget('sokol.dictionaries', {
                     addMethod: $.proxy(this.doAdd, this)
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-                if (this.options.dispatcher) {
-                    document.title = data.title;
-                    this.options.dispatcher.updateHash('dictionaries/' + id);
-                }
+                document.title = data.title;
             }, this)
         ).fail(function failLoadList() {
             $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
@@ -809,15 +809,14 @@ $.widget('sokol.dictionaries', {
     },
 
     createPagedGrid: function(id) {
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('dictionaries/' + id);
+        }
         $.getJSON('app/config', {id: 'dictionaries/' + id}, $.proxy(function(response) {
             var options = response.gridConfig;
             options.addable = 'link';
             this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-
-            if (this.options.dispatcher) {
-                document.title = options.title;
-                this.options.dispatcher.updateHash('dictionaries/' + id);
-            }
+            document.title = options.title;
         }, this));
     },
 
@@ -1567,33 +1566,34 @@ $.widget("sokol.grid", {
             if (colType != "hidden" && this.isColumnVisible(col.id)) {
                 var th = $("<th>" + col.title + "</th>");
 
-                if (this.sortColumn == col.id) {
-                    if (this.sortAsc) {
-                        var sortLabel = $('<span class="glyphicon glyphicon-triangle-top" style="margin-left: 5px;"></span>');
-                        th.append(sortLabel);
-                    } else {
-                        var sortLabel = $('<span class="glyphicon glyphicon-triangle-bottom" style="margin-left: 5px;"></span>');
-                        th.append(sortLabel);
+                if (this.options.sortable) {
+                    if (this.sortColumn == col.id) {
+                        if (this.sortAsc) {
+                            var sortLabel = $('<span class="glyphicon glyphicon-triangle-top" style="margin-left: 5px;"></span>');
+                            th.append(sortLabel);
+                        } else {
+                            var sortLabel = $('<span class="glyphicon glyphicon-triangle-bottom" style="margin-left: 5px;"></span>');
+                            th.append(sortLabel);
+                        }
                     }
+
+                    th.click($.proxy(function(colId) {
+                        return $.proxy(function() {
+                            if (this.sortColumn && this.sortColumn == colId) {
+                                if (this.sortAsc) {
+                                    this.sortAsc = false;
+                                } else {
+                                    this.sortColumn = null;
+                                }
+                            } else {
+                                this.sortColumn = colId;
+                                this.sortAsc = true;
+                            }
+                            this.reload();
+                        }, this);
+                    }, this)(col.id));
                 }
 
-                th.click($.proxy(function(colId) {
-                    return $.proxy(function() {
-                        if (this.sortColumn && this.sortColumn == colId) {
-                            if (this.sortAsc) {
-                                this.sortAsc = false;
-                            } else {
-                                this.sortColumn = null;
-                            }
-                        } else {
-                            this.sortColumn = colId;
-                            this.sortAsc = true;
-                        }
-                        this.reload();
-                    //    var sortLabel = $('<span class="glyphicon glyphicon-triangle-bottom" style="margin-left: 5px;"></span>');
-                    //    th.append(sortLabel);
-                    }, this);
-                }, this)(col.id));
                 th.appendTo(header);
             }
         }
@@ -1993,7 +1993,8 @@ $.widget('sokol.list', {
                     columns: data.columns,
                     url: 'app/documents',
                     id: id,
-                    filterable: true
+                    filterable: true,
+                    sortable: true
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {

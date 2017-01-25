@@ -63,7 +63,8 @@ $.widget('sokol.list', {
                     columns: data.columns,
                     url: 'app/documents',
                     id: id,
-                    filterable: true
+                    filterable: true,
+                    sortable: true
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {

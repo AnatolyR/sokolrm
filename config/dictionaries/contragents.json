@@ -2,6 +2,7 @@
   "gridConfig": {
     "title": "Внешние организации",
     "addableType": "contragent",
+    "filterable": true,
     "columnsVisible": [
       "title",
       "fullName",

@@ -195,31 +195,34 @@ $.widget("sokol.grid", {
             if (colType != "hidden" && this.isColumnVisible(col.id)) {
                 var th = $("<th>" + col.title + "</th>");
 
-                if (this.sortColumn == col.id) {
-                    if (this.sortAsc) {
-                        var sortLabel = $('<span class="glyphicon glyphicon-triangle-top" style="margin-left: 5px;"></span>');
-                        th.append(sortLabel);
-                    } else {
-                        var sortLabel = $('<span class="glyphicon glyphicon-triangle-bottom" style="margin-left: 5px;"></span>');
-                        th.append(sortLabel);
+                if (this.options.sortable) {
+                    if (this.sortColumn == col.id) {
+                        if (this.sortAsc) {
+                            var sortLabel = $('<span class="glyphicon glyphicon-triangle-top" style="margin-left: 5px;"></span>');
+                            th.append(sortLabel);
+                        } else {
+                            var sortLabel = $('<span class="glyphicon glyphicon-triangle-bottom" style="margin-left: 5px;"></span>');
+                            th.append(sortLabel);
+                        }
                     }
+
+                    th.click($.proxy(function(colId) {
+                        return $.proxy(function() {
+                            if (this.sortColumn && this.sortColumn == colId) {
+                                if (this.sortAsc) {
+                                    this.sortAsc = false;
+                                } else {
+                                    this.sortColumn = null;
+                                }
+                            } else {
+                                this.sortColumn = colId;
+                                this.sortAsc = true;
+                            }
+                            this.reload();
+                        }, this);
+                    }, this)(col.id));
                 }
 
-                th.click($.proxy(function(colId) {
-                    return $.proxy(function() {
-                        if (this.sortColumn && this.sortColumn == colId) {
-                            if (this.sortAsc) {
-                                this.sortAsc = false;
-                            } else {
-                                this.sortColumn = null;
-                            }
-                        } else {
-                            this.sortColumn = colId;
-                            this.sortAsc = true;
-                        }
-                        this.reload();
-                    }, this);
-                }, this)(col.id));
                 th.appendTo(header);
             }
         }
