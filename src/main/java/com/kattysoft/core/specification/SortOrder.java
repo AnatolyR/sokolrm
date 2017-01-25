@@ -5,5 +5,5 @@ package com.kattysoft.core.specification;
  * Date: 20.07.2016
  */
 public enum SortOrder {
-    ASC, DSC
+    ASC, DESC
 }

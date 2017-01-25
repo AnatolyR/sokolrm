@@ -913,7 +913,7 @@ $.widget('sokol.filter', {
             }
         });
 
-        var fieldSelector = $('<select name="columnSelector" class="selectpicker tableCell" style1="width: 450px;"></select>').appendTo(condition);
+        var fieldSelector = $('<select name="columnSelector" class="selectpicker tableCell"></select>').appendTo(condition);
         fieldSelector.append($('<option value="">&nbsp;</option>'));
         var columns = this.options.columns;
         for (var c = 0; c < columns.length; c++) {
@@ -1464,7 +1464,9 @@ $.widget("sokol.grid", {
                 listId: this.options.id,
                 size: this.options.pageSize,
                 offset: this.options.offset,
-                conditions: (this.filter && this.filter.conditions) ? JSON.stringify(this.filter.conditions) : null
+                conditions: (this.filter && this.filter.conditions) ? JSON.stringify(this.filter.conditions) : null,
+                sort: this.sortColumn,
+                sortAsc: this.sortAsc
             }, $.proxy(function (data) {
                 this.options.data = data.data;
                 this.options.total = data.total;
@@ -1564,6 +1566,34 @@ $.widget("sokol.grid", {
             var colType = columns[i].type;
             if (colType != "hidden" && this.isColumnVisible(col.id)) {
                 var th = $("<th>" + col.title + "</th>");
+
+                if (this.sortColumn == col.id) {
+                    if (this.sortAsc) {
+                        var sortLabel = $('<span class="glyphicon glyphicon-triangle-top" style="margin-left: 5px;"></span>');
+                        th.append(sortLabel);
+                    } else {
+                        var sortLabel = $('<span class="glyphicon glyphicon-triangle-bottom" style="margin-left: 5px;"></span>');
+                        th.append(sortLabel);
+                    }
+                }
+
+                th.click($.proxy(function(colId) {
+                    return $.proxy(function() {
+                        if (this.sortColumn && this.sortColumn == colId) {
+                            if (this.sortAsc) {
+                                this.sortAsc = false;
+                            } else {
+                                this.sortColumn = null;
+                            }
+                        } else {
+                            this.sortColumn = colId;
+                            this.sortAsc = true;
+                        }
+                        this.reload();
+                    //    var sortLabel = $('<span class="glyphicon glyphicon-triangle-bottom" style="margin-left: 5px;"></span>');
+                    //    th.append(sortLabel);
+                    }, this);
+                }, this)(col.id));
                 th.appendTo(header);
             }
         }

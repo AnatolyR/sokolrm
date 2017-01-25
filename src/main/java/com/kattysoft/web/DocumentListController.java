@@ -22,10 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -46,7 +43,7 @@ public class DocumentListController {
     private ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "/documents")
-    public Object listDocuments(String listId, Integer offset, Integer size, String conditions) throws IOException {
+    public Object listDocuments(String listId, Integer offset, Integer size, String conditions, String sort, String sortAsc) throws IOException {
         if (offset == null) {
             offset = 0;
         }
@@ -64,6 +61,13 @@ public class DocumentListController {
 
 
         Specification spec = new Specification();
+        if (sort != null && !sort.isEmpty()) {
+            Sort sortObject = new Sort();
+            sortObject.setField(sort);
+            sortObject.setOrder("true".equals(sortAsc) ? SortOrder.ASC : SortOrder.DESC);
+            spec.setSort(Collections.singletonList(sortObject));
+        }
+
         spec.setOffset(offset);
         spec.setSize(size);
         List<String> fields = StreamSupport.stream(config.get("gridConfig").get("columns").spliterator(), false)

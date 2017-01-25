@@ -34,4 +34,12 @@ public class Sort {
     public void setOrder(SortOrder order) {
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "Sort{" +
+            "field='" + field + '\'' +
+            ", order=" + order +
+            '}';
+    }
 }

@@ -12,7 +12,6 @@ package com.kattysoft.core.dao;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.*;
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,6 +140,13 @@ public class DocumentDaoPg implements DocumentDao {
                 String conditionSql = conditionToSql(condition, paramsValues, columnTypes);
                 sql.append("WHERE ");
                 sql.append(conditionSql);
+            }
+            if (spec.getSort() != null && spec.getSort().size() > 0) {
+                String column = spec.getSort().get(0).getField();
+                SortOrder order = spec.getSort().get(0).getOrder();
+                if (columnTypes.containsKey(column)) {
+                    sql.append(" ORDER BY \"").append(column).append("\" ").append(order);
+                }
             }
             if (spec.getSize() != null) {
                 sql.append(" LIMIT ");
