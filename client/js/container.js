@@ -3,6 +3,7 @@ $.widget('sokol.container', {
         mode: "read"
     },
     _create: function () {
+        this.childs = [];
         this.createForm();
     },
     _destroy: function() {
@@ -17,6 +18,12 @@ $.widget('sokol.container', {
         }
         if (this.attaches) {
             this.attaches.destroy();
+        }
+        for (var i = 0; i < this.childs.length; i++) {
+            var child = this.childs[i];
+            if (child.destroy) {
+                child.destroy();
+            }
         }
         this.element.detach();
     },
@@ -55,9 +62,28 @@ $.widget('sokol.container', {
             containerType: this.options.containerType
         }, $('<div></div>').appendTo(this.element));
 
+        if (this.options.subforms) {
+            for (var i = 0; i < this.options.subforms.length; i++) {
+                var subform = this.options.subforms[i];
+                this.createSubform(subform);
+            }
+        }
+
         if (this.options.id) {
             this.attaches = $.sokol.attachesGrid({mode: this.options.mode, id: data.id}, $('<div></div>').appendTo(this.element));
         }
+    },
+
+    createSubform: function(subform) {
+        var form = $.sokol.form({
+            mode: "read",
+            data: subform.data ? subform.data : this.options.data,
+            form: subform.form,
+            parent: this,
+            dispatcher: this.options.dispatcher,
+            containerType: this.options.containerType
+        }, $('<div></div>').appendTo(this.element));
+        this.childs.push(form);
     },
 
     notify: function(message) {
@@ -78,6 +104,13 @@ $.widget('sokol.container', {
         this.form.setMode(mode);
 
         this.attaches.setMode(mode);
+
+        for (var i = 0; i < this.childs.length; i++) {
+            var child = this.childs[i];
+            if (child.setMode) {
+                child.setMode(mode);
+            }
+        }
     },
 
     saveForm: function() {
@@ -86,6 +119,13 @@ $.widget('sokol.container', {
         }
 
         var data = this.form.getData();
+
+        for (var i = 0; i < this.childs.length; i++) {
+            var child = this.childs[i];
+            if (child.getData) {
+                data[child.formId] = child.getData();
+            }
+        }
 
         var saveUrl;
         var message;

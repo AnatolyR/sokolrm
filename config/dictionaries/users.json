@@ -1,0 +1,41 @@
+{
+  "gridConfig": {
+    "title": "Сотрудники организации",
+    "addableType": "user",
+    "sortable": true,
+    "columnsVisible": [
+      "login",
+      "lastName",
+      "firstName",
+      "middleName",
+      "title"
+    ],
+    "columns": [
+      {
+        "id": "login",
+        "title": "Учетное имя",
+        "render": "link",
+        "linkType": "user"
+      },
+      {
+        "id": "title",
+        "title": "Сокращенное имя"
+      },
+      {
+        "id": "lastName",
+        "title": "Фамилия"
+      },
+      {
+        "id": "firstName",
+        "title": "Имя"
+      },
+      {
+        "id": "middleName",
+        "title": "Отчество"
+      }
+    ],
+    "id": "users",
+    "url": "app/users",
+    "filterable": true
+  }
+}

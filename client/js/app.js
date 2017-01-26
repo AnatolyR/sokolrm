@@ -108,7 +108,8 @@ $.widget('sokol.app', {
                     id: data.data.id,
                     data: data.data,
                     form: data.form,
-                    containerType: type
+                    containerType: type,
+                    subforms: data.subforms
                 };
                 if (mode) {
                     options.mode = mode;

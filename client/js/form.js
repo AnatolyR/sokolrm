@@ -1,12 +1,12 @@
 $.widget('sokol.form', {
     options: {
         mode: 'read',
-        objectType: '',
-        fieldsInfo: [],
-        fieldsInfoMap: []
+        objectType: ''
     },
 
     _create: function () {
+        this.fieldsInfo = [];
+        this.fieldsInfoMap = [];
         this.createForm();
     },
 
@@ -15,6 +15,7 @@ $.widget('sokol.form', {
     },
 
     createForm: function() {
+        this.formId = this.options.form.id;
         var data = this.options.data;
         var form = this.options.form;
 
@@ -32,6 +33,30 @@ $.widget('sokol.form', {
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(panel);
         return panelBody;
+    },
+
+    createButton: function(formNode, field, value, edit) {
+        var button = $('<button type="button" class="btn">' + field.title + '</button>');
+        if (field.class) {
+            button.addClass(field.class);
+        } else {
+            button.addClass('btn-default');
+        }
+        button.click($.proxy(function() {
+            if (this[field.method]) {
+                this[field.method]();
+            }
+        }, this));
+        button.appendTo(formNode);
+    },
+
+    resetPassword: function() {
+        $.post('app/resetPassword', {id: this.options.data.id}, function(data) {
+            $.sokol.smodal({
+                title: 'Новый пароль',
+                body: data
+            });
+        });
     },
 
     createFieldString: function(formNode, field, value, edit) {
@@ -196,7 +221,7 @@ $.widget('sokol.form', {
         var formNode = this.element.find('[name="mainForm"]');
         if (formNode.length == 0) {
             formNode = $('<form name="mainForm"></form>');
-            var blockTitle = this.options.containerType == 'user' ? 'Свойства' : 'Основные реквизиты';
+            var blockTitle = form.title;
             var blockNode = this.createBlock(container, blockTitle);
             formNode.appendTo(blockNode);
         } else {
@@ -241,14 +266,16 @@ $.widget('sokol.form', {
         var valueTitle = data[id + "Title"];
         var type = field.type;
 
-        this.options.fieldsInfo.push(field);
-        this.options.fieldsInfoMap[id] = field;
+        this.fieldsInfo.push(field);
+        this.fieldsInfoMap[id] = field;
 
         if (!value) {
             value = "";
         }
         if (type == "string" || type == "smallstring") {
             this.createFieldString(formNode, field, value, edit);
+        } else if (type == "button") {
+            this.createButton(formNode, field, value, edit);
         } else if (type == "date") {
             this.createFieldDate(formNode, field, value, edit);
         } else if (type == "select") {
@@ -287,8 +314,8 @@ $.widget('sokol.form', {
 
         var valid = true;
 
-        for (var i = 0; i < this.options.fieldsInfo.length; i++) {
-            var field = this.options.fieldsInfo[i];
+        for (var i = 0; i < this.fieldsInfo.length; i++) {
+            var field = this.fieldsInfo[i];
             var val = values[field.id];
 
             var fieldDiv = mainForm.find("[name=" + field.id + "]").parent();
@@ -322,7 +349,7 @@ $.widget('sokol.form', {
         var fields = {};
         for (var i = 0; i < valuesList.length; i++) {
             var value = valuesList[i];
-            var fieldInfo = this.options.fieldsInfoMap[value.name];
+            var fieldInfo = this.fieldsInfoMap[value.name];
             if (fieldInfo.multiple) {
                 if (fields[value.name]) {
                     fields[value.name].push(value.value);

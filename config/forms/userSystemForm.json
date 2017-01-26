@@ -1,0 +1,29 @@
+{
+  "id": "userSystem",
+  "title": "Системные свойства",
+  "fields": [
+    {
+      "items": [
+        {
+          "id": "login",
+          "title": "Учетное имя",
+          "type": "string",
+          "mandatory": true
+        },
+        {
+          "id": "newPasswordButton",
+          "title": "Сбросить пароль",
+          "type": "button",
+          "method": "resetPassword",
+          "class": "btn-danger"
+        }
+      ]
+    },
+    {
+      "id": "email",
+      "title": "Электронная почта",
+      "type": "string",
+      "mandatory": true
+    }
+  ]
+}

@@ -13,15 +13,20 @@ $.widget('sokol.admin', {
         var produceHandler = $.proxy(function produceHandler(item) {
             return $.proxy(function handleCategoryClick(e) {
                 e.preventDefault();
-                //this.createGrid(item.id);
+                this.createGrid(item.id);
             }, this)
         }, this);
         $.getJSON('app/config', {id: 'navigation/admin'}, $.proxy(function(data) {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
-                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
-                    currentNode = header;
-                    header.find("a").click(produceHandler(item));
+                    if (item.title) {
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        currentNode = header;
+                        header.find("a").click(produceHandler(item));
+                    } else {
+                        var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                        currentNode = block;
+                    }
                 } else {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
@@ -43,32 +48,34 @@ $.widget('sokol.admin', {
         //}
     },
 
+    createPagedGrid: function(id) {
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('admin/' + id);
+        }
+        $.getJSON('app/config', {id: 'dictionaries/' + id}, $.proxy(function(response) {
+            var options = response.gridConfig;
+            options.addable = 'link';
+            this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+            document.title = options.title;
+        }, this));
+    },
+
     createGrid: function(id) {
-        var fullId = 'lists/' + id + 'List';
+        this.options.id = "dictionaries/" + id;
         if (this.grid) {
             this.grid.destroy();
+        }
+        if (this.info) {
+            this.info.remove();
         }
         this.sidebar.find('li').removeClass('active');
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
-        $.getJSON('app/config', {id: fullId},
-            $.proxy(function (data) {
-                var options = {
-                    title: data.title,
-                    columnsVisible: data.columnsVisible,
-                    columns: data.columns,
-                    url: 'app/documents',
-                    id: id
-                };
-                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-                if (this.options.dispatcher) {
-                    this.options.dispatcher.updateHash('lists/' + id);
-                }
-            }, this)
-        ).fail(function failLoadList() {
-            $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
-        });
+        if (id == 'users') {
+            this.createPagedGrid(id);
+            return;
+        }
     },
 
     _destroy: function() {
@@ -185,7 +192,8 @@ $.widget('sokol.app', {
                     id: data.data.id,
                     data: data.data,
                     form: data.form,
-                    containerType: type
+                    containerType: type,
+                    subforms: data.subforms
                 };
                 if (mode) {
                     options.mode = mode;
@@ -457,6 +465,7 @@ $.widget('sokol.container', {
         mode: "read"
     },
     _create: function () {
+        this.childs = [];
         this.createForm();
     },
     _destroy: function() {
@@ -471,6 +480,12 @@ $.widget('sokol.container', {
         }
         if (this.attaches) {
             this.attaches.destroy();
+        }
+        for (var i = 0; i < this.childs.length; i++) {
+            var child = this.childs[i];
+            if (child.destroy) {
+                child.destroy();
+            }
         }
         this.element.detach();
     },
@@ -509,9 +524,28 @@ $.widget('sokol.container', {
             containerType: this.options.containerType
         }, $('<div></div>').appendTo(this.element));
 
+        if (this.options.subforms) {
+            for (var i = 0; i < this.options.subforms.length; i++) {
+                var subform = this.options.subforms[i];
+                this.createSubform(subform);
+            }
+        }
+
         if (this.options.id) {
             this.attaches = $.sokol.attachesGrid({mode: this.options.mode, id: data.id}, $('<div></div>').appendTo(this.element));
         }
+    },
+
+    createSubform: function(subform) {
+        var form = $.sokol.form({
+            mode: "read",
+            data: subform.data ? subform.data : this.options.data,
+            form: subform.form,
+            parent: this,
+            dispatcher: this.options.dispatcher,
+            containerType: this.options.containerType
+        }, $('<div></div>').appendTo(this.element));
+        this.childs.push(form);
     },
 
     notify: function(message) {
@@ -532,6 +566,13 @@ $.widget('sokol.container', {
         this.form.setMode(mode);
 
         this.attaches.setMode(mode);
+
+        for (var i = 0; i < this.childs.length; i++) {
+            var child = this.childs[i];
+            if (child.setMode) {
+                child.setMode(mode);
+            }
+        }
     },
 
     saveForm: function() {
@@ -540,6 +581,13 @@ $.widget('sokol.container', {
         }
 
         var data = this.form.getData();
+
+        for (var i = 0; i < this.childs.length; i++) {
+            var child = this.childs[i];
+            if (child.getData) {
+                data[child.formId] = child.getData();
+            }
+        }
 
         var saveUrl;
         var message;
@@ -952,12 +1000,12 @@ $.fn.filter = primary;
 $.widget('sokol.form', {
     options: {
         mode: 'read',
-        objectType: '',
-        fieldsInfo: [],
-        fieldsInfoMap: []
+        objectType: ''
     },
 
     _create: function () {
+        this.fieldsInfo = [];
+        this.fieldsInfoMap = [];
         this.createForm();
     },
 
@@ -966,6 +1014,7 @@ $.widget('sokol.form', {
     },
 
     createForm: function() {
+        this.formId = this.options.form.id;
         var data = this.options.data;
         var form = this.options.form;
 
@@ -983,6 +1032,30 @@ $.widget('sokol.form', {
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(panel);
         return panelBody;
+    },
+
+    createButton: function(formNode, field, value, edit) {
+        var button = $('<button type="button" class="btn">' + field.title + '</button>');
+        if (field.class) {
+            button.addClass(field.class);
+        } else {
+            button.addClass('btn-default');
+        }
+        button.click($.proxy(function() {
+            if (this[field.method]) {
+                this[field.method]();
+            }
+        }, this));
+        button.appendTo(formNode);
+    },
+
+    resetPassword: function() {
+        $.post('app/resetPassword', {id: this.options.data.id}, function(data) {
+            $.sokol.smodal({
+                title: 'Новый пароль',
+                body: data
+            });
+        });
     },
 
     createFieldString: function(formNode, field, value, edit) {
@@ -1147,7 +1220,7 @@ $.widget('sokol.form', {
         var formNode = this.element.find('[name="mainForm"]');
         if (formNode.length == 0) {
             formNode = $('<form name="mainForm"></form>');
-            var blockTitle = this.options.containerType == 'user' ? 'Свойства' : 'Основные реквизиты';
+            var blockTitle = form.title; //this.options.containerType == 'user' ? 'Свойства' : 'Основные реквизиты';
             var blockNode = this.createBlock(container, blockTitle);
             formNode.appendTo(blockNode);
         } else {
@@ -1192,14 +1265,16 @@ $.widget('sokol.form', {
         var valueTitle = data[id + "Title"];
         var type = field.type;
 
-        this.options.fieldsInfo.push(field);
-        this.options.fieldsInfoMap[id] = field;
+        this.fieldsInfo.push(field);
+        this.fieldsInfoMap[id] = field;
 
         if (!value) {
             value = "";
         }
         if (type == "string" || type == "smallstring") {
             this.createFieldString(formNode, field, value, edit);
+        } else if (type == "button") {
+            this.createButton(formNode, field, value, edit);
         } else if (type == "date") {
             this.createFieldDate(formNode, field, value, edit);
         } else if (type == "select") {
@@ -1238,8 +1313,8 @@ $.widget('sokol.form', {
 
         var valid = true;
 
-        for (var i = 0; i < this.options.fieldsInfo.length; i++) {
-            var field = this.options.fieldsInfo[i];
+        for (var i = 0; i < this.fieldsInfo.length; i++) {
+            var field = this.fieldsInfo[i];
             var val = values[field.id];
 
             var fieldDiv = mainForm.find("[name=" + field.id + "]").parent();
@@ -1273,7 +1348,7 @@ $.widget('sokol.form', {
         var fields = {};
         for (var i = 0; i < valuesList.length; i++) {
             var value = valuesList[i];
-            var fieldInfo = this.options.fieldsInfoMap[value.name];
+            var fieldInfo = this.fieldsInfoMap[value.name];
             if (fieldInfo.multiple) {
                 if (fields[value.name]) {
                     fields[value.name].push(value.value);
@@ -2014,7 +2089,7 @@ $.widget('sokol.smodal', {
     options: {
         title: '',
         body: '',
-        confirmButtonTitle: '',
+        confirmButtonTitle: null,
         confirmAction: null,
         data: null
     },
@@ -2033,8 +2108,8 @@ $.widget('sokol.smodal', {
             this.options.body +
             '            </div>' +
             '            <div class="modal-footer">' +
-            '                <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>' +
-            '                <button type="button" name="confirmButton" class="btn btn-danger">' + this.options.confirmButtonTitle + '</button>' +
+            '                <button type="button" class="btn btn-default" data-dismiss="modal">' + (this.options.confirmButtonTitle ? 'Отмена' : 'ОК') + '</button>' +
+            (this.options.confirmButtonTitle ? '                <button type="button" name="confirmButton" class="btn btn-danger">' + this.options.confirmButtonTitle + '</button>' : '') +
             '            </div>' +
             '        </div>' +
             '    </div>' +

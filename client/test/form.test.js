@@ -41,6 +41,7 @@ modules["form"] = (function() {
     var options = {
         "type" : "form",
         "form" : {
+            "title": "Основные реквизиты",
             "fields" : [ {
                 "id" : "title",
                 "title" : "Заголовок",

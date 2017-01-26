@@ -13,15 +13,20 @@ $.widget('sokol.admin', {
         var produceHandler = $.proxy(function produceHandler(item) {
             return $.proxy(function handleCategoryClick(e) {
                 e.preventDefault();
-                //this.createGrid(item.id);
+                this.createGrid(item.id);
             }, this)
         }, this);
         $.getJSON('app/config', {id: 'navigation/admin'}, $.proxy(function(data) {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
-                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
-                    currentNode = header;
-                    header.find("a").click(produceHandler(item));
+                    if (item.title) {
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        currentNode = header;
+                        header.find("a").click(produceHandler(item));
+                    } else {
+                        var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                        currentNode = block;
+                    }
                 } else {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
@@ -43,32 +48,34 @@ $.widget('sokol.admin', {
         //}
     },
 
+    createPagedGrid: function(id) {
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('admin/' + id);
+        }
+        $.getJSON('app/config', {id: 'dictionaries/' + id}, $.proxy(function(response) {
+            var options = response.gridConfig;
+            options.addable = 'link';
+            this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+            document.title = options.title;
+        }, this));
+    },
+
     createGrid: function(id) {
-        var fullId = 'lists/' + id + 'List';
+        this.options.id = "dictionaries/" + id;
         if (this.grid) {
             this.grid.destroy();
+        }
+        if (this.info) {
+            this.info.remove();
         }
         this.sidebar.find('li').removeClass('active');
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
-        $.getJSON('app/config', {id: fullId},
-            $.proxy(function (data) {
-                var options = {
-                    title: data.title,
-                    columnsVisible: data.columnsVisible,
-                    columns: data.columns,
-                    url: 'app/documents',
-                    id: id
-                };
-                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-                if (this.options.dispatcher) {
-                    this.options.dispatcher.updateHash('lists/' + id);
-                }
-            }, this)
-        ).fail(function failLoadList() {
-            $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
-        });
+        if (id == 'users') {
+            this.createPagedGrid(id);
+            return;
+        }
     },
 
     _destroy: function() {

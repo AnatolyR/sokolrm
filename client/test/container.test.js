@@ -10,6 +10,7 @@ modules["container"] = (function() {
         "id" : "d0e38e2e-18bd-48fd-91ec-5e102519cd06",
         "type" : "form",
         "form" : {
+            "title": "Основные реквизиты",
             "fields" : [ {
                 "id" : "title",
                 "title" : "Заголовок",

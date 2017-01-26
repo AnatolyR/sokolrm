@@ -36,4 +36,6 @@ public interface UserService {
     String saveUser(User user);
 
     void deleteUser(String id);
+
+    String resetPassword(String id);
 }

@@ -109,6 +109,18 @@ public class UserController {
         card.set("data", data);
         card.put("containerType", "user");
 
+        if (user.getId() != null) {
+            ArrayNode subforms = mapper.createArrayNode();
+
+            ObjectNode subformCard = mapper.createObjectNode();
+            JsonNode systemForm = configService.getConfig2("forms/userSystemForm");
+            subformCard.set("form", systemForm);
+
+            subforms.add(subformCard);
+
+            card.set("subforms", subforms);
+        }
+
         return card;
     }
 
@@ -121,6 +133,14 @@ public class UserController {
 
         User user = mapper.treeToValue(fields, User.class);
         user.setId(uuid);
+
+        JsonNode systemUserForm = data.get("userSystem");
+        if (systemUserForm != null) {
+            JsonNode systemFields = systemUserForm.get("fields");
+            String login = systemFields.get("login").asText();
+            String email = systemFields.get("email").asText();
+            user.setLogin(login);
+        }
 
         String id = userService.saveUser(user);
 
@@ -135,6 +155,16 @@ public class UserController {
         userService.deleteUser(id);
         return "true";
     }
+
+    @RequestMapping(value = "/resetPassword")
+    public String resetPassword(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new SokolException("User id is empty");
+        }
+        String password = userService.resetPassword(id);
+        return password;
+    }
+
 
     public void setUserService(UserService userService) {
         this.userService = userService;

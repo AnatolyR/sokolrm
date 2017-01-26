@@ -11,6 +11,7 @@ package com.kattysoft.core.impl;
 
 import com.kattysoft.core.SokolException;
 import com.kattysoft.core.UserService;
+import com.kattysoft.core.Utils;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.UserRepository;
@@ -18,6 +19,9 @@ import com.kattysoft.core.specification.SortOrder;
 import com.kattysoft.core.specification.Specification;
 import com.kattysoft.core.specification.SpecificationUtil;
 import org.joda.time.LocalDate;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,9 +35,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -108,8 +110,12 @@ public class UserServiceImpl implements UserService {
             UUID id = UUID.randomUUID();
             user.setId(id);
         } else {
-            if (userRepository.findOne(user.getId()) == null) {
+            User existUser = userRepository.findOne(user.getId());
+            if (existUser == null) {
                 throw new SokolException("User not found");
+            } else {
+                BeanUtils.copyProperties(user, existUser, Utils.getNullPropertyNames(user));
+                user = existUser;
             }
         }
         userRepository.save(user);
@@ -119,6 +125,29 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(String id) {
         UUID uuid = UUID.fromString(id);
         userRepository.delete(uuid);
+    }
+
+    public static String chars = "abcdefghigklmopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
+    public String resetPassword(String id) {
+        int l = chars.length();
+        Random random  = new Random();
+        String pass = "";
+        for (int i = 0; i < 8; i++) {
+            pass += chars.charAt(random.nextInt(l));
+        }
+
+        User user = this.getUserById(id);
+        if (user.getLogin() == null || user.getLogin().length() < 3) {
+            throw new SokolException("Login length too small");
+        }
+        try {
+            String hashedPass = md5(md5(md5(pass) + user.getLogin()) + PASS_SALT);
+            user.setPassword(hashedPass);
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        this.saveUser(user);
+        return pass;
     }
 
     public void setUserRepository(UserRepository userRepository) {
