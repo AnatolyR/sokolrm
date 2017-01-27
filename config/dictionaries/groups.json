@@ -1,0 +1,16 @@
+{
+  "gridConfig": {
+    "title": "Группы доступа",
+    "addableType": "group",
+    "sortable": false,
+    "columns": [
+      {
+        "id": "title",
+        "title": "Название"
+      }
+    ],
+    "id": "groups",
+    "url": "app/groups",
+    "filterable": false
+  }
+}
