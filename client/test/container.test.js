@@ -9,6 +9,7 @@ modules["container"] = (function() {
     var options = {
         "id" : "d0e38e2e-18bd-48fd-91ec-5e102519cd06",
         "type" : "form",
+        containerType: 'document',
         "form" : {
             "title": "Основные реквизиты",
             "fields" : [ {

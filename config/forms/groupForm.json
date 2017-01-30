@@ -1,0 +1,11 @@
+{
+  "title": "Свойства",
+  "fields": [
+    {
+      "id": "title",
+      "title": "Название",
+      "type": "string",
+      "mandatory": true
+    }
+  ]
+}

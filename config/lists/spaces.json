@@ -1,0 +1,12 @@
+{
+  "title": "Пространства",
+  "gridConfig": {
+    "columns": [
+      {
+        "id": "title",
+        "title": "Название",
+        "editor": "text"
+      }
+    ]
+  }
+}

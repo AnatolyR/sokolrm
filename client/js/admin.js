@@ -38,14 +38,16 @@ $.widget('sokol.admin', {
             if (this.options.id) {
                 setTimeout($.proxy(function () {
                     this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
-                }, this), 0);
+                }, this), 200);
             }
         }, this));
-        //if (this.options.id) {
-        //    this.createGrid(this.options.id);
-        //}else {
-        //    this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите раздел</div></div>').appendTo(this.main);
-        //}
+        if (this.options.id) {
+            if (this.options.id.startsWith("admin/")) {
+                this.createGrid(this.options.id.substring(6));
+            } else {
+                this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите справочник</div></div>').appendTo(this.main);
+            }
+        }
     },
 
     createPagedGrid: function(id) {
@@ -61,7 +63,7 @@ $.widget('sokol.admin', {
     },
 
     createGrid: function(id) {
-        this.options.id = "dictionaries/" + id;
+        this.options.id = "admin/" + id;
         if (this.grid) {
             this.grid.destroy();
         }
@@ -72,10 +74,114 @@ $.widget('sokol.admin', {
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
-        if (id == 'users') {
+        if (id == 'users' || id == 'groups') {
             this.createPagedGrid(id);
             return;
         }
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('admin/' + id);
+        }
+        $.getJSON('app/spaces', {id: id},
+            $.proxy(function (data) {
+                var preparedData = [];
+                data.data.forEach(function(item) {
+                    preparedData.push({
+                        id: item.id,
+                        title: item.title
+                    });
+                });
+                var options = {
+                    title: data.title,
+                    columnsVisible: data.gridConfig.columnsVisible,
+                    columns: data.gridConfig.columns,
+                    data: preparedData,
+                    id: id,
+                    selectable: true,
+                    deletable: true,
+                    deleteMethod: $.proxy(this.doDeleteWithConfirm, this),
+                    addable: true,
+                    addMethod: $.proxy(this.doAdd, this)
+                };
+                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+                document.title = data.title;
+            }, this)
+        ).fail(function failLoadList() {
+                $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+            });
+    },
+
+    doDelete: function(data) {
+        var ids = data.map(function(e) {return e.id});
+        $.post('app/deleteSpaces',
+            {ids: ids},
+            $.proxy(function(response){
+                if (response === 'true') {
+                    $.notify({
+                        message: 'Элементы удалены'
+                    },{
+                        type: 'success',
+                        delay: 1000,
+                        timer: 1000
+                    });
+                    if (this.options.id.startsWith("admin/")) {
+                        this.createGrid(this.options.id.substring(6));
+                    }
+                } else {
+                    $.notify({message: 'Не удалось удалить эелементы'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this)
+        );
+    },
+
+    doDeleteWithConfirm: function(grid, objects) {
+        var titles = objects.map(function(e) {return e.title});
+
+        $.sokol.smodal({
+            title: 'Подтверждение удаления',
+            body: titles.join(', '),
+            confirmButtonTitle: 'Удалить',
+            confirmAction: $.proxy(this.doDelete, this),
+            data: objects
+        });
+    },
+
+    doAdd: function(data, callback) {
+        var obj = {};
+
+        data.forEach(function(e) {
+            obj[e.id] = e.value;
+        });
+
+        if (!obj['title'] || obj['title'].length === 0 || !obj['title'].trim()) {
+            $.notify({message: 'Название пространства не может быть пустым.'},{type: 'warning', delay: 1000, timer: 1000});
+            return;
+        }
+        var id = this.options.id.substring(6);
+        $.post('app/addSpace',
+            {
+                data: JSON.stringify(obj)
+            },
+            $.proxy(function(response){
+                if (response) {
+                    $.notify({
+                        message: 'Элемент добавлен'
+                    },{
+                        type: 'success',
+                        delay: 1000,
+                        timer: 1000
+                    });
+                    callback(response);
+                } else {
+                    $.notify({message: 'Не удалось добавить эелемент'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this)
+        ).fail(function(e) {
+                if (e.responseJSON && e.responseJSON.error) {
+                    $.notify({message: 'Пространство с таким названием уже существует.'},{type: 'warning', delay: 1000, timer: 1000});
+                } else {
+                    $.notify({message: 'Не удалось добавить эелемент. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                }
+            });
     },
 
     _destroy: function() {

@@ -43,8 +43,12 @@ $.widget('sokol.container', {
                 title: data.title,
                 subtitle: data.fullName
             }, $('<div></div>').appendTo(this.element));
-        } else {
+        } else if (this.options.containerType == 'document') {
             this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
+        } else {
+            this.header = $.sokol.titleHeader({
+                title: data.title
+            }, $('<div></div>').appendTo(this.element));
         }
 
         this.formButtons = $.sokol.formButtons({

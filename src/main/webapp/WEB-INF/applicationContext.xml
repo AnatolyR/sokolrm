@@ -77,4 +77,12 @@
 
     </bean>
 
+    <bean class="com.kattysoft.core.impl.GroupServiceImpl">
+
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.SpaceServiceImpl">
+
+    </bean>
+
 </beans>

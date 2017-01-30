@@ -6,7 +6,9 @@
     "columns": [
       {
         "id": "title",
-        "title": "Название"
+        "title": "Название",
+        "render": "link",
+        "linkType": "group"
       }
     ],
     "id": "groups",
