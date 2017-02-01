@@ -5,7 +5,7 @@
     "columns": [
       {
         "id": "title",
-        "title": "Знчение",
+        "title": "Значение",
         "editor": "text"
       }
     ]

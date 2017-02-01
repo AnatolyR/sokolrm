@@ -7,6 +7,7 @@
  */
 package com.kattysoft.core;
 
+import com.kattysoft.core.model.Dictionary;
 import com.kattysoft.core.model.DictionaryValue;
 
 import java.util.List;
@@ -27,4 +28,6 @@ public interface DictionaryService {
     String addDictionaryValue(DictionaryValue value);
 
     DictionaryValue getDictionaryValue(String id);
+
+    List<Dictionary> getDictionaries();
 }

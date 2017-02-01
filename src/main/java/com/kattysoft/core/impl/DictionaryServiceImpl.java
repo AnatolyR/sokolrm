@@ -9,12 +9,16 @@
  */
 package com.kattysoft.core.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.DictionaryService;
+import com.kattysoft.core.model.Dictionary;
 import com.kattysoft.core.model.DictionaryValue;
 import com.kattysoft.core.repository.DictionaryValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,6 +29,9 @@ import java.util.stream.Stream;
  * Date: 28.12.2016
  */
 public class DictionaryServiceImpl implements DictionaryService {
+    @Autowired
+    private ConfigService configService;
+
     @Autowired
     private DictionaryValueRepository dictionaryValueRepository;
 
@@ -68,11 +75,35 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
+    public List<Dictionary> getDictionaries() {
+        JsonNode documentTypes = configService.getConfig2("dictionaries");
+        List<Dictionary> dictionaries = new ArrayList<>();
+
+        documentTypes.forEach(jsonNode -> {
+            String dictionaryName = jsonNode.asText();
+            JsonNode typeNode = configService.getConfig2("dictionaries/" + dictionaryName);
+            String title = typeNode.get("gridConfig").get("title").asText();
+
+            Dictionary dictionary = new Dictionary();
+            dictionary.setDictionaryId(dictionaryName);
+            dictionary.setTitle(title);
+
+            dictionaries.add(dictionary);
+        });
+
+        return dictionaries;
+    }
+
+    @Override
     public DictionaryValue getDictionaryValue(String id) {
         return dictionaryValueRepository.findOne(UUID.fromString(id));
     }
 
     public void setDictionaryValueRepository(DictionaryValueRepository dictionaryValueRepository) {
         this.dictionaryValueRepository = dictionaryValueRepository;
+    }
+
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
     }
 }

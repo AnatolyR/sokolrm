@@ -36,6 +36,7 @@ $.widget("sokol.grid", {
         central.empty();
 
         var topBar = this.createButtonsBar(central);
+        this.topBar = topBar;
         if (!this.options.data) {
             var pagination = this.createPagination(topBar);
         } else {
@@ -324,7 +325,7 @@ $.widget("sokol.grid", {
     },
 
     createDeleteButton: function(element) {
-        var deleteButton = $('<button type="button" disabled="disabled" name="delete" style="margin-right: 5px;" class="btn btn-danger">Удалить</button>');
+        var deleteButton = $('<button type="button" disabled="disabled" name="delete" style="margin-right: 5px;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
         deleteButton.click($.proxy(function() {
             var ids = this.element.find('tbody input:checked').map(function (i, el) {
                 return $(el).attr('dataId');
@@ -362,7 +363,7 @@ $.widget("sokol.grid", {
 
     createAddButton: function(buttonBar) {
         if (this.options.addable == 'link') {
-            var addButton = $('<a type="button" name="add" target="_blank" href="#new/' + this.options.addableType + '" style="margin-right: 5px;" class="btn btn-success controlElementLeftMargin">Создать</a>');
+            var addButton = $('<a type="button" name="add" target="_blank" href="#new/' + this.options.addableType + '" style="" class="btn btn-success controlElementLeftMargin">Создать</a>');
             addButton.appendTo(buttonBar);
         } else {
             var addButton = $('<button type="button" name="add" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');

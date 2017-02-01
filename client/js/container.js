@@ -79,6 +79,13 @@ $.widget('sokol.container', {
     },
 
     createSubform: function(subform) {
+        if (subform.form.id == 'accessRightsGrid') {
+            var arGrid = $.sokol.accessRightsGrid({
+                groupId: this.options.id
+            }, $('<div></div>').appendTo(this.element));
+            this.childs.push(arGrid);
+            return;
+        }
         var form = $.sokol.form({
             mode: "read",
             data: subform.data ? subform.data : this.options.data,

@@ -85,4 +85,12 @@
 
     </bean>
 
+    <bean class="com.kattysoft.core.impl.DocumentTypeServiceImpl">
+
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.AccessRightServiceImpl">
+
+    </bean>
+
 </beans>
