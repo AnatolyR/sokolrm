@@ -149,6 +149,10 @@ $.widget('sokol.container', {
             saveUrl = 'app/savecontragent';
             openType = 'contragent';
             message = 'Не удалось сохранить карточку контрагента. Обратитесь к администратору.';
+        } else if (this.options.containerType == 'group') {
+            saveUrl = 'app/saveGroup';
+            openType = 'group';
+            message = 'Не удалось сохранить карточку группы. Обратитесь к администратору.';
         } else {
             saveUrl = 'app/savedocument';
             openType = 'document';
@@ -184,6 +188,10 @@ $.widget('sokol.container', {
             deleteUrl = 'app/deletecontragent';
             errorMessage = 'Не удалось удалить карточку контрагента. Обратитесь к администратору.';
             message = 'Карточка контрагента удалена';
+        } else if (this.options.containerType == 'group') {
+            deleteUrl = 'app/deleteGroup';
+            errorMessage = 'Не удалось удалить карточку группы. Обратитесь к администратору.';
+            message = 'Карточка группы удалена';
         } else {
             deleteUrl = 'app/deletedocument';
             errorMessage = 'Не удалось удалить документ. Обратитесь к администратору.';

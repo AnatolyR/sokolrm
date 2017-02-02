@@ -40,12 +40,14 @@ $.widget('sokol.admin', {
                     this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
                 }, this), 200);
             }
-        }, this));
+        }, this)).fail(function (jqXHR, textStatus, errorThrown) {
+            $.notify({message: 'Не удалось получить данные. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+        });
         if (this.options.id) {
             if (this.options.id.startsWith("admin/")) {
                 this.createGrid(this.options.id.substring(6));
             } else {
-                this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите справочник</div></div>').appendTo(this.main);
+                this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите категорию</div></div>').appendTo(this.main);
             }
         }
     },

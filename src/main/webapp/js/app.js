@@ -286,12 +286,14 @@ $.widget('sokol.admin', {
                     this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
                 }, this), 200);
             }
-        }, this));
+        }, this)).fail(function (jqXHR, textStatus, errorThrown) {
+            $.notify({message: 'Не удалось получить данные. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+        });
         if (this.options.id) {
             if (this.options.id.startsWith("admin/")) {
                 this.createGrid(this.options.id.substring(6));
             } else {
-                this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите справочник</div></div>').appendTo(this.main);
+                this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите категорию</div></div>').appendTo(this.main);
             }
         }
     },
@@ -503,9 +505,9 @@ $.widget('sokol.app', {
             this.createForm('user', id.substring(5), mode, 'Не удалось загрузить карточку пользователя');
 
         } else if (id.startsWith('new/group')) {
-            this.createForm('group', 'new/group', 'edit', 'Не удалось загрузить карточку группу');
+            this.createForm('group', 'new/group', 'edit', 'Не удается создать карточку группы');
         } else if (id.startsWith('group/')) {
-            this.createForm('group', id.substring(6), mode, 'Не удалось загрузить карточку группу');
+            this.createForm('group', id.substring(6), mode, 'Не удалось загрузить карточку группы');
 
         } else if (id.startsWith('new/contragent')) {
             this.createForm('contragent', 'new/contragent', 'edit', 'Не удалось загрузить карточку контрагента');
@@ -969,6 +971,10 @@ $.widget('sokol.container', {
             saveUrl = 'app/savecontragent';
             openType = 'contragent';
             message = 'Не удалось сохранить карточку контрагента. Обратитесь к администратору.';
+        } else if (this.options.containerType == 'group') {
+            saveUrl = 'app/saveGroup';
+            openType = 'group';
+            message = 'Не удалось сохранить карточку группы. Обратитесь к администратору.';
         } else {
             saveUrl = 'app/savedocument';
             openType = 'document';
@@ -1004,6 +1010,10 @@ $.widget('sokol.container', {
             deleteUrl = 'app/deletecontragent';
             errorMessage = 'Не удалось удалить карточку контрагента. Обратитесь к администратору.';
             message = 'Карточка контрагента удалена';
+        } else if (this.options.containerType == 'group') {
+            deleteUrl = 'app/deleteGroup';
+            errorMessage = 'Не удалось удалить карточку группы. Обратитесь к администратору.';
+            message = 'Карточка группы удалена';
         } else {
             deleteUrl = 'app/deletedocument';
             errorMessage = 'Не удалось удалить документ. Обратитесь к администратору.';

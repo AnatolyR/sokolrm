@@ -19,4 +19,8 @@ public interface GroupService {
     Page<Group> getGroups(Specification spec);
 
     Group getGroupById(String id);
+
+    String saveGroup(Group group);
+
+    void deleteGroup(String id);
 }

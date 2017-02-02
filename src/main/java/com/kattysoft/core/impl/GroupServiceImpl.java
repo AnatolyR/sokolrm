@@ -10,12 +10,15 @@
 package com.kattysoft.core.impl;
 
 import com.kattysoft.core.GroupService;
+import com.kattysoft.core.SokolException;
+import com.kattysoft.core.Utils;
 import com.kattysoft.core.model.Group;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.repository.GroupRepository;
 import com.kattysoft.core.specification.SortOrder;
 import com.kattysoft.core.specification.Specification;
 import com.kattysoft.core.specification.SpecificationUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -63,6 +66,30 @@ public class GroupServiceImpl implements GroupService {
         UUID uuid = UUID.fromString(id);
         Group group = groupRepository.findOne(uuid);
         return group;
+    }
+
+    @Override
+    public String saveGroup(Group group) {
+        if (group.getId() == null) {
+            UUID id = UUID.randomUUID();
+            group.setId(id);
+        } else {
+            Group existGroup = groupRepository.findOne(group.getId());
+            if (existGroup == null) {
+                throw new SokolException("Group not found");
+            } else {
+                BeanUtils.copyProperties(group, existGroup, Utils.getNullPropertyNames(group));
+                group = existGroup;
+            }
+        }
+        groupRepository.save(group);
+        return group.getId().toString();
+    }
+
+    @Override
+    public void deleteGroup(String id) {
+        UUID uuid = UUID.fromString(id);
+        groupRepository.delete(uuid);
     }
 
     public void setGroupRepository(GroupRepository groupRepository) {

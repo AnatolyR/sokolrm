@@ -17,11 +17,13 @@ import com.kattysoft.core.*;
 import com.kattysoft.core.model.*;
 import com.kattysoft.core.model.Dictionary;
 import com.kattysoft.core.specification.*;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -250,6 +252,30 @@ public class GroupController {
     @RequestMapping("deleteAccessRightRecord")
     public String deleteAccessRightRecord(String[] ids) {
         accessRightService.deleteRecords(Arrays.asList(ids));
+        return "true";
+    }
+
+    @RequestMapping(value = "/saveGroup")
+    public String saveGroup(Reader reader) throws IOException {
+        String requestBody = IOUtils.toString(reader);
+        ObjectNode data = (ObjectNode) mapper.readTree(requestBody);
+        UUID uuid = data.has("id") && !data.get("id").asText().isEmpty() && !data.get("id").isNull() ? UUID.fromString(data.get("id").asText()) : null;
+        ObjectNode fields = (ObjectNode) data.get("fields");
+
+        Group group = mapper.treeToValue(fields, Group.class);
+        group.setId(uuid);
+
+        String id = groupService.saveGroup(group);
+
+        return id;
+    }
+
+    @RequestMapping(value = "/deleteGroup")
+    public String deleteGroup(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new SokolException("Group id is empty");
+        }
+        groupService.deleteGroup(id);
         return "true";
     }
 

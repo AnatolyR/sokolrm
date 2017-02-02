@@ -67,9 +67,9 @@ $.widget('sokol.app', {
             this.createForm('user', id.substring(5), mode, 'Не удалось загрузить карточку пользователя');
 
         } else if (id.startsWith('new/group')) {
-            this.createForm('group', 'new/group', 'edit', 'Не удалось загрузить карточку группу');
+            this.createForm('group', 'new/group', 'edit', 'Не удается создать карточку группы');
         } else if (id.startsWith('group/')) {
-            this.createForm('group', id.substring(6), mode, 'Не удалось загрузить карточку группу');
+            this.createForm('group', id.substring(6), mode, 'Не удалось загрузить карточку группы');
 
         } else if (id.startsWith('new/contragent')) {
             this.createForm('contragent', 'new/contragent', 'edit', 'Не удалось загрузить карточку контрагента');
