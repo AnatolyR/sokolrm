@@ -21,4 +21,6 @@ public interface AccessRightService {
     String addRecord(AccessRightRecord record);
 
     AccessRightRecord getRecord(String id);
+
+    void deleteRecords(List<String> strings);
 }

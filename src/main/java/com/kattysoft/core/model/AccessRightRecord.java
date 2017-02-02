@@ -38,6 +38,13 @@ public class AccessRightRecord {
 
     private String level;
 
+    public AccessRightRecord() {
+    }
+
+    public AccessRightRecord(UUID id) {
+        this.id = id;
+    }
+
     public UUID getId() {
         return id;
     }

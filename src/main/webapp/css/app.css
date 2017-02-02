@@ -44,3 +44,7 @@ body {
 .activeFilterButton {
     font-weight: bold;
 }
+
+.dropdown-menu {
+    z-index: 10001 !important;
+}

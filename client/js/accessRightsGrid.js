@@ -58,6 +58,9 @@ $.widget('sokol.accessRightsGrid', {
                     deletable: true,
                     deleteMethod: $.proxy(this.doDeleteWithConfirm, this)
                 };
+                if (this.grid) {
+                    this.grid.destroy();
+                }
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.element));
                 $.getJSON('app/getAccessRightsElements', {}, $.proxy(function (data) {
                     this.renderAddBlock(data, this.grid.topBar);
@@ -67,6 +70,39 @@ $.widget('sokol.accessRightsGrid', {
         ).fail(function failLoadList() {
                 $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
             });
+    },
+
+    doDelete: function(data) {
+        var ids = data.map(function(e) {return e.id});
+        $.post('app/deleteAccessRightRecord',
+            {ids: ids},
+            $.proxy(function(response){
+                if (response === 'true') {
+                    $.notify({
+                        message: 'Элементы удалены'
+                    },{
+                        type: 'success',
+                        delay: 1000,
+                        timer: 1000
+                    });
+                    this.createBlock();
+                } else {
+                    $.notify({message: 'Не удалось удалить эелементы'},{type: 'danger', delay: 0, timer: 0});
+                }
+            }, this)
+        );
+    },
+
+    doDeleteWithConfirm: function(grid, objects) {
+        var titles = objects.map(function(e) {return e.spaceTitle + '.' + e.elementTitle + '.' + (e.subelementTitle ? e.subelementTitle : '*') + '=' + e.level});
+
+        $.sokol.smodal({
+            title: 'Подтверждение удаления',
+            body: titles.join(', '),
+            confirmButtonTitle: 'Удалить',
+            confirmAction: $.proxy(this.doDelete, this),
+            data: objects
+        });
     },
 
     renderAddBlock: function(settings, element) {

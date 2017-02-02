@@ -202,7 +202,7 @@ public class GroupController {
     }
 
     @RequestMapping(value = "getAccessRightsRecordsForGroup")
-    public ArrayNode getAccessRightsRecordsForGroup(String groupId) {
+    public List<JsonNode> getAccessRightsRecordsForGroup(String groupId) {
         if (groupId == null || groupId.isEmpty()) {
             throw new SokolException("GroupId is empty");
         }
@@ -211,7 +211,24 @@ public class GroupController {
 
         fillTitles(recordsNodes);
 
-        return recordsNodes;
+        List<JsonNode> nodesList = new ArrayList<>();
+        recordsNodes.forEach(nodesList::add);
+        Collections.sort(nodesList, this::compareAR);
+
+        return nodesList;
+    }
+
+    public static final String[] sortFields = {"spaceTitle", "elementTitle", "subelementTitle", "level"};
+    private int compareAR(JsonNode o1, JsonNode o2) {
+        for (String field : sortFields) {
+            String val1 = o1.has(field) ? o1.get(field).asText() : "";
+            String val2 = o2.has(field) ? o2.get(field).asText() : "";
+            int compare = val1.compareTo(val2);
+            if (compare != 0) {
+                return compare;
+            }
+        }
+        return 0;
     }
 
     @RequestMapping("addAccessRightRecord")
@@ -228,6 +245,12 @@ public class GroupController {
         ObjectNode reloadedValueNode = mapper.valueToTree(reloadedValue);
         fillTitles(reloadedValueNode);
         return reloadedValueNode;
+    }
+
+    @RequestMapping("deleteAccessRightRecord")
+    public String deleteAccessRightRecord(String[] ids) {
+        accessRightService.deleteRecords(Arrays.asList(ids));
+        return "true";
     }
 
     private void fillTitles(JsonNode node) {

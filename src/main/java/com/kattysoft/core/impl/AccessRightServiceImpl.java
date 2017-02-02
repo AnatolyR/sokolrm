@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -53,6 +54,12 @@ public class AccessRightServiceImpl implements AccessRightService {
         UUID uuid = UUID.fromString(id);
         AccessRightRecord record = accessRightRecordRepository.findOne(uuid);
         return record;
+    }
+
+    @Override
+    public void deleteRecords(List<String> ids) {
+        List<AccessRightRecord> values = ids.stream().map(id -> new AccessRightRecord(UUID.fromString(id))).collect(Collectors.toList());
+        accessRightRecordRepository.delete(values);
     }
 
     public void setAccessRightRecordRepository(AccessRightRecordRepository accessRightRecordRepository) {

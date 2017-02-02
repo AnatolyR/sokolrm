@@ -267,11 +267,12 @@ $.widget("sokol.grid", {
             checkbox.appendTo(td);
             td.appendTo(row);
 
-            td.click(function(){
-                var cb = $(this).find('input[type=checkbox]');
+            td.click($.proxy(function(e){
+                var cb = $(e.target).find('input[type=checkbox]');
                 var checked = cb.prop('checked');
                 cb.prop('checked', checked ? '' : 'checked');
-            });
+                this.updateButtons();
+            }, this));
 
         }
         for (var k = 0; k < columns.length; k++) {
