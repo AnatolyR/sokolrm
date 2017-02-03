@@ -9,6 +9,7 @@
  */
 package com.kattysoft.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -34,6 +35,7 @@ public class Group {
 
     private String title;
 
+    @JsonIgnore
     @Column(name = "ardata")
     @Type(type = "JsonObject")
     private ObjectNode data;

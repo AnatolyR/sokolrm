@@ -71,9 +71,12 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         user.setId(id);
         user.setTitle("Test User Title");
         user.setLogin("login1");
-        user.setFirstName("First Name");
+        user.setFirstName("First Name22");
         user.setMiddleName("Middle Name");
         user.setLastName("Last Name");
+
+        user.getGroups().add("111111");
+        user.getGroups().add("222222");
 
         userRepository.save(user);
 
@@ -88,7 +91,7 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         Iterable<User> users = userRepository.findAll();
         int n = 0;
         for (User user : users) {
-            System.out.println(user.getId() + " " + user.getTitle());
+            System.out.println(user.getId() + " " + user.getTitle() + " " + String.join(",", user.getGroups()));
             n++;
         }
         System.out.println("----------------");

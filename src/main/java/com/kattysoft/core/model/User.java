@@ -11,8 +11,12 @@ package com.kattysoft.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,6 +25,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "users")
+@TypeDefs({@TypeDef( name= "ArrayObject", typeClass = ArrayType.class)})
 public class User {
     @Id
     @Type(type = "pg-uuid")
@@ -39,6 +44,9 @@ public class User {
     private String middleName;
 
     private String lastName;
+
+    @Type(type = "ArrayObject")
+    private List<String> groups;
 
     public User() {
     }
@@ -102,5 +110,16 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public List<String> getGroups() {
+        if (groups == null) {
+            groups = new ArrayList<>();
+        }
+        return groups;
+    }
+
+    public void setGroups(List<String> groups) {
+        this.groups = groups;
     }
 }

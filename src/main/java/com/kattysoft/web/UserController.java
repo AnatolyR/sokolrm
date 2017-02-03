@@ -15,12 +15,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.ConfigService;
+import com.kattysoft.core.GroupService;
 import com.kattysoft.core.SokolException;
 import com.kattysoft.core.UserService;
+import com.kattysoft.core.model.Group;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.specification.*;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +42,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     public static final Integer DEFAULT_PAGE_SIZE = 20;
 
     @Autowired
@@ -45,6 +50,9 @@ public class UserController {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private GroupService groupService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -106,6 +114,18 @@ public class UserController {
         ObjectNode card = mapper.createObjectNode();
         card.set("form", formConfig);
         ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(user);
+
+        ArrayNode groupsTitle = data.putArray("groupsTitle");
+        data.get("groups").forEach(g -> {
+            Group group = null;
+            try {
+                group = groupService.getGroupById(g.asText());
+            } catch (Exception e) {
+                log.error("Can not read group from user groups field");
+            }
+            groupsTitle.add(group != null ? group.getTitle() : "[Группа отсутствует]");
+        });
+
         card.set("data", data);
         card.put("containerType", "user");
 
@@ -140,6 +160,9 @@ public class UserController {
             String login = systemFields.get("login").asText();
             String email = systemFields.get("email").asText();
             user.setLogin(login);
+
+            ArrayNode groups = (ArrayNode) systemFields.get("groups");
+            groups.forEach(g -> user.getGroups().add(g.asText()));
         }
 
         String id = userService.saveUser(user);
@@ -172,5 +195,9 @@ public class UserController {
 
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
+    }
+
+    public void setGroupService(GroupService groupService) {
+        this.groupService = groupService;
     }
 }

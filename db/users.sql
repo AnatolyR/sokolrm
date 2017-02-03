@@ -6,5 +6,6 @@ CREATE TABLE users (
   password varchar(255),
   firstName varchar(255),
   middleName varchar(255),
-  lastName varchar(255)
+  lastName varchar(255),
+  groups varchar(255)[]
 );
