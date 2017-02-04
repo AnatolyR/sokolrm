@@ -23,4 +23,6 @@ public interface GroupService {
     String saveGroup(Group group);
 
     void deleteGroup(String id);
+
+    Group getGroupByTitle(String title);
 }

@@ -295,7 +295,13 @@ $.widget("sokol.grid", {
                         var td = $('<td>' + (val ? val : '') + '</td>');
                         td.appendTo(row);
                     } else {
+                        if(Object.prototype.toString.call(val) === '[object Array]' ) {
+                            val = val.join(", ");
+                        }
                         var td = $('<td>' + (val ? val : '') + '</td>');
+                        if (column.class) {
+                            td.addClass(column.class);
+                        }
                         td.appendTo(row);
                     }
                 } else {

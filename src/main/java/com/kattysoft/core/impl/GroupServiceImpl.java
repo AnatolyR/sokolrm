@@ -92,6 +92,12 @@ public class GroupServiceImpl implements GroupService {
         groupRepository.delete(uuid);
     }
 
+    @Override
+    public Group getGroupByTitle(String title) {
+        Group group = groupRepository.findOneByTitle(title);
+        return group;
+    }
+
     public void setGroupRepository(GroupRepository groupRepository) {
         this.groupRepository = groupRepository;
     }

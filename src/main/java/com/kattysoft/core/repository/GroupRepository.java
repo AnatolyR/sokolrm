@@ -18,5 +18,5 @@ import java.util.UUID;
  * Date: 27.01.2017
  */
 public interface GroupRepository extends CrudRepository<Group, UUID>, JpaSpecificationExecutor<Group> {
-
+    Group findOneByTitle(String title);
 }

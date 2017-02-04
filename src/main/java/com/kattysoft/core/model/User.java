@@ -25,7 +25,6 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "users")
-@TypeDefs({@TypeDef( name= "ArrayObject", typeClass = ArrayType.class)})
 public class User {
     @Id
     @Type(type = "pg-uuid")
@@ -45,8 +44,10 @@ public class User {
 
     private String lastName;
 
-    @Type(type = "ArrayObject")
-    private List<String> groups;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name="user_groups", joinColumns=@JoinColumn(name="userid"))
+    @Column(name="groupid")
+    private List<UUID> groups;
 
     public User() {
     }
@@ -112,14 +113,14 @@ public class User {
         this.lastName = lastName;
     }
 
-    public List<String> getGroups() {
+    public List<UUID> getGroups() {
         if (groups == null) {
             groups = new ArrayList<>();
         }
         return groups;
     }
 
-    public void setGroups(List<String> groups) {
+    public void setGroups(List<UUID> groups) {
         this.groups = groups;
     }
 }

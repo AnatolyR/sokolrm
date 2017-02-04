@@ -6,6 +6,12 @@
       "title": "Название",
       "type": "string",
       "mandatory": true
+    },
+    {
+      "id": "users",
+      "title": "Пользователи",
+      "type": "users",
+      "multiple": true
     }
   ]
 }

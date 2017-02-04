@@ -18,6 +18,8 @@ import com.kattysoft.core.model.*;
 import com.kattysoft.core.model.Dictionary;
 import com.kattysoft.core.specification.*;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class GroupController {
+    private static final Logger log = LoggerFactory.getLogger(GroupController.class);
+
     public static final Integer DEFAULT_PAGE_SIZE = 20;
 
     @Autowired
@@ -53,6 +57,9 @@ public class GroupController {
 
     @Autowired
     private AccessRightService accessRightService;
+
+    @Autowired
+    private UserService userService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -86,17 +93,30 @@ public class GroupController {
             spec.setCondition(clientCondition);
         }
 
-        Page<Group> contragents = groupService.getGroups(spec);
-        List<ObjectNode> userNodes = contragents.getContent().stream().map(contragent ->
-                (ObjectNode) mapper.valueToTree(contragent)
+        Page<Group> groups = groupService.getGroups(spec);
+        List<ObjectNode> groupNodes = groups.getContent().stream().map(group ->
+                (ObjectNode) mapper.valueToTree(group)
         ).collect(Collectors.toList());
 
         ObjectNode page = mapper.createObjectNode();
-        page.putArray("data").addAll(userNodes);
+        page.putArray("data").addAll(groupNodes);
         page.put("offset", offset);
-        page.put("total", contragents.getTotal());
+        page.put("total", groups.getTotal());
 
         return page;
+    }
+
+    public void fillTitle(ObjectNode node) {
+        ArrayNode groupsTitle = node.putArray("usersTitle");
+        node.get("users").forEach(g -> {
+            User user = null;
+            try {
+                user = userService.getUserById(g.asText());
+            } catch (Exception e) {
+                log.error("Can not read user from groups user field");
+            }
+            groupsTitle.add(user != null ? user.getTitle() : "[Пользовтель отсутствует]");
+        });
     }
 
     @RequestMapping(value = "/groupcard")
@@ -114,6 +134,7 @@ public class GroupController {
         ObjectNode card = mapper.createObjectNode();
         card.set("form", formConfig);
         ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(group);
+        fillTitle(data);
         card.set("data", data);
         card.put("containerType", "group");
 
@@ -347,5 +368,9 @@ public class GroupController {
 
     public void setAccessRightService(AccessRightService accessRightService) {
         this.accessRightService = accessRightService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

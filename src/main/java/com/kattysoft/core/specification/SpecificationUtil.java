@@ -13,17 +13,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.model.User;
+import org.hibernate.query.criteria.internal.CriteriaBuilderImpl;
+import org.hibernate.query.criteria.internal.Renderable;
+import org.hibernate.query.criteria.internal.compile.RenderingContext;
+import org.hibernate.query.criteria.internal.predicate.LikePredicate;
 import org.joda.time.LocalDate;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.CollectionAttribute;
+import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -112,12 +113,14 @@ public class SpecificationUtil {
         } else if (condition instanceof ValueCondition) {
             ValueCondition valueCondition = (ValueCondition) condition;
             Attribute attr = root.getModel().getAttribute(valueCondition.getField());
-            Path path = root.get((SingularAttribute) attr);
+            Expression path = attr instanceof SingularAttribute ? root.get((SingularAttribute) attr) : root.get((PluralAttribute) attr);
             Predicate predicate;
-            if (valueCondition.getOperation() ==  Operation.EQUAL) {
+            if (valueCondition.getOperation() == Operation.EQUAL) {
                 predicate = criteriaBuilder.equal(path, valueCondition.getValue());
             } else if (valueCondition.getOperation() == Operation.NOT_EQUAL) {
                 predicate = criteriaBuilder.notEqual(path, valueCondition.getValue());
+            } else if (valueCondition.getOperation() == Operation.LIKE && List.class.equals(attr.getJavaType()) && valueCondition.getValue() instanceof String) {
+                predicate = criteriaBuilder.isMember((String) valueCondition.getValue(), path);
             } else if (valueCondition.getOperation() == Operation.LIKE && valueCondition.getValue() instanceof String) {
                 predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue() + "%");
             } else if (valueCondition.getOperation() == Operation.STARTS && valueCondition.getValue() instanceof String) {

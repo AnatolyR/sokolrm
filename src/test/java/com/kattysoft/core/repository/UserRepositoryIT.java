@@ -39,6 +39,7 @@ import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kattysoft.core.impl.UserServiceImpl.md5;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -65,6 +66,7 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
 
     @Test
     @Sql("file:db/users.sql")
+    @Sql("file:db/user_groups.sql")
     public void testAddUser() {
         User user = new User();
         UUID id = UUID.randomUUID();
@@ -75,8 +77,8 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         user.setMiddleName("Middle Name");
         user.setLastName("Last Name");
 
-        user.getGroups().add("111111");
-        user.getGroups().add("222222");
+        user.getGroups().add(UUID.randomUUID());
+        user.getGroups().add(UUID.randomUUID());
 
         userRepository.save(user);
 
@@ -87,11 +89,12 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
     @Test
     @Sql("file:db/users.sql")
     @Sql("file:db/sampleData/usersData.sql")
+    @Sql("file:db/user_groups.sql")
     public void testFindAll() {
         Iterable<User> users = userRepository.findAll();
         int n = 0;
         for (User user : users) {
-            System.out.println(user.getId() + " " + user.getTitle() + " " + String.join(",", user.getGroups()));
+            System.out.println(user.getId() + " " + user.getTitle() + " " + String.join(",", user.getGroups().stream().map(UUID::toString).collect(Collectors.toList())));
             n++;
         }
         System.out.println("----------------");

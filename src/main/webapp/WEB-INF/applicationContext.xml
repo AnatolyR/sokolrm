@@ -37,6 +37,11 @@
         <property name="jpaDialect">
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
         </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.connection.release_mode">on_close</prop>
+            </props>
+        </property>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

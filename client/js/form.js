@@ -250,11 +250,73 @@ $.widget('sokol.form', {
             options: options,
             load: function(query, callback) {
                 $.getJSON('app/groups', {
+                    size: 100,
                     conditions: JSON.stringify([{'condition':'','column':'title','operation':'LIKE','value':query}])
                 }, function(response) {
                     callback(response.data);
                 }).fail(function() {
                     $.notify({message: 'Не удалось загрузить данные для справочника. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                });
+            },
+            create: false
+        });
+        selector.find('select')[0].selectize.setValue(initialValues);
+    },
+
+    createFieldUser: function(formNode, field, value, valueTitle, edit) {
+        if( Object.prototype.toString.call(value) !== '[object Array]' ) {
+            value = value ? [value] : [];
+            valueTitle = valueTitle ? [valueTitle] : [];
+        }
+
+        var options = [];
+        var initialValues = [];
+        var titles = [];
+
+        for (var i = 0; i < value.length; i++) {
+            options.push({
+                id: value[i],
+                title: valueTitle[i]
+            });
+            initialValues.push(value[i]);
+            titles.push(valueTitle[i]);
+        }
+
+        if (!edit) {
+            $(formNode).append('' +
+                '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
+                '<label class="control-label">' + field.title + ':</label>' +
+                '<div>' + titles.join(", ") + '</div>' +
+                '</div>' +
+                '');
+            return;
+        }
+
+        var selector = $('<div class="form-group no-dropdown' + (field.mandatory ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
+            '<label class="control-label">' + field.title + ':</label>' +
+            '<select name="' + field.id + '" class="demo-default" id="selector_' + field.id + '">' + '</select>' +
+            '' +
+            '</div>' +
+            '');
+        $(formNode).append(selector);
+
+        selector.find('select').selectize({
+            maxItems: 100,
+            plugins: ['restore_on_backspace', 'remove_button'],
+            valueField: 'id',
+            labelField: 'title',
+            searchField: 'title',
+            preload: true,
+            closeAfterSelect: false,
+            options: options,
+            load: function(query, callback) {
+                $.getJSON('app/users', {
+                    size: 1000,
+                    conditions: JSON.stringify([{'condition':'','column':'title','operation':'LIKE','value':query}])
+                }, function(response) {
+                    callback(response.data);
+                }).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
                 });
             },
             create: false
@@ -345,6 +407,8 @@ $.widget('sokol.form', {
             this.createFieldDictionary(formNode, field, value, valueTitle, edit);
         } else if (type == "group") {
             this.createFieldGroup(formNode, field, value, valueTitle, edit);
+        } else if (type == "users") {
+            this.createFieldUser(formNode, field, value, valueTitle, edit);
         } else if (type == "number") {
             this.createFieldNumber(formNode, field, value, edit);
         }

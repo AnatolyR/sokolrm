@@ -37,8 +37,8 @@ $.widget('sokol.admin', {
             }, this));
             if (this.options.id) {
                 setTimeout($.proxy(function () {
-                    this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
-                }, this), 200);
+                    this.sidebar.find('[name="category_' + this.options.id.substring(6) + '"]').addClass('active');
+                }, this), 0);
             }
         }, this)).fail(function (jqXHR, textStatus, errorThrown) {
             $.notify({message: 'Не удалось получить данные. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});

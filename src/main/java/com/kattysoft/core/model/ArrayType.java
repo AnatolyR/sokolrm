@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -114,8 +115,7 @@ public class ArrayType implements UserType {
     @Override
     public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor session) throws HibernateException, SQLException {
         if (value == null || !(value instanceof List)) {
-            st.setNull(index, Types.OTHER);
-            return;
+            value = Collections.emptyList();
         }
 
         Array array = st.getConnection().createArrayOf("varchar", ((List) value).toArray(new String[((List) value).size()]));

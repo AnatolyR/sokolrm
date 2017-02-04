@@ -19,7 +19,9 @@
       },
       {
         "id": "title",
-        "title": "Сокращенное имя"
+        "title": "Сокращенное имя",
+        "render": "link",
+        "linkType": "user"
       },
       {
         "id": "lastName",
@@ -32,6 +34,14 @@
       {
         "id": "middleName",
         "title": "Отчество"
+      },
+      {
+        "id": "groups",
+        "title": "Группы (ИД)"
+      },
+      {
+        "id": "groupsTitle",
+        "title": "Группы"
       }
     ],
     "id": "users",

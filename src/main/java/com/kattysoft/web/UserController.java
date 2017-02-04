@@ -69,6 +69,19 @@ public class UserController {
             conditions = "[]";
         }
         JsonNode clientConditionsNode = mapper.readTree(conditions);
+        clientConditionsNode.forEach(c -> {
+            if ("groupsTitle".equals(c.get("column").asText())) {
+                String value = c.has("value") ? c.get("value").asText() : "";
+                Group group = groupService.getGroupByTitle(value);
+                if (group != null) {
+                    ((ObjectNode) c).put("column", "groups");
+                    ((ObjectNode) c).put("value", group.getId().toString());
+                } else {
+                    ((ObjectNode) c).put("column", "");
+                }
+            }
+        });
+
         Condition clientCondition = SpecificationUtil.read((ArrayNode) clientConditionsNode);
 
         Specification spec = new Specification();
@@ -91,12 +104,27 @@ public class UserController {
             (ObjectNode) mapper.valueToTree(user)
         ).collect(Collectors.toList());
 
+        userNodes.forEach(this::fillTitle);
+
         ObjectNode page = mapper.createObjectNode();
         page.putArray("data").addAll(userNodes);
         page.put("offset", offset);
         page.put("total", users.getTotal());
 
         return page;
+    }
+
+    public void fillTitle(ObjectNode node) {
+        ArrayNode groupsTitle = node.putArray("groupsTitle");
+        node.get("groups").forEach(g -> {
+            Group group = null;
+            try {
+                group = groupService.getGroupById(g.asText());
+            } catch (Exception e) {
+                log.error("Can not read group from user groups field");
+            }
+            groupsTitle.add(group != null ? group.getTitle() : "[Группа отсутствует]");
+        });
     }
 
     @RequestMapping(value = "/usercard")
@@ -115,16 +143,7 @@ public class UserController {
         card.set("form", formConfig);
         ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(user);
 
-        ArrayNode groupsTitle = data.putArray("groupsTitle");
-        data.get("groups").forEach(g -> {
-            Group group = null;
-            try {
-                group = groupService.getGroupById(g.asText());
-            } catch (Exception e) {
-                log.error("Can not read group from user groups field");
-            }
-            groupsTitle.add(group != null ? group.getTitle() : "[Группа отсутствует]");
-        });
+        fillTitle(data);
 
         card.set("data", data);
         card.put("containerType", "user");
@@ -162,7 +181,7 @@ public class UserController {
             user.setLogin(login);
 
             ArrayNode groups = (ArrayNode) systemFields.get("groups");
-            groups.forEach(g -> user.getGroups().add(g.asText()));
+            groups.forEach(g -> user.getGroups().add(UUID.fromString(g.asText())));
         }
 
         String id = userService.saveUser(user);

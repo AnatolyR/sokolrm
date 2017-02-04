@@ -15,10 +15,8 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,6 +37,11 @@ public class Group {
     @Column(name = "ardata")
     @Type(type = "JsonObject")
     private ObjectNode data;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name="user_groups", joinColumns=@JoinColumn(name="groupid"))
+    @Column(name="userid")
+    private List<UUID> users;
 
     public UUID getId() {
         return id;
@@ -62,5 +65,13 @@ public class Group {
 
     public void setData(ObjectNode data) {
         this.data = data;
+    }
+
+    public List<UUID> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UUID> users) {
+        this.users = users;
     }
 }
