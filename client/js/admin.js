@@ -32,7 +32,14 @@ $.widget('sokol.admin', {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
                     }
                     var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
-                    category.find("a").click(produceHandler(item));
+                    if (item.disabled) {
+                        category.addClass('disabled');
+                        category.find('a').click(function handleCategoryClick(e) {
+                            e.preventDefault();
+                        });
+                    } else {
+                        category.find('a').click(produceHandler(item));
+                    }
                 }
             }, this));
             if (this.options.id) {

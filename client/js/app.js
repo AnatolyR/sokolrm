@@ -21,7 +21,9 @@ $.widget('sokol.app', {
 
         $(document).ajaxError(function(event, jqxhr, settings, exception) {
             if (jqxhr.status == 401) {
-                $.notify({message: 'Не выполнен вход.'},{type: 'warning', delay: 0, timer: 0});
+                $.notify({message: 'Не выполнен вход.'}, {type: 'warning', delay: 0, timer: 0});
+            } else if (jqxhr.status == 403) {
+                $.notify({message: 'Нет прав для выполнения действия.'}, {type: 'warning', delay: 0, timer: 0});
             }
         });
     },

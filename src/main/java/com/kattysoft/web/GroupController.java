@@ -195,19 +195,8 @@ public class GroupController {
         settings.set("documentTypes", documentTypesNode);
 
 
-        ArrayNode systemObjects = settings.putArray("systemObjects");
-        ObjectNode usersSystemObject = mapper.createObjectNode();
-        usersSystemObject.put("id", "users");
-        usersSystemObject.put("title", "Пользователи");
-        systemObjects.add(usersSystemObject);
-        ObjectNode groupsSystemObject = mapper.createObjectNode();
-        groupsSystemObject.put("id", "groups");
-        groupsSystemObject.put("title", "Группы");
-        systemObjects.add(groupsSystemObject);
-        ObjectNode spacesSystemObject = mapper.createObjectNode();
-        spacesSystemObject.put("id", "spaces");
-        spacesSystemObject.put("title", "Пространства");
-        systemObjects.add(spacesSystemObject);
+        JsonNode accessRightsElements = configService.getConfig2("accessRightsElements");
+        settings.set("systemObjects", accessRightsElements.get(0).get("elements"));
 
         List<Dictionary> dictionaries = dictionaryService.getDictionaries();
         JsonNode dictionariesNode = mapper.valueToTree(dictionaries);
@@ -312,8 +301,11 @@ public class GroupController {
         elementTitles.putAll(documentTypes.stream().collect(Collectors.toMap(DocumentType::getId, DocumentType::getTitle)));
         elementTitles.putAll(dictionaryService.getDictionaries().stream().collect(Collectors.toMap(Dictionary::getDictionaryId, Dictionary::getTitle)));
         elementTitles.put("spaces", "Пространства");
-        elementTitles.put("groups", "Группы");
-        elementTitles.put("users", "Пользователи");
+
+        JsonNode accessRightsElements = configService.getConfig2("accessRightsElements");
+        JsonNode systemElements = accessRightsElements.get(0).get("elements");
+        systemElements.forEach(n -> elementTitles.put(n.get("id").asText(), n.get("title").asText()));
+
         elementTitles.put("_document", "[Документ]");
 
         Map<String, String> subelementTitles = new HashMap<>();

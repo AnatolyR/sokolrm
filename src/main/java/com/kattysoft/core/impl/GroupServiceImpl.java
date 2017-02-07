@@ -9,9 +9,7 @@
  */
 package com.kattysoft.core.impl;
 
-import com.kattysoft.core.GroupService;
-import com.kattysoft.core.SokolException;
-import com.kattysoft.core.Utils;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Group;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.repository.GroupRepository;
@@ -34,8 +32,14 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     private GroupRepository groupRepository;
 
+    @Autowired
+    private AccessRightService accessRightService;
+
     @Override
     public Page<Group> getGroups(Specification specification) {
+        if (!accessRightService.checkRights("_system", "groups", null, AccessRightLevel.LIST)) {
+            throw new NoAccessRightsException("No access rights for list group");
+        }
         int offset = specification.getOffset();
         int size = specification.getSize();
         int pageNum = offset / size;
@@ -63,6 +67,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getGroupById(String id) {
+        if (!accessRightService.checkRights("_system", "groups", null, AccessRightLevel.READ)) {
+            throw new NoAccessRightsException("No access rights for read group");
+        }
         UUID uuid = UUID.fromString(id);
         Group group = groupRepository.findOne(uuid);
         return group;
@@ -71,9 +78,15 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public String saveGroup(Group group) {
         if (group.getId() == null) {
+            if (!accessRightService.checkRights("_system", "groups", null, AccessRightLevel.ADD)) {
+                throw new NoAccessRightsException("No access rights for add group");
+            }
             UUID id = UUID.randomUUID();
             group.setId(id);
         } else {
+            if (!accessRightService.checkRights("_system", "groups", null, AccessRightLevel.WRITE)) {
+                throw new NoAccessRightsException("No access rights for save group");
+            }
             Group existGroup = groupRepository.findOne(group.getId());
             if (existGroup == null) {
                 throw new SokolException("Group not found");
@@ -88,6 +101,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void deleteGroup(String id) {
+        if (!accessRightService.checkRights("_system", "groups", null, AccessRightLevel.DELETE)) {
+            throw new NoAccessRightsException("No access rights for delete group");
+        }
         UUID uuid = UUID.fromString(id);
         groupRepository.delete(uuid);
     }
@@ -100,5 +116,9 @@ public class GroupServiceImpl implements GroupService {
 
     public void setGroupRepository(GroupRepository groupRepository) {
         this.groupRepository = groupRepository;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

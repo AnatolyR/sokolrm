@@ -23,4 +23,8 @@ public interface AccessRightService {
     AccessRightRecord getRecord(String id);
 
     void deleteRecords(List<String> strings);
+
+    boolean checkRights(String space, String element, String subelement, AccessRightLevel level);
+
+    List<AccessRightLevel> getRights(String space, String element, String subelement);
 }

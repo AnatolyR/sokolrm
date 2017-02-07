@@ -1,0 +1,24 @@
+[
+  {
+    "id": "_system",
+    "title": "[Системные объекты]",
+    "elements": [
+      {
+        "id": "users",
+        "title": "Пользователи"
+      },
+      {
+        "id": "groups",
+        "title": "Группы"
+      },
+      {
+        "id": "documentGroups",
+        "title": "Пространства"
+      }
+    ]
+  },
+  {
+    "id": "_dictionaries",
+    "title": "[Справочники]"
+  }
+]

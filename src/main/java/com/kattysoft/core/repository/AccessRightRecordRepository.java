@@ -19,4 +19,8 @@ import java.util.UUID;
  */
 public interface AccessRightRecordRepository extends CrudRepository<AccessRightRecord, UUID> {
     List<AccessRightRecord> findAllByGroupId(UUID groupId);
+
+    List<AccessRightRecord> findAllByGroupIdAndSpaceAndElementAndSubelement(UUID groupId, String space, String element, String subelement);
+
+    List<AccessRightRecord> findAllByGroupIdAndSpaceAndElementAndSubelementAndLevel(UUID groupId, String space, String element, String subelement, String level);
 }

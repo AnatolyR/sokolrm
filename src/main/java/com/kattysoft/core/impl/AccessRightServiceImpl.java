@@ -9,12 +9,18 @@
  */
 package com.kattysoft.core.impl;
 
+import com.kattysoft.core.AccessRightLevel;
 import com.kattysoft.core.AccessRightService;
 import com.kattysoft.core.SokolException;
+import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.AccessRightRecord;
+import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.AccessRightRecordRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,8 +30,12 @@ import java.util.stream.Collectors;
  * Date: 01.02.2017
  */
 public class AccessRightServiceImpl implements AccessRightService {
+    private static final Logger log = LoggerFactory.getLogger(AccessRightServiceImpl.class);
     @Autowired
     private AccessRightRecordRepository accessRightRecordRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public List<AccessRightRecord> getAccessRightsForGroup(String groupId) {
@@ -62,7 +72,57 @@ public class AccessRightServiceImpl implements AccessRightService {
         accessRightRecordRepository.delete(values);
     }
 
+    @Override
+    public boolean checkRights(String space, String element, String subelement, AccessRightLevel level) {
+        User user = userService.getCurrentUser();
+        log.debug("Check rights for user {}: {}.{}.{}.{}", user.getTitle() + " (" + user.getId() + ")", space, element, subelement, level);
+        List<UUID> groups = user.getGroups();
+        boolean result = false;
+        boolean generalResult = false;
+        boolean generalNone = false;
+        if (log.isDebugEnabled()) {
+            groups.forEach(groupId -> {
+                log.debug("User groups {}: {}", user.getTitle() + " (" + user.getId() + ")", String.join(", ", groups.stream().map(UUID::toString).collect(Collectors.toList())));
+            });
+        }
+        for (UUID groupId : groups) {
+            List<AccessRightRecord> records = accessRightRecordRepository.findAllByGroupIdAndSpaceAndElementAndSubelement(groupId, space, element, subelement);
+            if (log.isDebugEnabled()) {
+                records.forEach(r -> log.debug("Record : {}", r));
+            }
+            List<String> levels = records.stream().map(AccessRightRecord::getLevel).collect(Collectors.toList());
+            if (levels.contains(AccessRightLevel.NONE.toString())) {
+                return false;
+            }
+            if (levels.contains(level.toString())) {
+                result = true;
+            }
+            List<AccessRightRecord> generalRecords = accessRightRecordRepository.findAllByGroupIdAndSpaceAndElementAndSubelementAndLevel(groupId, space, element, "", level.toString());
+            if (log.isDebugEnabled()) {
+                generalRecords.forEach(r -> log.debug("General record : {}", r));
+            }
+            List<String> generalLevels = generalRecords.stream().map(AccessRightRecord::getLevel).collect(Collectors.toList());
+            if (generalLevels.contains(level.toString())) {
+                generalResult = true;
+            }
+            if (generalLevels.contains(AccessRightLevel.NONE.toString())) {
+                generalNone = true;
+            }
+        }
+        return result || (generalResult && !generalNone);
+    }
+
+    @Override
+    public List<AccessRightLevel> getRights(String space, String element, String subelement) {
+        return Arrays.asList(AccessRightLevel.NONE, AccessRightLevel.READ, AccessRightLevel.WRITE,
+            AccessRightLevel.CREATE, AccessRightLevel.ADD, AccessRightLevel.DELETE, AccessRightLevel.LIST);
+    }
+
     public void setAccessRightRecordRepository(AccessRightRecordRepository accessRightRecordRepository) {
         this.accessRightRecordRepository = accessRightRecordRepository;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

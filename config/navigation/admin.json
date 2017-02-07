@@ -1,4 +1,5 @@
 {
+  "checkAccessRightsForItems": true,
   "items": [
     {
       "id": "users",

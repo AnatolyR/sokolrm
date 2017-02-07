@@ -9,6 +9,8 @@
  */
 package com.kattysoft.web;
 
+import com.kattysoft.core.AccessRightLevel;
+import com.kattysoft.core.AccessRightService;
 import com.kattysoft.core.ConfigService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.User;
@@ -33,6 +35,9 @@ public class ConfigController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AccessRightService accessRightService;
+
     @RequestMapping(value = "/config", produces = "application/json; charset=utf-8")
     public String getConfig(String id) {
         JsonNode config = configService.getConfig(id);
@@ -44,6 +49,29 @@ public class ConfigController {
             String userTitle = user.getTitle();
             ((ObjectNode) config).put("userName", userTitle);
         }
+
+        if (config.has("checkAccessRightsForItems") && config.get("checkAccessRightsForItems").asBoolean()) {
+            ((ObjectNode) config).remove("checkAccessRightsForItems");
+            config.get("items").forEach(n -> {
+                String itemId = n.has("id") ? n.get("id").asText() : null;
+                if (itemId != null) {
+                    if (!accessRightService.checkRights("_system", itemId, null, AccessRightLevel.LIST)) {
+                        ((ObjectNode) n).put("disabled", true);
+                    }
+                }
+            });
+        }
+        if (config.has("checkAccessRightsForColumnLinks") && config.get("checkAccessRightsForColumnLinks").asBoolean()) {
+            ((ObjectNode) config).remove("checkAccessRightsForColumnLinks");
+            String itemId = config.get("gridConfig").get("id").asText();
+            if (!accessRightService.checkRights("_system", itemId, null, AccessRightLevel.READ)) {
+                config.get("gridConfig").get("columns").forEach(n -> {
+                    ((ObjectNode) n).remove("render");
+                    ((ObjectNode) n).remove("linkType");
+                });
+            }
+        }
+
         return config.toString();
     }
 
@@ -53,5 +81,9 @@ public class ConfigController {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

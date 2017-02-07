@@ -92,4 +92,16 @@ public class AccessRightRecord {
     public void setLevel(String level) {
         this.level = level;
     }
+
+    @Override
+    public String toString() {
+        return "AccessRightRecord{" +
+            "id=" + id +
+            ", groupId=" + groupId +
+            ", space='" + space + '\'' +
+            ", element='" + element + '\'' +
+            ", subelement='" + subelement + '\'' +
+            ", level='" + level + '\'' +
+            '}';
+    }
 }

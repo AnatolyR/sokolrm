@@ -9,6 +9,7 @@
  */
 package com.kattysoft.web;
 
+import com.kattysoft.core.NoAccessRightsException;
 import com.kattysoft.core.SokolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +36,23 @@ public class ErrorFilter implements Filter {
             chain.doFilter(request, response);
         } catch (Exception e) {
             String message = "";
+            int status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             if (e instanceof SokolException) {
                 message = e.getMessage();
+            } else if (e instanceof NoAccessRightsException) {
+                message = e.getMessage();
+                status = HttpServletResponse.SC_FORBIDDEN;
             } else if (e.getCause() != null && e.getCause() instanceof SokolException) {
                 message = e.getCause().getMessage();
+            } else if (e.getCause() != null && e.getCause() instanceof NoAccessRightsException) {
+                message = e.getCause().getMessage();
+                status = HttpServletResponse.SC_FORBIDDEN;
             } else {
                 throw e;
             }
             response.setContentType("application/json; charset=utf-8");
             response.getWriter().print("{\"error\": \"" + message.replaceAll("\"", "\\\"") + "\"}");
-            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            ((HttpServletResponse) response).setStatus(status);
         }
     }
 

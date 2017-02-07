@@ -1,4 +1,5 @@
 {
+  "checkAccessRightsForColumnLinks": true,
   "gridConfig": {
     "title": "Группы доступа",
     "addableType": "group",

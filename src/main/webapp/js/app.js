@@ -278,7 +278,14 @@ $.widget('sokol.admin', {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
                     }
                     var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
-                    category.find("a").click(produceHandler(item));
+                    if (item.disabled) {
+                        category.addClass('disabled');
+                        category.find('a').click(function handleCategoryClick(e) {
+                            e.preventDefault();
+                        });
+                    } else {
+                        category.find('a').click(produceHandler(item));
+                    }
                 }
             }, this));
             if (this.options.id) {
@@ -459,7 +466,9 @@ $.widget('sokol.app', {
 
         $(document).ajaxError(function(event, jqxhr, settings, exception) {
             if (jqxhr.status == 401) {
-                $.notify({message: 'Не выполнен вход.'},{type: 'warning', delay: 0, timer: 0});
+                $.notify({message: 'Не выполнен вход.'}, {type: 'warning', delay: 0, timer: 0});
+            } else if (jqxhr.status == 403) {
+                $.notify({message: 'Нет прав для выполнения действия.'}, {type: 'warning', delay: 0, timer: 0});
             }
         });
     },
