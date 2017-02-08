@@ -1,6 +1,7 @@
 $.widget('sokol.formButtons', {
     options: {
-        mode: "read"
+        mode: "read",
+        actions: []
     },
 
     _create: function () {
@@ -33,6 +34,14 @@ $.widget('sokol.formButtons', {
         }, this));
         deleteButton.appendTo(buttons);
 
+        if (this.options.actions.indexOf('doresolution') >= 0) {
+            var resolutionButton = $('<button type="button" name="doresolution" style="margin-right: 5px; display: none;" class="btn btn-default">Резолюция</button>');
+            resolutionButton.click($.proxy(function() {
+
+            }, this));
+            resolutionButton.appendTo(buttons);
+        }
+
         this.manageButtons();
     },
 
@@ -44,7 +53,13 @@ $.widget('sokol.formButtons', {
     manageButtons: function() {
         var buttons = this.element;
         buttons.children().hide();
-        if (this.options.mode == "read") {
+        if (this.options.mode == 'read') {
+            buttons.children().each(function(i, c) {
+                var $c = $(c);
+                if ($c.attr('name').indexOf('do') == 0) {
+                    $c.show();
+                }
+            });
             buttons.children('[name="edit"]').show();
             buttons.children('[name="delete"]').show();
         } else if (this.options.mode == "edit") {

@@ -51,6 +51,10 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
             documentType.setTitle(typeTitle);
             documentType.setFieldsTypes(fieldsTypes);
 
+            if (typeNode.has("actions")) {
+                typeNode.get("actions").forEach(a -> documentType.getActions().add(a.asText()));
+            }
+
             types.add(documentType);
         });
 

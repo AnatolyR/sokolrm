@@ -22,8 +22,13 @@ import java.util.Map;
  */
 public class Document {
     private String id;
+
     private String title;
+
     private String type;
+
+    private String space;
+
     private String kind;
 
     private Map<String, Object> fields;
@@ -50,6 +55,14 @@ public class Document {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getSpace() {
+        return space;
+    }
+
+    public void setSpace(String space) {
+        this.space = space;
     }
 
     public String getKind() {

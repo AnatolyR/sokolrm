@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS documents;
 CREATE TABLE documents (
   id uuid CONSTRAINT documents_pkey PRIMARY KEY,
   type varchar(255),
+  space varchar(255),
   status varchar(255),
   title varchar(255),
   "documentKind" varchar(255),

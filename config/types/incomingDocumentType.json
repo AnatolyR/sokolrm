@@ -1,5 +1,6 @@
 {
   "title": "Входящий",
+  "actions": ["doresolution"],
   "fields": [
     {
       "id": "title",

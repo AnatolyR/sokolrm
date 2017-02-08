@@ -1,5 +1,6 @@
 package com.kattysoft.web;
 
+import com.kattysoft.core.AccessRightService;
 import com.kattysoft.core.DocumentService;
 import com.kattysoft.core.impl.ConfigServiceImpl;
 import com.kattysoft.core.model.Document;
@@ -37,6 +38,9 @@ public class DocumentCardControllerIT {
 
     @Mock
     private DocumentService documentService;
+
+    @Mock
+    private AccessRightService accessRightService;
 
     @InjectMocks
     private DocumentCardController documentCardController;

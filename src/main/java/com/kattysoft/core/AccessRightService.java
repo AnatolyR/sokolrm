@@ -8,6 +8,7 @@
 package com.kattysoft.core;
 
 import com.kattysoft.core.model.AccessRightRecord;
+import com.kattysoft.core.model.Document;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public interface AccessRightService {
     void deleteRecords(List<String> strings);
 
     boolean checkRights(String space, String element, String subelement, AccessRightLevel level);
+
+    boolean checkDocumentRights(Document document, String subelement, AccessRightLevel level);
 
     List<AccessRightLevel> getRights(String space, String element, String subelement);
 }

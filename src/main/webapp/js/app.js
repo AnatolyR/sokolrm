@@ -171,6 +171,11 @@ $.widget('sokol.accessRightsGrid', {
                 for (var p = 0; p < fieldTypes.length; p++) {
                     subelementSelector.append($('<option value="' + fieldTypes[p].id + '">' + fieldTypes[p].title + '</option>'));
                 }
+
+                var actions = documentType.actions;
+                for (var p = 0; p < actions.length; p++) {
+                    subelementSelector.append($('<option value="' + actions[p].id + '">{' + actions[p].title + '}</option>'));
+                }
             }
             subelementSelector.selectpicker('refresh');
         });
@@ -886,6 +891,7 @@ $.widget('sokol.container', {
             mode: this.options.mode,
             dispatcher: this,
             containerType: this.options.containerType,
+            actions: this.options.form.actions,
             id: this.options.id
         }, $('<div></div>').prependTo(this.element));
 
@@ -1900,7 +1906,8 @@ $.widget('sokol.form', {
 
 $.widget('sokol.formButtons', {
     options: {
-        mode: "read"
+        mode: "read",
+        actions: []
     },
 
     _create: function () {
@@ -1933,6 +1940,14 @@ $.widget('sokol.formButtons', {
         }, this));
         deleteButton.appendTo(buttons);
 
+        if (this.options.actions.indexOf('doresolution') >= 0) {
+            var resolutionButton = $('<button type="button" name="doresolution" style="margin-right: 5px; display: none;" class="btn btn-default">Резолюция</button>');
+            resolutionButton.click($.proxy(function() {
+
+            }, this));
+            resolutionButton.appendTo(buttons);
+        }
+
         this.manageButtons();
     },
 
@@ -1944,7 +1959,14 @@ $.widget('sokol.formButtons', {
     manageButtons: function() {
         var buttons = this.element;
         buttons.children().hide();
-        if (this.options.mode == "read") {
+        if (this.options.mode == 'read') {
+            buttons.children().each(function(i, c) {
+                var $c = $(c);
+                if ($c.attr('name').indexOf('do') == 0) {
+                    $c.show();
+                }
+            });
+            //buttons.children('[name="doresolution"]').show();
             buttons.children('[name="edit"]').show();
             buttons.children('[name="delete"]').show();
         } else if (this.options.mode == "edit") {

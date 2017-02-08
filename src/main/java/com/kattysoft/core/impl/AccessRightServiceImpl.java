@@ -14,6 +14,7 @@ import com.kattysoft.core.AccessRightService;
 import com.kattysoft.core.SokolException;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.AccessRightRecord;
+import com.kattysoft.core.model.Document;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.AccessRightRecordRepository;
 import org.slf4j.Logger;
@@ -110,6 +111,53 @@ public class AccessRightServiceImpl implements AccessRightService {
             }
         }
         return result || (generalResult && !generalNone);
+    }
+
+    public boolean hasRights(String space, String element, String subelement, AccessRightLevel level) {
+        User user = userService.getCurrentUser();
+        log.debug("Has rights for user {}: {}.{}.{}.{}", user.getTitle() + " (" + user.getId() + ")", space, element, subelement, level);
+        List<UUID> groups = user.getGroups();
+        if (log.isDebugEnabled()) {
+            groups.forEach(groupId -> {
+                log.debug("User groups {}: {}", user.getTitle() + " (" + user.getId() + ")", String.join(", ", groups.stream().map(UUID::toString).collect(Collectors.toList())));
+            });
+        }
+        for (UUID groupId : groups) {
+
+            List<AccessRightRecord> records = accessRightRecordRepository.findAllByGroupIdAndSpaceAndElementAndSubelementAndLevel(groupId, space, element, subelement, level.toString());
+            if (log.isDebugEnabled()) {
+                records.forEach(r -> log.debug("Record : {}", r));
+            }
+            List<String> generalLevels = records.stream().map(AccessRightRecord::getLevel).collect(Collectors.toList());
+            if (generalLevels.contains(level.toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    public boolean checkDocumentRights(Document document, String subelement, AccessRightLevel level) {
+        if (this.hasRights(document.getSpace(), document.getType(), subelement, AccessRightLevel.NONE)) {
+            return false;
+        }
+        if (this.hasRights(document.getSpace(), document.getType(), subelement, level)) {
+            return true;
+        }
+        if (this.hasRights(document.getSpace(), "_document", subelement, AccessRightLevel.NONE)) {
+            return false;
+        }
+        if (this.hasRights(document.getSpace(), "_document", subelement, level)) {
+            return true;
+        }
+        if (this.hasRights("_space", "_document", subelement, AccessRightLevel.NONE)) {
+            return false;
+        }
+        if (this.hasRights("_space", "_document", subelement, level)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

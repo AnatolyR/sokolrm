@@ -18,6 +18,16 @@
     ]
   },
   {
+    "id": "_space",
+    "title": "[Документы]",
+    "actions": [
+      {
+        "id": "doresolution",
+        "title": "Резолюция"
+      }
+    ]
+  },
+  {
     "id": "_dictionaries",
     "title": "[Справочники]"
   }

@@ -54,6 +54,8 @@ public class DocumentDaoPg implements DocumentDao {
                 document.setTitle(title);
                 String type = resultSet.getString("type");
                 document.setType(type);
+                String space = resultSet.getString("space");
+                document.setSpace(space);
 
                 Map<String, Object> fields = new HashMap<>();
 

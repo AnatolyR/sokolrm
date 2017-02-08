@@ -1,5 +1,6 @@
 {
   "title": "Основные реквизиты",
+  "actions": ["doresolution"],
   "fields": [
     {
       "id": "title"

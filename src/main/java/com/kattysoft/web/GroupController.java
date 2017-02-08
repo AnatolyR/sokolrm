@@ -161,6 +161,10 @@ public class GroupController {
         List<ObjectNode> spaces = spaceService.getSpaces().stream().map(s ->
             (ObjectNode) mapper.valueToTree(s)
         ).collect(Collectors.toList());
+        ObjectNode spaceDocuments = mapper.createObjectNode();
+        spaceDocuments.put("id", "_space");
+        spaceDocuments.put("title", "[Документы]");
+        spaces.add(spaceDocuments);
         ObjectNode spaceSystem = mapper.createObjectNode();
         spaceSystem.put("id", "_system");
         spaceSystem.put("title", "[Системные объекты]");
@@ -173,9 +177,11 @@ public class GroupController {
 
         List<DocumentType> documentTypes = documentTypeService.getDocumentTypes();
         JsonNode documentTypesNode = mapper.valueToTree(documentTypes);
+
         ObjectNode anyDocumentType = mapper.createObjectNode();
         anyDocumentType.put("id", "_document");
         anyDocumentType.put("title", "[Документ]");
+
         ArrayNode fieldsTypes = anyDocumentType.putArray("fieldsTypes");
         Set<String> fieldsTypesIdsSet = new HashSet<>();
         documentTypesNode.forEach(node -> {
@@ -191,11 +197,35 @@ public class GroupController {
             });
         });
 
+
+        Map<String, String> actionsTitles = new HashMap<>();
+        JsonNode accessRightsElements = configService.getConfig2("accessRightsElements");
+        JsonNode documentActions = accessRightsElements.get(1).get("actions");
+        documentActions.forEach(n -> actionsTitles.put(n.get("id").asText(), n.get("title").asText()));
+
+        ArrayNode actions = anyDocumentType.putArray("actions");
+        Set<String> actionsIdsSet = new HashSet<>();
+        documentTypesNode.forEach(node -> {
+            ArrayNode titledActions = mapper.createArrayNode();
+            if (node.has("actions")) {
+                node.get("actions").forEach(a -> {
+                    String actionId = a.asText();
+                    if (!actionsIdsSet.contains(actionId)) {
+                        actionsIdsSet.add(actionId);
+                        ObjectNode action = mapper.createObjectNode();
+                        action.put("id", actionId);
+                        action.put("title", actionsTitles.get(actionId));
+                        actions.add(action);
+                        titledActions.add(action);
+                    }
+                });
+            }
+            ((ObjectNode) node).set("actions", titledActions);
+        });
+
         ((ArrayNode) documentTypesNode).insert(0, anyDocumentType);
         settings.set("documentTypes", documentTypesNode);
 
-
-        JsonNode accessRightsElements = configService.getConfig2("accessRightsElements");
         settings.set("systemObjects", accessRightsElements.get(0).get("elements"));
 
         List<Dictionary> dictionaries = dictionaryService.getDictionaries();
@@ -295,6 +325,7 @@ public class GroupController {
         spaceTitles.putAll(spaceService.getSpaces().stream().collect(Collectors.toMap(s -> s.getId().toString(), Space::getTitle)));
         spaceTitles.put("_system", "[Системные объекты]");
         spaceTitles.put("_dictionaries", "[Справочники]");
+        spaceTitles.put("_space", "[Документы]");
 
         Map<String, String> elementTitles = new HashMap<>();
         List<DocumentType> documentTypes = documentTypeService.getDocumentTypes();
@@ -309,6 +340,9 @@ public class GroupController {
         elementTitles.put("_document", "[Документ]");
 
         Map<String, String> subelementTitles = new HashMap<>();
+        JsonNode documentActions = accessRightsElements.get(1).get("actions");
+        documentActions.forEach(n -> subelementTitles.put(n.get("id").asText(), "{" + n.get("title").asText() + "}"));
+
         documentTypes.forEach(dt -> {
             dt.getFieldsTypes().forEach(ft -> {
                 if (!subelementTitles.containsKey(ft.getId())) {

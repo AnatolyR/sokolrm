@@ -171,6 +171,11 @@ $.widget('sokol.accessRightsGrid', {
                 for (var p = 0; p < fieldTypes.length; p++) {
                     subelementSelector.append($('<option value="' + fieldTypes[p].id + '">' + fieldTypes[p].title + '</option>'));
                 }
+
+                var actions = documentType.actions;
+                for (var p = 0; p < actions.length; p++) {
+                    subelementSelector.append($('<option value="' + actions[p].id + '">{' + actions[p].title + '}</option>'));
+                }
             }
             subelementSelector.selectpicker('refresh');
         });

@@ -9,14 +9,13 @@
  */
 package com.kattysoft.web;
 
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.DocumentService;
-import com.kattysoft.core.SokolException;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +39,9 @@ public class DocumentCardController {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private AccessRightService accessRightService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -84,6 +86,15 @@ public class DocumentCardController {
         formConfig.get("fields").forEach(merge);
 
         ((ObjectNode) formConfig).put("typeTitle", typeConfig.get("title"));
+        if (formConfig.has("actions")) {
+            ArrayNode filteredActions = mapper.createArrayNode();
+            formConfig.get("actions").forEach(a -> {
+                if (accessRightService.checkDocumentRights(document, a.asText(), AccessRightLevel.CREATE)) {
+                    filteredActions.add(a);
+                }
+            });
+            ((ObjectNode) formConfig).put("actions", filteredActions);
+        }
 
         ObjectNode card = mapper.createObjectNode();
         card.put("form", formConfig);
@@ -219,5 +230,9 @@ public class DocumentCardController {
         public void setData(Document data) {
             this.data = data;
         }
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

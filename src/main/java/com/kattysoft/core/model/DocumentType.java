@@ -23,6 +23,8 @@ public class DocumentType {
 
     private List<FieldType> fieldsTypes;
 
+    private List<String> actions;
+
     public String getId() {
         return id;
     }
@@ -48,6 +50,17 @@ public class DocumentType {
 
     public void setFieldsTypes(List<FieldType> fieldsTypes) {
         this.fieldsTypes = fieldsTypes;
+    }
+
+    public List<String> getActions() {
+        if (actions == null) {
+            actions =  new ArrayList<>();
+        }
+        return actions;
+    }
+
+    public void setActions(List<String> actions) {
+        this.actions = actions;
     }
 
     @Override
