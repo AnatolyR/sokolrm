@@ -1013,6 +1013,19 @@ $.widget('sokol.container', {
         });
     },
 
+    resolution: function() {
+        if (!this.executionForm) {
+            this.executionForm = $.sokol.executionForm({dispatcher: this}, $("<div></div>").insertAfter(this.header.element));
+        }
+    },
+
+    cancelExecution: function() {
+        if (this.executionForm) {
+            this.executionForm.destroy();
+            this.executionForm = null;
+        }
+    },
+
     doDeleteDocument: function() {
         var deleteUrl;
         var errorMessage;
@@ -1266,6 +1279,191 @@ $.widget('sokol.dictionaries', {
         this.element.detach();
     }
 });
+$.widget('sokol.executionForm', {
+    options: {},
+
+    _create: function () {
+        this.createBlock()
+    },
+
+    createBlock: function () {
+
+        this.element.addClass('panel panel-default');
+        this.element.attr('name', 'attachmentsPanel');
+
+        var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
+        var panelTitle = $('<div class="panel-title">Резолюция</div>').appendTo(panelHeader);
+        var panelBody = $('<div class="panel-body"></div>');
+        panelBody.appendTo(this.element);
+
+        this.form = $.sokol.form({
+            mode: 'edit',
+            data: {},
+            form: {
+                "id": "userSystem",
+                "title": "Системные свойства",
+                "fields": [
+                    {
+                        "items": [
+                            {
+                                "id": "author",
+                                "title": "Автор",
+                                "type": "users",
+                                "mandatory": true,
+                                "multiple": false
+                            },
+                            {
+                                "id": "date",
+                                "title": "Дата",
+                                "type": "date",
+                                "mandatory": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "comment",
+                        "title": "Резолюция",
+                        "type": "text",
+                        "mandatory": true
+                    }
+                ]
+            },
+            usePanel: false,
+            dispatcher: this.options.dispatcher,
+            containerType: this.options.containerType
+        }, $('<div></div>').appendTo(panelBody));
+
+        var response = {
+            "gridConfig": {
+                "title": "Исполнители",
+                "sortable": true,
+                "mode": "edit",
+                "columnsVisible": [
+                    "executorTitle",
+                    "date",
+                    "executed"
+                ],
+                "columns": [
+                    {
+                        "id": "executor",
+                        "title": "Исполнитель (ИД)",
+                        "render": "link",
+                        "linkType": "user"
+                    },
+                    {
+                        "id": "executorTitle",
+                        "idColumn": "executor",
+                        "title": "Исполнитель",
+                        "render": "link",
+                        "linkType": "user",
+                        "editor": "user",
+                        "width": "500px"
+                    },
+                    {
+                        "id": "date",
+                        "title": "Срок",
+                        render: 'datetime',
+                        "editor": "date"
+                    },
+                    {
+                        "id": "executed",
+                        "title": "Выполнено",
+                        render: 'datetime'
+                    }
+                ],
+                "id": "tasks",
+                "filterable": false
+            }
+        };
+        var data = [];
+        var options = response.gridConfig;
+        options.data = data;
+        options.usePanel = false;
+        this.grid = $.sokol.grid(options, this.element);
+
+        this.createButtons();
+    },
+
+    saveExecution: function() {
+        if (!this.form.validateForm()) {
+            return;
+        }
+
+        var data = this.form.getData();
+
+        var saveUrl = 'app/saveExecutionList';
+        var message = 'Не удалось сохранить список исполнителей. Обратитесь к администратору.';
+
+        var rows = this.grid.element.find('tr');
+        var rowsData = [];
+        rows.each(function(i, row) {
+            var rowData = {};
+            var inputs = $(row).find('input');
+            for (var j = 0; j < inputs.length; j++) {
+                var input = $(inputs[j]);
+                var name = input.attr('name');
+                var value = input.attr('value');
+                if (name && value) {
+                    rowData[name] = value;
+                }
+            }
+            var selects = $(row).find('select');
+            for (var j = 0; j < selects.length; j++) {
+                var select = $(selects[j]);
+                var name = select.attr('name');
+                var value = select.val();
+                if (name && value) {
+                    if (name == 'executorTitle') {
+                        name = 'executorId';
+                    }
+                    rowData[name] = value;
+                }
+            }
+            if (!$.isEmptyObject(rowData)) {
+                rowsData.push(rowData);
+            }
+        });
+
+        data.rowsData = rowsData;
+        data.type = 'resolution';
+
+        //alert(JSON.stringify(data));
+
+        $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
+            $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
+
+            //todo reload
+
+        }, this)).fail($.proxy(function() {
+            $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
+        }, this));
+    },
+
+    createButtons: function() {
+        var buttons = $('<div class="panel-body"></div>').appendTo(this.element);
+
+        var saveButton = $('<button type="button" name="add" style="" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
+        saveButton.click($.proxy(function() {
+            this.saveExecution();
+        }, this));
+        saveButton.appendTo(buttons);
+
+        var cancelButton = $('<button type="button" name="add" style="" class="btn btn-default controlElementLeftMargin">Отмена</button>');
+        cancelButton.click($.proxy(function() {
+            $.sokol.smodal({
+                title: 'Подтверждение отмены',
+                body: 'Отменить создание резолюции?',
+                confirmButtonTitle: 'Подтвердить',
+                confirmAction: $.proxy(this.options.dispatcher.cancelExecution, this.options.dispatcher)
+            });
+        }, this));
+        cancelButton.appendTo(buttons);
+    },
+
+    _destroy: function () {
+        this.element.detach();
+    }
+});
 var primary = $.fn.filter;
 $.widget('sokol.filter', {
     options: {
@@ -1394,7 +1592,8 @@ $.fn.filter = primary;
 $.widget('sokol.form', {
     options: {
         mode: 'read',
-        objectType: ''
+        objectType: '',
+        usePanel: true
     },
 
     _create: function () {
@@ -1460,6 +1659,16 @@ $.widget('sokol.form', {
                 ('<div>' + value + '</div>')) +
             '</div>');
     },
+
+    createFieldText: function(formNode, field, value, edit) {
+        $(formNode).append('' +
+            '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
+            '<label class="control-label">' + field.title + ':</label>' +
+            (edit ? ('<textarea rows="3" name="' + field.id + '" class="form-control">' + value + '</textarea>') :
+                ('<div>' + value + '</div>')) +
+            '</div>');
+    },
+
     createFieldDate: function (formNode, field, value, edit) {
         value = value ? moment(value, 'DD.MM.YYYY HH:mm').format("L LT") : '';
         if (!edit) {
@@ -1483,6 +1692,7 @@ $.widget('sokol.form', {
             '</div>');
         dateNode.appendTo(formNode);
         dateNode.find(".date").datetimepicker({
+            //format: 'L',
             locale: 'ru'
         });
 
@@ -1694,7 +1904,7 @@ $.widget('sokol.form', {
         $(formNode).append(selector);
 
         selector.find('select').selectize({
-            maxItems: 100,
+            maxItems: field.multiple ? 1000 : 1,
             plugins: ['restore_on_backspace', 'remove_button'],
             valueField: 'id',
             labelField: 'title',
@@ -1734,14 +1944,20 @@ $.widget('sokol.form', {
             '</div>');
     },
     createMainBlock: function(container, form, data, edit) {
-        var formNode = this.element.find('[name="mainForm"]');
-        if (formNode.length == 0) {
-            formNode = $('<form name="mainForm"></form>');
-            var blockTitle = form.title;
-            var blockNode = this.createBlock(container, blockTitle);
-            formNode.appendTo(blockNode);
+        var formNode;
+        if (this.options.usePanel) {
+            formNode = this.element.find('[name="mainForm"]');
+            if (formNode.length == 0) {
+                formNode = $('<form name="mainForm"></form>');
+                var blockTitle = form.title;
+                var blockNode = this.createBlock(container, blockTitle);
+                formNode.appendTo(blockNode);
+            } else {
+                formNode.children().remove();
+            }
         } else {
-            formNode.children().remove();
+            container.empty();
+            formNode = $('<form name="mainForm"></form>').appendTo(container);
         }
         for (var i = 0; i < form.fields.length; i++) {
             var field = form.fields[i];
@@ -1790,6 +2006,8 @@ $.widget('sokol.form', {
         }
         if (type == "string" || type == "smallstring") {
             this.createFieldString(formNode, field, value, edit);
+        } else if (type == "text") {
+            this.createFieldText(formNode, field, value, edit);
         } else if (type == "button") {
             this.createButton(formNode, field, value, edit);
         } else if (type == "date") {
@@ -1839,6 +2057,9 @@ $.widget('sokol.form', {
             var val = values[field.id];
 
             var fieldDiv = mainForm.find("[name=" + field.id + "]").parent();
+            if (fieldDiv.hasClass('date')) {
+                fieldDiv = fieldDiv.parent();
+            }
             if (field.mandatory) {
                 if (val && val.value) {
                     fieldDiv.removeClass("has-error");
@@ -1943,7 +2164,7 @@ $.widget('sokol.formButtons', {
         if (this.options.actions.indexOf('doresolution') >= 0) {
             var resolutionButton = $('<button type="button" name="doresolution" style="margin-right: 5px; display: none;" class="btn btn-default">Резолюция</button>');
             resolutionButton.click($.proxy(function() {
-
+                this.options.dispatcher.resolution();
             }, this));
             resolutionButton.appendTo(buttons);
         }
@@ -1966,7 +2187,6 @@ $.widget('sokol.formButtons', {
                     $c.show();
                 }
             });
-            //buttons.children('[name="doresolution"]').show();
             buttons.children('[name="edit"]').show();
             buttons.children('[name="delete"]').show();
         } else if (this.options.mode == "edit") {
@@ -1998,7 +2218,8 @@ $.widget("sokol.grid", {
         deletable: false,
         deleteMethod: null,
         addable: false,
-        addMethod: null
+        addMethod: null,
+        usePanel: true
     },
 
     _create: function () {
@@ -2015,11 +2236,41 @@ $.widget("sokol.grid", {
     },
 
     createList: function() {
+        if (this.options.mode == 'edit') {
+            this.options.addable = true;
+            this.options.selectable = true;
+            this.options.deletable = true;
+        }
         var central = this.element;
-        central.empty();
+        if (this.options.usePanel) {
+            central.empty();
+        }
 
-        var topBar = this.createButtonsBar(central);
-        this.topBar = topBar;
+        this.createButtons();
+
+        this.renderTablePanel();
+        this.reload();
+        if (!this.options.data) {
+            var bottomBar = this.createButtonsBar(central);
+            this.createPagination(bottomBar);
+        }
+    },
+
+    createButtons: function() {
+        var topBar;
+
+        if (this.topBar) {
+            topBar = this.topBar.empty();
+        } else {
+            var topBar = $('<div style="margin-bottom: 10px;"></div>');
+            topBar.appendTo(this.element);
+
+            if (!this.options.usePanel) {
+                topBar.css('margin-left', '15px');
+            }
+            this.topBar = topBar;
+        }
+
         if (!this.options.data) {
             var pagination = this.createPagination(topBar);
         } else {
@@ -2037,13 +2288,6 @@ $.widget("sokol.grid", {
         if (this.options.addable) {
             this.createAddButton(topBar);
         }
-
-        this.renderTablePanel();
-        this.reload();
-        if (!this.options.data) {
-            var bottomBar = this.createButtonsBar(central);
-            this.createPagination(bottomBar);
-        }
     },
 
     setPage: function(page) {
@@ -2060,6 +2304,20 @@ $.widget("sokol.grid", {
 
     previewPage: function() {
         this.setPage(this.options.currentPage - 1);
+    },
+
+    goToMode: function(mode) {
+        if (mode == 'edit') {
+            this.options.addable = true;
+            this.options.selectable = true;
+            this.options.deletable = true;
+        } else {
+            this.options.addable = false;
+            this.options.selectable = false;
+            this.options.deletable = false;
+        }
+        this.createButtons();
+        this.refresh();
     },
 
     refresh: function () {
@@ -2213,15 +2471,26 @@ $.widget("sokol.grid", {
     },
 
     renderTablePanel: function() {
-        var panel = this.element.find('[name="tablePanel"]');
-        if (!panel.length) {
-            panel = $('<div name="tablePanel" class="panel panel-default"></div>');
-            panel.appendTo(this.element);
+        var panel;
+        if (this.options.usePanel) {
+            panel = this.element.find('[name="tablePanel"]');
+            if (!panel.length) {
+                panel = $('<div name="tablePanel" class="panel panel-default"></div>');
+                panel.appendTo(this.element);
+            } else {
+                panel.empty();
+            }
         } else {
-            panel.empty();
+            panel = this.element;
         }
         var panelHeader = $('<div class="panel-heading"></div>');
-        var panelTitle = $('<div class="panel-title">' + this.options.title + '</div>');
+        if (!this.options.usePanel) {
+            panelHeader.addClass('panel-footer');
+        }
+        var panelTitle = $('<div>' + this.options.title + '</div>');
+        if (this.options.usePanel) {
+            panelTitle.addClass('panel-title');
+        }
         panelTitle.appendTo(panelHeader);
         panelHeader.appendTo(panel);
         var table = $("<table class='table'></table>");
@@ -2238,25 +2507,28 @@ $.widget("sokol.grid", {
         return !this.options.columnsVisible || this.options.columnsVisible.indexOf(columnId) >= 0;
     },
 
+    renderCheckboxColumn: function(row, id) {
+        var td = $('<td></td>');
+        var checkbox = $('<input type="checkbox" dataId="' + id + '">');
+        checkbox.click($.proxy(function(e) {
+            this.updateButtons();
+            e.stopPropagation();
+        }, this));
+        checkbox.appendTo(td);
+        td.appendTo(row);
+
+        td.click($.proxy(function(e){
+            var cb = $(e.target).find('input[type=checkbox]');
+            var checked = cb.prop('checked');
+            cb.prop('checked', checked ? '' : 'checked');
+            this.updateButtons();
+        }, this));
+    },
+
     renderRow: function(row, rowObj) {
         var columns = this.options.columns;
         if (this.options.selectable) {
-            var td = $('<td></td>');
-            var checkbox = $('<input type="checkbox" dataId="' + rowObj.id + '">');
-            checkbox.click($.proxy(function(e) {
-                this.updateButtons();
-                e.stopPropagation();
-            }, this));
-            checkbox.appendTo(td);
-            td.appendTo(row);
-
-            td.click($.proxy(function(e){
-                var cb = $(e.target).find('input[type=checkbox]');
-                var checked = cb.prop('checked');
-                cb.prop('checked', checked ? '' : 'checked');
-                this.updateButtons();
-            }, this));
-
+            this.renderCheckboxColumn(row, rowObj.id);
         }
         for (var k = 0; k < columns.length; k++) {
             var column = columns[k];
@@ -2264,7 +2536,20 @@ $.widget("sokol.grid", {
             var colType = column.type;
             if (colType != "hidden" && this.isColumnVisible(colId)) {
                 var val = rowObj[colId];
-                if (val || colId == "title") {
+                if (this.options.mode == 'edit' && column.editor) {
+                    if (column.editor == "text") {
+                        var td = $('<td></td>');
+                        var input = $('<input name="' + colId + '" type="text">').appendTo(td);
+
+                        td.appendTo(row);
+                    } else if (column.editor == "user") {
+                        this.createEditorUser(row, column, rowObj[column.idColumn], val);
+                    } else if (column.editor == "date") {
+                        this.createEditorDate(row, column, val);
+                    } else {
+                        row.append($('<td></td>'));
+                    }
+                } else if (val || colId == "title") {
                     if (colId == this.options.linkColumn || column.render == 'link') {
                         if (!val || 0 === val.length) {
                             val = "[Заголовок не указан]";
@@ -2315,7 +2600,7 @@ $.widget("sokol.grid", {
     },
 
     createDeleteButton: function(element) {
-        var deleteButton = $('<button type="button" disabled="disabled" name="delete" style="margin-right: 5px;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
+        var deleteButton = $('<button type="button" disabled="disabled" name="delete" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
         deleteButton.click($.proxy(function() {
             var ids = this.element.find('tbody input:checked').map(function (i, el) {
                 return $(el).attr('dataId');
@@ -2356,7 +2641,7 @@ $.widget("sokol.grid", {
             var addButton = $('<a type="button" name="add" target="_blank" href="#new/' + this.options.addableType + '" style="" class="btn btn-success controlElementLeftMargin">Создать</a>');
             addButton.appendTo(buttonBar);
         } else {
-            var addButton = $('<button type="button" name="add" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
+            var addButton = $('<button type="button" name="add" style="" class="btn btn-success controlElementLeftMargin">Добавить</button>');
             addButton.click($.proxy(function() {
                 this.renderAddNewRow();
             }, this));
@@ -2390,7 +2675,11 @@ $.widget("sokol.grid", {
         var columns = this.options.columns;
         var row = $("<tr></tr>");
         if (this.options.selectable) {
-            $('<td></td>').appendTo(row);
+            if (this.options.usePanel) {
+                $('<td></td>').appendTo(row);
+            } else {
+                this.renderCheckboxColumn(row, '_new' + new Date().getTime());
+            }
         }
         for (var k = 0; k < columns.length; k++) {
             var column = columns[k];
@@ -2410,12 +2699,85 @@ $.widget("sokol.grid", {
                     }, this));
 
                     td.appendTo(row);
+                } else if (editor == "user") {
+                    this.createEditorUser(row, column);
+                } else if (editor == "date") {
+                    this.createEditorDate(row, column);
                 } else {
                     row.append($('<td></td>'));
                 }
             }
         }
         row.prependTo(tbody);
+    },
+
+    createEditorDate: function (formNode, field, value) {
+        value = value ? moment(value).format("L LT") : '';
+        var dateNode = $('<td>' +
+            '<div class="' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="width: 200px;">' +
+            '<div class="input-group date">' +
+            '<input name="' + field.id + '" type="text" class="form-control" value="' + value + '"/>' +
+            '<span class="input-group-addon">' +
+            '<span class="glyphicon glyphicon-calendar"></span>' +
+            '</span>' +
+            '</div>' +
+            '</div></td>');
+        dateNode.appendTo(formNode);
+        dateNode.find(".date").datetimepicker({
+            format: 'L',
+            locale: 'ru'
+        });
+
+    },
+
+    createEditorUser: function(formNode, field, value, valueTitle) {
+        if( Object.prototype.toString.call(value) !== '[object Array]' ) {
+            value = value ? [value] : [];
+            valueTitle = valueTitle ? [valueTitle] : [];
+        }
+
+        var options = [];
+        var initialValues = [];
+        var titles = [];
+
+        for (var i = 0; i < value.length; i++) {
+            options.push({
+                id: value[i],
+                title: valueTitle[i]
+            });
+            initialValues.push(value[i]);
+            titles.push(valueTitle[i]);
+        }
+
+        var selector = $('<td><div class="no-dropdown' + (field.mandatory ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
+            '<select name="' + field.id + '" class="demo-default" id="selector_' + field.id + '">' + '</select>' +
+            '' +
+            '</div>' +
+            '</td>');
+        $(formNode).append(selector);
+
+        selector.find('select').selectize({
+            maxItems: field.multiple ? 1000 : 1,
+            plugins: ['restore_on_backspace', 'remove_button'],
+            valueField: 'id',
+            labelField: 'title',
+            searchField: 'title',
+            preload: true,
+            closeAfterSelect: true,
+            options: options,
+            load: function(query, callback) {
+                $.getJSON('app/dictionary', {
+                    id: 'organizationPersons',
+                    query: query
+                },  function(response) {
+                    callback(response);
+                }).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные для справочника. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                });
+            },
+            create: false
+        });
+        selector.find('select')[0].selectize.setValue(initialValues);
     },
 
     createColumnsSelector: function(element) {

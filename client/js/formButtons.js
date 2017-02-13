@@ -37,7 +37,7 @@ $.widget('sokol.formButtons', {
         if (this.options.actions.indexOf('doresolution') >= 0) {
             var resolutionButton = $('<button type="button" name="doresolution" style="margin-right: 5px; display: none;" class="btn btn-default">Резолюция</button>');
             resolutionButton.click($.proxy(function() {
-
+                this.options.dispatcher.resolution();
             }, this));
             resolutionButton.appendTo(buttons);
         }

@@ -1,7 +1,8 @@
 $.widget('sokol.form', {
     options: {
         mode: 'read',
-        objectType: ''
+        objectType: '',
+        usePanel: true
     },
 
     _create: function () {
@@ -67,6 +68,16 @@ $.widget('sokol.form', {
                 ('<div>' + value + '</div>')) +
             '</div>');
     },
+
+    createFieldText: function(formNode, field, value, edit) {
+        $(formNode).append('' +
+            '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
+            '<label class="control-label">' + field.title + ':</label>' +
+            (edit ? ('<textarea rows="3" name="' + field.id + '" class="form-control">' + value + '</textarea>') :
+                ('<div>' + value + '</div>')) +
+            '</div>');
+    },
+
     createFieldDate: function (formNode, field, value, edit) {
         value = value ? moment(value, 'DD.MM.YYYY HH:mm').format("L LT") : '';
         if (!edit) {
@@ -90,6 +101,7 @@ $.widget('sokol.form', {
             '</div>');
         dateNode.appendTo(formNode);
         dateNode.find(".date").datetimepicker({
+            //format: 'L',
             locale: 'ru'
         });
 
@@ -301,7 +313,7 @@ $.widget('sokol.form', {
         $(formNode).append(selector);
 
         selector.find('select').selectize({
-            maxItems: 100,
+            maxItems: field.multiple ? 1000 : 1,
             plugins: ['restore_on_backspace', 'remove_button'],
             valueField: 'id',
             labelField: 'title',
@@ -341,14 +353,20 @@ $.widget('sokol.form', {
             '</div>');
     },
     createMainBlock: function(container, form, data, edit) {
-        var formNode = this.element.find('[name="mainForm"]');
-        if (formNode.length == 0) {
-            formNode = $('<form name="mainForm"></form>');
-            var blockTitle = form.title;
-            var blockNode = this.createBlock(container, blockTitle);
-            formNode.appendTo(blockNode);
+        var formNode;
+        if (this.options.usePanel) {
+            formNode = this.element.find('[name="mainForm"]');
+            if (formNode.length == 0) {
+                formNode = $('<form name="mainForm"></form>');
+                var blockTitle = form.title;
+                var blockNode = this.createBlock(container, blockTitle);
+                formNode.appendTo(blockNode);
+            } else {
+                formNode.children().remove();
+            }
         } else {
-            formNode.children().remove();
+            container.empty();
+            formNode = $('<form name="mainForm"></form>').appendTo(container);
         }
         for (var i = 0; i < form.fields.length; i++) {
             var field = form.fields[i];
@@ -397,6 +415,8 @@ $.widget('sokol.form', {
         }
         if (type == "string" || type == "smallstring") {
             this.createFieldString(formNode, field, value, edit);
+        } else if (type == "text") {
+            this.createFieldText(formNode, field, value, edit);
         } else if (type == "button") {
             this.createButton(formNode, field, value, edit);
         } else if (type == "date") {
@@ -446,6 +466,9 @@ $.widget('sokol.form', {
             var val = values[field.id];
 
             var fieldDiv = mainForm.find("[name=" + field.id + "]").parent();
+            if (fieldDiv.hasClass('date')) {
+                fieldDiv = fieldDiv.parent();
+            }
             if (field.mandatory) {
                 if (val && val.value) {
                     fieldDiv.removeClass("has-error");

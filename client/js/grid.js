@@ -15,7 +15,8 @@ $.widget("sokol.grid", {
         deletable: false,
         deleteMethod: null,
         addable: false,
-        addMethod: null
+        addMethod: null,
+        usePanel: true
     },
 
     _create: function () {
@@ -32,11 +33,41 @@ $.widget("sokol.grid", {
     },
 
     createList: function() {
+        if (this.options.mode == 'edit') {
+            this.options.addable = true;
+            this.options.selectable = true;
+            this.options.deletable = true;
+        }
         var central = this.element;
-        central.empty();
+        if (this.options.usePanel) {
+            central.empty();
+        }
 
-        var topBar = this.createButtonsBar(central);
-        this.topBar = topBar;
+        this.createButtons();
+
+        this.renderTablePanel();
+        this.reload();
+        if (!this.options.data) {
+            var bottomBar = this.createButtonsBar(central);
+            this.createPagination(bottomBar);
+        }
+    },
+
+    createButtons: function() {
+        var topBar;
+
+        if (this.topBar) {
+            topBar = this.topBar.empty();
+        } else {
+            var topBar = $('<div style="margin-bottom: 10px;"></div>');
+            topBar.appendTo(this.element);
+
+            if (!this.options.usePanel) {
+                topBar.css('margin-left', '15px');
+            }
+            this.topBar = topBar;
+        }
+
         if (!this.options.data) {
             var pagination = this.createPagination(topBar);
         } else {
@@ -54,13 +85,6 @@ $.widget("sokol.grid", {
         if (this.options.addable) {
             this.createAddButton(topBar);
         }
-
-        this.renderTablePanel();
-        this.reload();
-        if (!this.options.data) {
-            var bottomBar = this.createButtonsBar(central);
-            this.createPagination(bottomBar);
-        }
     },
 
     setPage: function(page) {
@@ -77,6 +101,20 @@ $.widget("sokol.grid", {
 
     previewPage: function() {
         this.setPage(this.options.currentPage - 1);
+    },
+
+    goToMode: function(mode) {
+        if (mode == 'edit') {
+            this.options.addable = true;
+            this.options.selectable = true;
+            this.options.deletable = true;
+        } else {
+            this.options.addable = false;
+            this.options.selectable = false;
+            this.options.deletable = false;
+        }
+        this.createButtons();
+        this.refresh();
     },
 
     refresh: function () {
@@ -230,15 +268,26 @@ $.widget("sokol.grid", {
     },
 
     renderTablePanel: function() {
-        var panel = this.element.find('[name="tablePanel"]');
-        if (!panel.length) {
-            panel = $('<div name="tablePanel" class="panel panel-default"></div>');
-            panel.appendTo(this.element);
+        var panel;
+        if (this.options.usePanel) {
+            panel = this.element.find('[name="tablePanel"]');
+            if (!panel.length) {
+                panel = $('<div name="tablePanel" class="panel panel-default"></div>');
+                panel.appendTo(this.element);
+            } else {
+                panel.empty();
+            }
         } else {
-            panel.empty();
+            panel = this.element;
         }
         var panelHeader = $('<div class="panel-heading"></div>');
-        var panelTitle = $('<div class="panel-title">' + this.options.title + '</div>');
+        if (!this.options.usePanel) {
+            panelHeader.addClass('panel-footer');
+        }
+        var panelTitle = $('<div>' + this.options.title + '</div>');
+        if (this.options.usePanel) {
+            panelTitle.addClass('panel-title');
+        }
         panelTitle.appendTo(panelHeader);
         panelHeader.appendTo(panel);
         var table = $("<table class='table'></table>");
@@ -255,25 +304,28 @@ $.widget("sokol.grid", {
         return !this.options.columnsVisible || this.options.columnsVisible.indexOf(columnId) >= 0;
     },
 
+    renderCheckboxColumn: function(row, id) {
+        var td = $('<td></td>');
+        var checkbox = $('<input type="checkbox" dataId="' + id + '">');
+        checkbox.click($.proxy(function(e) {
+            this.updateButtons();
+            e.stopPropagation();
+        }, this));
+        checkbox.appendTo(td);
+        td.appendTo(row);
+
+        td.click($.proxy(function(e){
+            var cb = $(e.target).find('input[type=checkbox]');
+            var checked = cb.prop('checked');
+            cb.prop('checked', checked ? '' : 'checked');
+            this.updateButtons();
+        }, this));
+    },
+
     renderRow: function(row, rowObj) {
         var columns = this.options.columns;
         if (this.options.selectable) {
-            var td = $('<td></td>');
-            var checkbox = $('<input type="checkbox" dataId="' + rowObj.id + '">');
-            checkbox.click($.proxy(function(e) {
-                this.updateButtons();
-                e.stopPropagation();
-            }, this));
-            checkbox.appendTo(td);
-            td.appendTo(row);
-
-            td.click($.proxy(function(e){
-                var cb = $(e.target).find('input[type=checkbox]');
-                var checked = cb.prop('checked');
-                cb.prop('checked', checked ? '' : 'checked');
-                this.updateButtons();
-            }, this));
-
+            this.renderCheckboxColumn(row, rowObj.id);
         }
         for (var k = 0; k < columns.length; k++) {
             var column = columns[k];
@@ -281,7 +333,20 @@ $.widget("sokol.grid", {
             var colType = column.type;
             if (colType != "hidden" && this.isColumnVisible(colId)) {
                 var val = rowObj[colId];
-                if (val || colId == "title") {
+                if (this.options.mode == 'edit' && column.editor) {
+                    if (column.editor == "text") {
+                        var td = $('<td></td>');
+                        var input = $('<input name="' + colId + '" type="text">').appendTo(td);
+
+                        td.appendTo(row);
+                    } else if (column.editor == "user") {
+                        this.createEditorUser(row, column, rowObj[column.idColumn], val);
+                    } else if (column.editor == "date") {
+                        this.createEditorDate(row, column, val);
+                    } else {
+                        row.append($('<td></td>'));
+                    }
+                } else if (val || colId == "title") {
                     if (colId == this.options.linkColumn || column.render == 'link') {
                         if (!val || 0 === val.length) {
                             val = "[Заголовок не указан]";
@@ -332,7 +397,7 @@ $.widget("sokol.grid", {
     },
 
     createDeleteButton: function(element) {
-        var deleteButton = $('<button type="button" disabled="disabled" name="delete" style="margin-right: 5px;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
+        var deleteButton = $('<button type="button" disabled="disabled" name="delete" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
         deleteButton.click($.proxy(function() {
             var ids = this.element.find('tbody input:checked').map(function (i, el) {
                 return $(el).attr('dataId');
@@ -373,7 +438,7 @@ $.widget("sokol.grid", {
             var addButton = $('<a type="button" name="add" target="_blank" href="#new/' + this.options.addableType + '" style="" class="btn btn-success controlElementLeftMargin">Создать</a>');
             addButton.appendTo(buttonBar);
         } else {
-            var addButton = $('<button type="button" name="add" style="margin-right: 5px;" class="btn btn-success">Добавить</button>');
+            var addButton = $('<button type="button" name="add" style="" class="btn btn-success controlElementLeftMargin">Добавить</button>');
             addButton.click($.proxy(function() {
                 this.renderAddNewRow();
             }, this));
@@ -407,7 +472,11 @@ $.widget("sokol.grid", {
         var columns = this.options.columns;
         var row = $("<tr></tr>");
         if (this.options.selectable) {
-            $('<td></td>').appendTo(row);
+            if (this.options.usePanel) {
+                $('<td></td>').appendTo(row);
+            } else {
+                this.renderCheckboxColumn(row, '_new' + new Date().getTime());
+            }
         }
         for (var k = 0; k < columns.length; k++) {
             var column = columns[k];
@@ -427,12 +496,85 @@ $.widget("sokol.grid", {
                     }, this));
 
                     td.appendTo(row);
+                } else if (editor == "user") {
+                    this.createEditorUser(row, column);
+                } else if (editor == "date") {
+                    this.createEditorDate(row, column);
                 } else {
                     row.append($('<td></td>'));
                 }
             }
         }
         row.prependTo(tbody);
+    },
+
+    createEditorDate: function (formNode, field, value) {
+        value = value ? moment(value).format("L LT") : '';
+        var dateNode = $('<td>' +
+            '<div class="' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="width: 200px;">' +
+            '<div class="input-group date">' +
+            '<input name="' + field.id + '" type="text" class="form-control" value="' + value + '"/>' +
+            '<span class="input-group-addon">' +
+            '<span class="glyphicon glyphicon-calendar"></span>' +
+            '</span>' +
+            '</div>' +
+            '</div></td>');
+        dateNode.appendTo(formNode);
+        dateNode.find(".date").datetimepicker({
+            format: 'L',
+            locale: 'ru'
+        });
+
+    },
+
+    createEditorUser: function(formNode, field, value, valueTitle) {
+        if( Object.prototype.toString.call(value) !== '[object Array]' ) {
+            value = value ? [value] : [];
+            valueTitle = valueTitle ? [valueTitle] : [];
+        }
+
+        var options = [];
+        var initialValues = [];
+        var titles = [];
+
+        for (var i = 0; i < value.length; i++) {
+            options.push({
+                id: value[i],
+                title: valueTitle[i]
+            });
+            initialValues.push(value[i]);
+            titles.push(valueTitle[i]);
+        }
+
+        var selector = $('<td><div class="no-dropdown' + (field.mandatory ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
+            '<select name="' + field.id + '" class="demo-default" id="selector_' + field.id + '">' + '</select>' +
+            '' +
+            '</div>' +
+            '</td>');
+        $(formNode).append(selector);
+
+        selector.find('select').selectize({
+            maxItems: field.multiple ? 1000 : 1,
+            plugins: ['restore_on_backspace', 'remove_button'],
+            valueField: 'id',
+            labelField: 'title',
+            searchField: 'title',
+            preload: true,
+            closeAfterSelect: true,
+            options: options,
+            load: function(query, callback) {
+                $.getJSON('app/dictionary', {
+                    id: 'organizationPersons',
+                    query: query
+                },  function(response) {
+                    callback(response);
+                }).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные для справочника. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+                });
+            },
+            create: false
+        });
+        selector.find('select')[0].selectize.setValue(initialValues);
     },
 
     createColumnsSelector: function(element) {

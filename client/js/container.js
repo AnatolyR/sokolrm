@@ -177,6 +177,19 @@ $.widget('sokol.container', {
         });
     },
 
+    resolution: function() {
+        if (!this.executionForm) {
+            this.executionForm = $.sokol.executionForm({dispatcher: this}, $("<div></div>").insertAfter(this.header.element));
+        }
+    },
+
+    cancelExecution: function() {
+        if (this.executionForm) {
+            this.executionForm.destroy();
+            this.executionForm = null;
+        }
+    },
+
     doDeleteDocument: function() {
         var deleteUrl;
         var errorMessage;

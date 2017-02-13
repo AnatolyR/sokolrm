@@ -1,4 +1,5 @@
 var configResponses = configResponses || [];
+var mockResponses = mockResponses || [];
 (function() {
     var dictionariesData = {
         "items": [
@@ -42,6 +43,13 @@ var configResponses = configResponses || [];
 
     rs.list = function(id, size, offset) {
         var r = [];
+        if (!offset) {
+            offset = 0;
+        }
+
+        if (!size) {
+            size = 50;
+        }
 
         for (var i = offset + 1; i < size + offset + 1 && i <= total; i++) {
             r.push(users["id" + i]);
@@ -60,6 +68,10 @@ var configResponses = configResponses || [];
 
     mockResponses['app/users'] = function(params, callback) {
         callback(rs.list(params.id, parseInt(params.size), parseInt(params.offset)));
+    };
+
+    mockResponses['app/dictionary'] = function(params, callback) {
+        callback(rs.list(params.id, parseInt(params.size), parseInt(params.offset)).data);
     };
 
     var simpleDictionaryData = {
