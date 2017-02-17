@@ -283,6 +283,7 @@ $.widget("sokol.grid", {
         var panelHeader = $('<div class="panel-heading"></div>');
         if (!this.options.usePanel) {
             panelHeader.addClass('panel-footer');
+            panelHeader.css('border-radius', '0');
         }
         var panelTitle = $('<div>' + this.options.title + '</div>');
         if (this.options.usePanel) {
@@ -352,7 +353,8 @@ $.widget("sokol.grid", {
                             val = "[Заголовок не указан]";
                         }
                         var linkType = column.linkType ? column.linkType : this.options.objectType;
-                        var td = $('<td><a href="#' + linkType + '/' + rowObj.id + '" target="_blank">' + val + '</a></td>');
+                        var id = column.idColumn ? rowObj[column.idColumn] : rowObj.id;
+                        var td = $('<td><a href="#' + linkType + '/' + id + '" target="_blank">' + val + '</a></td>');
                         td.appendTo(row);
                     } else if (column.render == 'datetime') {
                         val = moment(val).format('L LT');

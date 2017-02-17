@@ -1,12 +1,14 @@
 $.widget('sokol.executionForm', {
-    options: {},
-
-    _create: function () {
-        this.createBlock()
+    options: {
+        mode: 'read'
     },
 
-    createBlock: function () {
+    _create: function () {
+        this.createHeader();
+        this.createBlock();
+    },
 
+    createHeader: function() {
         this.element.addClass('panel panel-default');
         this.element.attr('name', 'attachmentsPanel');
 
@@ -14,10 +16,16 @@ $.widget('sokol.executionForm', {
         var panelTitle = $('<div class="panel-title">Резолюция</div>').appendTo(panelHeader);
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(this.element);
+        this.panelBody = panelBody;
+    },
 
+    createBlock: function () {
+        if (this.form) {
+            this.form.destroy();
+        }
         this.form = $.sokol.form({
-            mode: 'edit',
-            data: {},
+            mode: (this.options.mode == 'create' || this.options.mode == 'edit') ? 'edit' : 'read',
+            data: this.options.data ? this.options.data : {},
             form: {
                 "id": "userSystem",
                 "title": "Системные свойства",
@@ -25,17 +33,19 @@ $.widget('sokol.executionForm', {
                     {
                         "items": [
                             {
-                                "id": "author",
+                                "id": "userId",
                                 "title": "Автор",
                                 "type": "users",
-                                "mandatory": true,
-                                "multiple": false
+                                "multiple": false,
+                                ar: 'read',
+                                hideIfEmpty: true
                             },
                             {
-                                "id": "date",
+                                "id": "created",
                                 "title": "Дата",
                                 "type": "date",
-                                "mandatory": true
+                                ar: 'read',
+                                hideIfEmpty: true
                             }
                         ]
                     },
@@ -49,29 +59,28 @@ $.widget('sokol.executionForm', {
             },
             usePanel: false,
             dispatcher: this.options.dispatcher,
-            containerType: this.options.containerType
-        }, $('<div></div>').appendTo(panelBody));
+            containerType: 'execution'
+        }, $('<div></div>').appendTo(this.panelBody));
 
-        var response = {
-            "gridConfig": {
+        var options = {
                 "title": "Исполнители",
                 "sortable": true,
-                "mode": "edit",
+                mode: (this.options.mode == 'create' || this.options.mode == 'edit') ? 'edit' : 'read',
                 "columnsVisible": [
-                    "executorTitle",
-                    "date",
+                    "userTitle",
+                    "dueDate",
                     "executed"
                 ],
                 "columns": [
                     {
-                        "id": "executor",
+                        "id": "userId",
                         "title": "Исполнитель (ИД)",
                         "render": "link",
                         "linkType": "user"
                     },
                     {
-                        "id": "executorTitle",
-                        "idColumn": "executor",
+                        "id": "userTitle",
+                        "idColumn": "userId",
                         "title": "Исполнитель",
                         "render": "link",
                         "linkType": "user",
@@ -79,7 +88,7 @@ $.widget('sokol.executionForm', {
                         "width": "500px"
                     },
                     {
-                        "id": "date",
+                        "id": "dueDate",
                         "title": "Срок",
                         render: 'datetime',
                         "editor": "date"
@@ -91,16 +100,31 @@ $.widget('sokol.executionForm', {
                     }
                 ],
                 "id": "tasks",
-                "filterable": false
-            }
+                "filterable": false,
+                deleteMethod: $.proxy(this.doDelete, this)
         };
-        var data = [];
-        var options = response.gridConfig;
-        options.data = data;
+        options.data = (this.options.data && this.options.data.tasks) ? this.options.data.tasks : [];
         options.usePanel = false;
-        this.grid = $.sokol.grid(options, this.element);
+
+        if (this.grid) {
+            this.grid.destroy();
+        }
+
+        this.grid = $.sokol.grid(options, $('<div class="panel panel-default" style="border-width: 0 0 1px 0; border-radius: 0;"></div>').insertAfter(this.panelBody));
 
         this.createButtons();
+    },
+
+    doDelete: function(grid, objects) {
+        var ids = objects.map(function(e) {return e.id});
+        var updatedData = [];
+        $.each(grid.options.data, function(i, o) {
+           if (ids.indexOf(o.id) < 0) {
+               updatedData.push(o);
+           }
+        });
+        grid.options.data = updatedData;
+        grid.refresh();
     },
 
     saveExecution: function() {
@@ -121,7 +145,7 @@ $.widget('sokol.executionForm', {
             for (var j = 0; j < inputs.length; j++) {
                 var input = $(inputs[j]);
                 var name = input.attr('name');
-                var value = input.attr('value');
+                var value = input.val();
                 if (name && value) {
                     rowData[name] = value;
                 }
@@ -132,8 +156,8 @@ $.widget('sokol.executionForm', {
                 var name = select.attr('name');
                 var value = select.val();
                 if (name && value) {
-                    if (name == 'executorTitle') {
-                        name = 'executorId';
+                    if (name == 'userTitle') {
+                        name = 'userId';
                     }
                     rowData[name] = value;
                 }
@@ -143,32 +167,47 @@ $.widget('sokol.executionForm', {
             }
         });
 
-        data.rowsData = rowsData;
+        data.executors = rowsData;
         data.type = 'resolution';
-
-        //alert(JSON.stringify(data));
+        data.documentId = this.options.documentId;
 
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
-
-            //todo reload
-
+            this.options.dispatcher.refreshExecutionList('resolution');
         }, this)).fail($.proxy(function() {
             $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
         }, this));
     },
 
     createButtons: function() {
-        var buttons = $('<div class="panel-body"></div>').appendTo(this.element);
+        var buttons = $(this.element).find('[name="buttons"]');
+        if (buttons.length == 0) {
+            buttons = $('<div name="buttons" class="panel-body"></div>').appendTo(this.element);
+        }
+        buttons.empty();
 
-        var saveButton = $('<button type="button" name="add" style="" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
+        var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
         saveButton.click($.proxy(function() {
             this.saveExecution();
         }, this));
         saveButton.appendTo(buttons);
 
-        var cancelButton = $('<button type="button" name="add" style="" class="btn btn-default controlElementLeftMargin">Отмена</button>');
+        var editButton = $('<button type="button" name="edit" style="display: none;" class="btn btn-success controlElementLeftMargin">Редактировать</button>');
+        editButton.click($.proxy(function() {
+            this.options.mode = 'edit';
+            this.createBlock();
+        }, this));
+        editButton.appendTo(buttons);
+
+        var cancelButton = $('<button type="button" name="cancel" style="display: none;" class="btn btn-default controlElementLeftMargin">Отмена</button>');
         cancelButton.click($.proxy(function() {
+            this.options.mode = 'read';
+            this.createBlock();
+        }, this));
+        cancelButton.appendTo(buttons);
+
+        var cancelCreateButton = $('<button type="button" name="cancelCreate" style="display: none;" class="btn btn-default controlElementLeftMargin">Отмена</button>');
+        cancelCreateButton.click($.proxy(function() {
             $.sokol.smodal({
                 title: 'Подтверждение отмены',
                 body: 'Отменить создание резолюции?',
@@ -176,7 +215,24 @@ $.widget('sokol.executionForm', {
                 confirmAction: $.proxy(this.options.dispatcher.cancelExecution, this.options.dispatcher)
             });
         }, this));
-        cancelButton.appendTo(buttons);
+        cancelCreateButton.appendTo(buttons);
+
+        this.manageButtons();
+    },
+
+    manageButtons: function() {
+        var buttons = $(this.element).find('[name="buttons"]');
+        buttons.children().hide();
+        var mode = this.options.mode;
+        if (mode == 'create') {
+            buttons.children('[name="save"]').show();
+            buttons.children('[name="cancelCreate"]').show();
+        } else if (mode == 'edit') {
+            buttons.children('[name="save"]').show();
+            buttons.children('[name="cancel"]').show();
+        } else {
+            buttons.children('[name="edit"]').show();
+        }
     },
 
     _destroy: function () {

@@ -67,6 +67,10 @@ $.widget('sokol.container', {
             containerType: this.options.containerType
         }, $('<div></div>').appendTo(this.element));
 
+        if (this.options.containerType == 'document') {
+            this.createExecutionListIfExist();
+        }
+
         if (this.options.subforms) {
             for (var i = 0; i < this.options.subforms.length; i++) {
                 var subform = this.options.subforms[i];
@@ -77,6 +81,39 @@ $.widget('sokol.container', {
         if (this.options.id) {
             this.attaches = $.sokol.attachesGrid({mode: this.options.mode, id: data.id}, $('<div></div>').appendTo(this.element));
         }
+    },
+
+    resolution: function() {
+        if (!this.executionForm) {
+            this.executionForm = $.sokol.executionForm({
+                dispatcher: this,
+                documentId: this.options.id,
+                mode: 'create'
+            }, $("<div></div>").insertAfter(this.header.element));
+        }
+    },
+
+    refreshExecutionList: function(type) {
+        if (this.executionForm) {
+            this.executionForm.destroy();
+        }
+        this.createExecutionListIfExist();
+    },
+
+    createExecutionListIfExist: function() {
+        $.getJSON('app/getExecutionList', {
+            documentId: this.options.id,
+            type: 'resolution'
+        }, $.proxy(function(data) {
+            if (!$.isEmptyObject(data)) {
+                this.executionForm = $.sokol.executionForm({
+                    dispatcher: this,
+                    data: data,
+                    documentId: this.options.id,
+                    mode: 'read'
+                }, $("<div></div>").insertAfter(this.form.element));
+            }
+        }, this));
     },
 
     createSubform: function(subform) {
@@ -175,12 +212,6 @@ $.widget('sokol.container', {
             confirmButtonTitle: 'Удалить',
             confirmAction: $.proxy(this.doDeleteDocument, this)
         });
-    },
-
-    resolution: function() {
-        if (!this.executionForm) {
-            this.executionForm = $.sokol.executionForm({dispatcher: this}, $("<div></div>").insertAfter(this.header.element));
-        }
     },
 
     cancelExecution: function() {

@@ -98,4 +98,8 @@
 
     </bean>
 
+    <bean class="com.kattysoft.core.impl.TaskServiceImpl">
+
+    </bean>
+
 </beans>

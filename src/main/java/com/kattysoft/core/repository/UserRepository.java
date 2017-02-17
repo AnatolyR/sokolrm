@@ -13,6 +13,8 @@ import com.kattysoft.core.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -30,7 +32,16 @@ public interface UserRepository extends CrudRepository<User, UUID>, JpaSpecifica
     @Query(value = "select new com.kattysoft.core.model.User(u.id, u.title) from User u where u.title like ?1")
     List<User> findIdAndTitleByTitle(String title);
 
+    @EntityGraph(value = "User.groups", type = EntityGraph.EntityGraphType.LOAD)
     User findByLoginAndPassword(String login, String password);
 
     Page<User> findAll(Pageable pageable);
+
+    @Override
+    @EntityGraph(value = "User.groups", type = EntityGraph.EntityGraphType.LOAD)
+    User findOne(UUID uuid);
+
+    @Override
+    @EntityGraph(value = "User.groups", type = EntityGraph.EntityGraphType.LOAD)
+    Page<User> findAll(Specification<User> specification, Pageable pageable);
 }

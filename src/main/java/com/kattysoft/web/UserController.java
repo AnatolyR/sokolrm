@@ -100,9 +100,12 @@ public class UserController {
         }
 
         Page<User> users = userService.getUsers(spec);
-        List<ObjectNode> userNodes = users.getContent().stream().map(user ->
-            (ObjectNode) mapper.valueToTree(user)
-        ).collect(Collectors.toList());
+        List<ObjectNode> userNodes = users.getContent().stream().map(user -> {
+            ObjectNode node = (ObjectNode) mapper.valueToTree(user);
+            ArrayNode groups = mapper.valueToTree(user.getGroups());
+            node.set("groups", groups);
+            return node;
+        }).collect(Collectors.toList());
 
         userNodes.forEach(this::fillTitle);
 
@@ -116,15 +119,17 @@ public class UserController {
 
     public void fillTitle(ObjectNode node) {
         ArrayNode groupsTitle = node.putArray("groupsTitle");
-        node.get("groups").forEach(g -> {
-            Group group = null;
-            try {
-                group = groupService.getGroupById(g.asText());
-            } catch (Exception e) {
-                log.error("Can not read group from user groups field");
-            }
-            groupsTitle.add(group != null ? group.getTitle() : "[Группа отсутствует]");
-        });
+        if (node.has("groups")) {
+            node.get("groups").forEach(g -> {
+                Group group = null;
+                try {
+                    group = groupService.getGroupById(g.asText());
+                } catch (Exception e) {
+                    log.error("Can not read group from user groups field");
+                }
+                groupsTitle.add(group != null ? group.getTitle() : "[Группа отсутствует]");
+            });
+        }
     }
 
     @RequestMapping(value = "/usercard")
@@ -142,6 +147,8 @@ public class UserController {
         ObjectNode card = mapper.createObjectNode();
         card.set("form", formConfig);
         ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(user);
+        ArrayNode groups = mapper.valueToTree(user.getGroups());
+        data.set("groups", groups);
 
         fillTitle(data);
 

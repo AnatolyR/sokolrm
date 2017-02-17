@@ -10,7 +10,9 @@
     {
       "id": "users",
       "title": "Пользователи",
-      "type": "users",
+      "type": "dictionary",
+      "dictionary": "organizationPersons",
+      "preload": true,
       "multiple": true
     }
   ]

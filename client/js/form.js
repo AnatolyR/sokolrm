@@ -80,7 +80,12 @@ $.widget('sokol.form', {
 
     createFieldDate: function (formNode, field, value, edit) {
         value = value ? moment(value, 'DD.MM.YYYY HH:mm').format("L LT") : '';
-        if (!edit) {
+
+        if (!value && field.hideIfEmpty) {
+            return;
+        }
+
+        if (!edit || field.ar == 'read') {
             $(formNode).append('' +
                 '<div class="form-group' + (field.mandatory && edit? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
                 '<label class="control-label">' + field.title + ':</label>' +
@@ -198,7 +203,7 @@ $.widget('sokol.form', {
             valueField: 'id',
             labelField: 'title',
             searchField: 'title',
-            preload: false,
+            preload: field.preload ? true : false,
             closeAfterSelect: true,
             options: options,
             load: function(query, callback) {
@@ -281,6 +286,10 @@ $.widget('sokol.form', {
             valueTitle = valueTitle ? [valueTitle] : [];
         }
 
+        if (value.length == 0 && field.hideIfEmpty) {
+            return;
+        }
+
         var options = [];
         var initialValues = [];
         var titles = [];
@@ -294,7 +303,7 @@ $.widget('sokol.form', {
             titles.push(valueTitle[i]);
         }
 
-        if (!edit) {
+        if (!edit || field.ar == 'read') {
             $(formNode).append('' +
                 '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
                 '<label class="control-label">' + field.title + ':</label>' +

@@ -23,6 +23,10 @@ import java.util.UUID;
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 14.12.2016
  */
+@NamedEntityGraph(
+    name = "User.groups",
+    attributeNodes={@NamedAttributeNode("groups")}
+)
 @Entity
 @Table(name = "users")
 public class User {
@@ -44,9 +48,10 @@ public class User {
 
     private String lastName;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name="user_groups", joinColumns=@JoinColumn(name="userid"))
     @Column(name="groupid")
+    @JsonIgnore
     private List<UUID> groups;
 
     public User() {

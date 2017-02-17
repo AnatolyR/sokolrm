@@ -7,10 +7,17 @@
  */
 package com.kattysoft.core;
 
+import com.kattysoft.core.model.TasksList;
+
+import java.util.UUID;
+
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 07.02.2017
  */
 public interface TaskService {
 
+    String saveExecutionList(TasksList tasksList);
+
+    TasksList getExecutionList(UUID documentId, String type);
 }

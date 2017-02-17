@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.model.User;
+import org.hibernate.metamodel.internal.PluralAttributeImpl;
 import org.hibernate.query.criteria.internal.CriteriaBuilderImpl;
 import org.hibernate.query.criteria.internal.Renderable;
 import org.hibernate.query.criteria.internal.compile.RenderingContext;
@@ -120,7 +121,12 @@ public class SpecificationUtil {
             } else if (valueCondition.getOperation() == Operation.NOT_EQUAL) {
                 predicate = criteriaBuilder.notEqual(path, valueCondition.getValue());
             } else if (valueCondition.getOperation() == Operation.LIKE && List.class.equals(attr.getJavaType()) && valueCondition.getValue() instanceof String) {
-                predicate = criteriaBuilder.isMember((String) valueCondition.getValue(), path);
+                Class elementType = ((PluralAttributeImpl) attr).getElementType().getJavaType();
+                if (UUID.class.equals(elementType)) {
+                    predicate = criteriaBuilder.isMember(UUID.fromString((String) valueCondition.getValue()), path);
+                } else {
+                    predicate = criteriaBuilder.isMember((String) valueCondition.getValue(), path);
+                }
             } else if (valueCondition.getOperation() == Operation.LIKE && valueCondition.getValue() instanceof String) {
                 predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue() + "%");
             } else if (valueCondition.getOperation() == Operation.STARTS && valueCondition.getValue() instanceof String) {

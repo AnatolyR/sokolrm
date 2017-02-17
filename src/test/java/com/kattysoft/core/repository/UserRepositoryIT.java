@@ -94,7 +94,8 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         Iterable<User> users = userRepository.findAll();
         int n = 0;
         for (User user : users) {
-            System.out.println(user.getId() + " " + user.getTitle() + " " + String.join(",", user.getGroups().stream().map(UUID::toString).collect(Collectors.toList())));
+//            System.out.println(user.getId() + " " + user.getTitle() + " " + String.join(",", user.getGroups().stream().map(UUID::toString).collect(Collectors.toList())));
+            System.out.println(user.getId() + " " + user.getTitle());
             n++;
         }
         System.out.println("----------------");
