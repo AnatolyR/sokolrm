@@ -9,6 +9,7 @@
  */
 package com.kattysoft.web;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,9 +17,11 @@ import com.kattysoft.core.SokolException;
 import com.kattysoft.core.TaskService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.Utils;
+import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.Task;
 import com.kattysoft.core.model.TasksList;
 import com.kattysoft.core.model.User;
+import com.kattysoft.core.specification.*;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,10 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -37,6 +38,7 @@ import java.util.UUID;
  */
 @RestController
 public class TaskController {
+    public static final Integer DEFAULT_PAGE_SIZE = 20;
 
     @Autowired
     private TaskService taskService;
@@ -62,7 +64,7 @@ public class TaskController {
         String comment = fields.get("comment").asText();
         tasksList.setComment(comment);
 
-        tasksList.setType("resolution");
+        tasksList.setType("execution");
 
         ArrayNode executors = (ArrayNode) data.get("executors");
         executors.forEach(e -> {
@@ -121,6 +123,49 @@ public class TaskController {
         }
 
         return null;
+    }
+
+    @RequestMapping(value = "/tasks")
+    public ObjectNode getTasks(Integer offset, Integer size, String conditions, String sort, String sortAsc) throws IOException {
+        if (offset == null) {
+            offset = 0;
+        }
+        if (size == null) {
+            size =  DEFAULT_PAGE_SIZE;
+        }
+
+        if (conditions == null || conditions.isEmpty()) {
+            conditions = "[]";
+        }
+        JsonNode clientConditionsNode = mapper.readTree(conditions);
+
+        Condition clientCondition = SpecificationUtil.read((ArrayNode) clientConditionsNode);
+
+        Specification spec = new Specification();
+        if (sort != null && !sort.isEmpty()) {
+            Sort sortObject = new Sort();
+            sortObject.setField(sort);
+            sortObject.setOrder("true".equals(sortAsc) ? SortOrder.ASC : SortOrder.DESC);
+            spec.setSort(Collections.singletonList(sortObject));
+        }
+
+        spec.setOffset(offset);
+        spec.setSize(size);
+
+        if (clientCondition != null) {
+            spec.setCondition(clientCondition);
+        }
+
+        Page<Task> tasks = taskService.getTasks(spec);
+        List<ObjectNode> taskNodes = tasks.getContent().stream().map(task
+            -> (ObjectNode) mapper.valueToTree(task)).collect(Collectors.toList());
+
+        ObjectNode page = mapper.createObjectNode();
+        page.putArray("data").addAll(taskNodes);
+        page.put("offset", offset);
+        page.put("total", tasks.getTotal());
+
+        return page;
     }
 
     public void setTaskService(TaskService taskService) {

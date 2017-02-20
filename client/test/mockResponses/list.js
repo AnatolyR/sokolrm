@@ -74,7 +74,7 @@ var configResponses = configResponses || [];
 
     var gridSettings = {
         title: 'Test',
-        url: "app/grid",
+        url: "app/documents",
         columnsVisible: [
             "id",
             "documentNumber",

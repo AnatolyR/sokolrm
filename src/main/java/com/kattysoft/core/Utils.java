@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -65,5 +66,11 @@ public class Utils {
             log.error("Can not parse date '" + dateStr + "'", e);
         }
         return null;
+    }
+
+    private static Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+
+    public static boolean isUUID(String uuid) {
+        return uuid != null && uuidPattern.matcher(uuid).matches();
     }
 }

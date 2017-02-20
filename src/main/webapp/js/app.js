@@ -919,6 +919,16 @@ $.widget('sokol.container', {
         }
     },
 
+    resolution: function() {
+        if (!this.executionForm) {
+            this.executionForm = $.sokol.executionForm({
+                dispatcher: this,
+                documentId: this.options.id,
+                mode: 'create'
+            }, $("<div></div>").insertAfter(this.header.element));
+        }
+    },
+
     refreshExecutionList: function(type) {
         if (this.executionForm) {
             this.executionForm.destroy();
@@ -1038,16 +1048,6 @@ $.widget('sokol.container', {
             confirmButtonTitle: 'Удалить',
             confirmAction: $.proxy(this.doDeleteDocument, this)
         });
-    },
-
-    resolution: function() {
-        if (!this.executionForm) {
-            this.executionForm = $.sokol.executionForm({
-                dispatcher: this,
-                documentId: this.options.id,
-                mode: 'create'
-            }, $("<div></div>").insertAfter(this.header.element));
-        }
     },
 
     cancelExecution: function() {
@@ -1348,7 +1348,6 @@ $.widget('sokol.executionForm', {
                                 "id": "userId",
                                 "title": "Автор",
                                 "type": "users",
-                                "mandatory": true,
                                 "multiple": false,
                                 ar: 'read',
                                 hideIfEmpty: true
@@ -1357,7 +1356,6 @@ $.widget('sokol.executionForm', {
                                 "id": "created",
                                 "title": "Дата",
                                 "type": "date",
-                                "mandatory": true,
                                 ar: 'read',
                                 hideIfEmpty: true
                             }
@@ -1373,11 +1371,10 @@ $.widget('sokol.executionForm', {
             },
             usePanel: false,
             dispatcher: this.options.dispatcher,
-            containerType: this.options.containerType
+            containerType: 'execution'
         }, $('<div></div>').appendTo(this.panelBody));
 
-        var response = {
-            "gridConfig": {
+        var options = {
                 "title": "Исполнители",
                 "sortable": true,
                 mode: (this.options.mode == 'create' || this.options.mode == 'edit') ? 'edit' : 'read',
@@ -1417,11 +1414,8 @@ $.widget('sokol.executionForm', {
                 "id": "tasks",
                 "filterable": false,
                 deleteMethod: $.proxy(this.doDelete, this)
-            }
         };
-        var data = (this.options.data && this.options.data.tasks) ? this.options.data.tasks : [];
-        var options = response.gridConfig;
-        options.data = data;
+        options.data = (this.options.data && this.options.data.tasks) ? this.options.data.tasks : [];
         options.usePanel = false;
 
         if (this.grid) {
@@ -1429,7 +1423,6 @@ $.widget('sokol.executionForm', {
         }
 
         this.grid = $.sokol.grid(options, $('<div class="panel panel-default" style="border-width: 0 0 1px 0; border-radius: 0;"></div>').insertAfter(this.panelBody));
-        //this.grid = $.sokol.grid(options, this.element);
 
         this.createButtons();
     },
@@ -1447,9 +1440,9 @@ $.widget('sokol.executionForm', {
     },
 
     saveExecution: function() {
-        //if (!this.form.validateForm()) {
-        //    return;
-        //}
+        if (!this.form.validateForm()) {
+            return;
+        }
 
         var data = this.form.getData();
 
@@ -1490,13 +1483,9 @@ $.widget('sokol.executionForm', {
         data.type = 'resolution';
         data.documentId = this.options.documentId;
 
-        //alert(JSON.stringify(data));
-
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
-
             this.options.dispatcher.refreshExecutionList('resolution');
-
         }, this)).fail($.proxy(function() {
             $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
         }, this));
@@ -3082,7 +3071,7 @@ $.widget('sokol.list', {
                     title: data.title,
                     columnsVisible: data.columnsVisible,
                     columns: data.columns,
-                    url: 'app/documents',
+                    url: data.url ? data.url : 'app/documents',
                     id: id,
                     filterable: true,
                     sortable: true

@@ -8,6 +8,9 @@
 package com.kattysoft.core.repository;
 
 import com.kattysoft.core.model.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
@@ -22,4 +25,7 @@ public interface TaskRepository extends CrudRepository<Task, UUID>, JpaSpecifica
     Task findOneByListIdAndUserId(UUID listId, UUID userId);
 
     List<Task> findAllByListId(UUID listId);
+
+    @Override
+    Page<Task> findAll(Specification<Task> specification, Pageable pageable);
 }

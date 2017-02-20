@@ -13,13 +13,19 @@ import com.kattysoft.core.SokolException;
 import com.kattysoft.core.TaskService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.Utils;
+import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.Task;
 import com.kattysoft.core.model.TasksList;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.TaskRepository;
 import com.kattysoft.core.repository.TasksListRepository;
+import com.kattysoft.core.specification.SortOrder;
+import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.SpecificationUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.Date;
 import java.util.List;
@@ -134,6 +140,33 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return tasksList;
+    }
+
+    @Override
+    public Page<Task> getTasks(Specification spec) {
+        int offset = spec.getOffset();
+        int size = spec.getSize();
+        int pageNum = offset / size;
+
+        Sort sort;
+        if (spec.getSort() != null && spec.getSort().size() > 0) {
+            sort = new Sort(spec.getSort().get(0).getOrder() == SortOrder.ASC
+                ? Sort.Direction.ASC : Sort.Direction.DESC, spec.getSort().get(0).getField());
+        } else {
+            sort = new Sort("created");
+        }
+
+        PageRequest pageRequest = new PageRequest(pageNum, size, sort);
+
+        org.springframework.data.jpa.domain.Specification<Task> specification = null;
+        if (spec.getCondition() != null) {
+            specification = SpecificationUtil.conditionToSpringSpecification(spec.getCondition(), Task.class);
+        }
+
+        org.springframework.data.domain.Page<Task> repoPage = taskRepository.findAll(specification, pageRequest);
+
+        Page<Task> page = new Page<>(repoPage.getTotalElements(), repoPage.getContent());
+        return page;
     }
 
     public void setTaskRepository(TaskRepository taskRepository) {

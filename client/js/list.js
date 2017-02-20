@@ -61,7 +61,7 @@ $.widget('sokol.list', {
                     title: data.title,
                     columnsVisible: data.columnsVisible,
                     columns: data.columns,
-                    url: 'app/documents',
+                    url: data.url ? data.url : 'app/documents',
                     id: id,
                     filterable: true,
                     sortable: true

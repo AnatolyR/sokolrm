@@ -9,6 +9,7 @@
  */
 package com.kattysoft.core.dao;
 
+import com.kattysoft.core.Utils;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.*;
 import org.apache.commons.dbutils.DbUtils;
@@ -115,17 +116,40 @@ public class DocumentDaoPg implements DocumentDao {
             List<Document> documents = new ArrayList<Document>();
             connection = dataSource.getConnection();
 
-            Map<String, String> columnTypes = getDocumentsMetadata(connection);
+            Map<String, String> columnTypes;
+            if (spec.getJoin() == null) {
+                columnTypes = getMetadata(connection, "documents", null);
+            } else {
+                columnTypes = new HashMap<>();
+                columnTypes.putAll(getMetadata(connection, "documents", "d"));
+                columnTypes.putAll(getMetadata(connection, "tasks", "t"));
+            }
+
             List<String> fieldsNames = spec.getFields();
 
             List<String> columns = new ArrayList<>();
-            if (!fieldsNames.contains("id")) {
-                columns.add("id");
+            if (!fieldsNames.contains("id") && !fieldsNames.contains("d.id")) {
+                if (spec.getJoin() == null) {
+                    columns.add("id");
+                } else {
+                    columns.add("d.\"id\" as d_id");
+                }
             }
-            if (!fieldsNames.contains("title")) {
-                columns.add("title");
+            if (!fieldsNames.contains("title") && !fieldsNames.contains("d.title")) {
+                if (spec.getJoin() == null) {
+                    columns.add("title");
+                } else {
+                    columns.add("d.\"title\" as d_title");
+                }
             }
-            columns.addAll(fieldsNames.stream().map(name -> "\"" + name + "\"").collect(Collectors.toList()));
+            columns.addAll(fieldsNames.stream().map(name -> {
+                if (name.contains(".")) {
+                    String[] split = name.split("\\.");
+                    return split[0] + ".\"" + split[1] + "\" as " + split[0] + "_" + split[1] + "";
+                } else {
+                    return "\"" + name + "\"";
+                }
+            }).collect(Collectors.toList()));
 
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT");
@@ -145,9 +169,16 @@ public class DocumentDaoPg implements DocumentDao {
             }
             if (spec.getSort() != null && spec.getSort().size() > 0) {
                 String column = spec.getSort().get(0).getField();
+                if (spec.getJoin() != null) {
+                    column = column.replace(".", "_");
+                }
                 SortOrder order = spec.getSort().get(0).getOrder();
                 if (columnTypes.containsKey(column)) {
-                    sql.append(" ORDER BY \"").append(column).append("\" ").append(order);
+                    if (spec.getJoin() != null) {
+                        sql.append(" ORDER BY ").append(column).append(" ").append(order);
+                    } else {
+                        sql.append(" ORDER BY \"").append(column).append("\" ").append(order);
+                    }
                 }
             }
             if (spec.getSize() != null) {
@@ -173,16 +204,17 @@ public class DocumentDaoPg implements DocumentDao {
 
             while (resultSet.next()) {
                 Document document = new Document();
-                String id = resultSet.getString("id");
+                String id = resultSet.getString(spec.getJoin() == null ? "id" : "d_id");
                 document.setId(id);
-                String title = resultSet.getString("title");
+                String title = resultSet.getString(spec.getJoin() == null ? "title" : "d_title");
                 document.setTitle(title);
 
                 final ResultSet finalResultSet = resultSet;
                 Map<String, Object> fields = new HashMap<>();
                 fieldsNames.forEach(name -> {
-                    String columnType = columnTypes.get(name);
-                    Object value = getValue(columnType, name, finalResultSet);
+                    String aliasName = name.replace(".", "_");
+                    String columnType = columnTypes.get(aliasName);
+                    Object value = getValue(columnType, aliasName, finalResultSet);
                     fields.put(name, value);
                 });
                 document.setFields(fields);
@@ -218,11 +250,20 @@ public class DocumentDaoPg implements DocumentDao {
     }
 
     private String valueConditionToString(ValueCondition valueCondition, List<Object> paramsValues, Map<String, String> columnTypes) {
-        String columnType = columnTypes.get(valueCondition.getField());
+        if (valueCondition.getField() == null) {
+            return null;
+        }
+        String columnType = columnTypes.get(valueCondition.getField().replace(".", "_"));
         if (columnType == null || valueCondition.getOperation() == null) {
             return null;
         }
-        String field = "\"" + valueCondition.getField() + "\"";
+        String field;
+        if (valueCondition.getField().contains(".")) {
+            String[] split = valueCondition.getField().split("\\.");
+            field = split[0] + ".\"" + split[1] + "\"";
+        } else {
+            field = "\"" + valueCondition.getField() + "\"";
+        }
         Object value = valueCondition.getValue();
 
         if (value == null || value.toString().isEmpty()) {
@@ -309,7 +350,7 @@ public class DocumentDaoPg implements DocumentDao {
             return null;
         }
 
-        String sql = field + " " + operation + " ? ";
+        String sql = field + " " + operation + ("uuid".equals(columnType) ? " ?::uuid " : " ? ");
         paramsValues.add(value);
         return sql;
     }
@@ -319,7 +360,14 @@ public class DocumentDaoPg implements DocumentDao {
         ResultSet resultSet = null;
         try {
             connection = dataSource.getConnection();
-            Map<String, String> columnTypes = getDocumentsMetadata(connection);
+            Map<String, String> columnTypes;
+            if (spec.getJoin() == null) {
+                columnTypes = getMetadata(connection, "documents", null);
+            } else {
+                columnTypes = new HashMap<>();
+                columnTypes.putAll(getMetadata(connection, "documents", "d"));
+                columnTypes.putAll(getMetadata(connection, "tasks", "t"));
+            }
 
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT");
@@ -368,7 +416,7 @@ public class DocumentDaoPg implements DocumentDao {
         try {
             connection = dataSource.getConnection();
             Map<String, Object> fields = document.getFields();
-            Map<String, String> columnTypes = getDocumentsMetadata(connection);
+            Map<String, String> columnTypes = getMetadata(connection, "documents", null);
 
             List<String> fieldsNames = new ArrayList<>();
             List<String> fieldsValuesPlaceholder = new ArrayList<>();
@@ -476,12 +524,15 @@ public class DocumentDaoPg implements DocumentDao {
         this.dataSource = dataSource;
     }
 
-    public Map<String, String> getDocumentsMetadata(Connection conn) throws SQLException {
+    public Map<String, String> getMetadata(Connection conn, String table, String prefix) throws SQLException {
         DatabaseMetaData databaseMetaData = conn.getMetaData();
-        ResultSet columnTypesMeta = databaseMetaData.getColumns(null, null, "documents", null);
+        ResultSet columnTypesMeta = databaseMetaData.getColumns(null, null, table, null);
         Map<String, String> columnTypes = new HashMap<>();
         while (columnTypesMeta.next()) {
             String columnName = columnTypesMeta.getString(4);
+            if (prefix != null) {
+                columnName = prefix + "_" + columnName;
+            }
             String columnTypeName = columnTypesMeta.getString(6);
             columnTypes.put(columnName, columnTypeName);
         }

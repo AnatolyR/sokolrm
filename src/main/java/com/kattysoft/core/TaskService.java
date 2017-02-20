@@ -7,7 +7,10 @@
  */
 package com.kattysoft.core;
 
+import com.kattysoft.core.model.Page;
+import com.kattysoft.core.model.Task;
 import com.kattysoft.core.model.TasksList;
+import com.kattysoft.core.specification.Specification;
 
 import java.util.UUID;
 
@@ -20,4 +23,6 @@ public interface TaskService {
     String saveExecutionList(TasksList tasksList);
 
     TasksList getExecutionList(UUID documentId, String type);
+
+    Page<Task> getTasks(Specification spec);
 }
