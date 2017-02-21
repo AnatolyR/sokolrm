@@ -518,6 +518,9 @@ $.widget('sokol.app', {
         } else if (id.startsWith('user/')) {
             this.createForm('user', id.substring(5), mode, 'Не удалось загрузить карточку пользователя');
 
+        } else if (id.startsWith('task/')) {
+            this.createForm('task', id.substring(5), mode, 'Не удалось загрузить карточку задачи');
+
         } else if (id.startsWith('new/group')) {
             this.createForm('group', 'new/group', 'edit', 'Не удается создать карточку группы');
         } else if (id.startsWith('group/')) {
@@ -781,7 +784,7 @@ $.widget('sokol.attachesGrid', {
         this.element.addClass('panel panel-default');
         this.element.attr('name', 'attachmentsPanel');
 
-        var panelHeader = $('<div class="panel-heading">Вложения</div>');
+        var panelHeader = $('<div class="panel-heading"><div class="panel-title">Вложения</div></div>');
         panelHeader.appendTo(this.element);
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(this.element);
@@ -879,7 +882,7 @@ $.widget('sokol.container', {
                 title: data.title,
                 subtitle: data.fullName
             }, $('<div></div>').appendTo(this.element));
-        } else if (this.options.containerType == 'document') {
+        } else if (this.options.containerType == 'document' || this.options.containerType == 'task') {
             this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
         } else {
             this.header = $.sokol.titleHeader({
@@ -887,13 +890,15 @@ $.widget('sokol.container', {
             }, $('<div></div>').appendTo(this.element));
         }
 
-        this.formButtons = $.sokol.formButtons({
-            mode: this.options.mode,
-            dispatcher: this,
-            containerType: this.options.containerType,
-            actions: this.options.form.actions,
-            id: this.options.id
-        }, $('<div></div>').prependTo(this.element));
+        if (this.options.containerType != 'task') {
+            this.formButtons = $.sokol.formButtons({
+                mode: this.options.mode,
+                dispatcher: this,
+                containerType: this.options.containerType,
+                actions: this.options.form.actions,
+                id: this.options.id
+            }, $('<div></div>').prependTo(this.element));
+        }
 
         this.form = $.sokol.form({
             mode: this.options.mode,
@@ -939,7 +944,7 @@ $.widget('sokol.container', {
     createExecutionListIfExist: function() {
         $.getJSON('app/getExecutionList', {
             documentId: this.options.id,
-            type: 'resolution'
+            type: 'execution'
         }, $.proxy(function(data) {
             if (!$.isEmptyObject(data)) {
                 this.executionForm = $.sokol.executionForm({
@@ -958,6 +963,13 @@ $.widget('sokol.container', {
                 groupId: this.options.id
             }, $('<div></div>').appendTo(this.element));
             this.childs.push(arGrid);
+            return;
+        }
+        if (subform.form.id == 'task') {
+            var executionReportForm = $.sokol.executionReportForm({
+                data: subform.data
+            }, $('<div></div>').insertAfter(this.header.element));
+            this.childs.push(executionReportForm);
             return;
         }
         var form = $.sokol.form({
@@ -1551,6 +1563,113 @@ $.widget('sokol.executionForm', {
         this.element.detach();
     }
 });
+$.widget('sokol.executionReportForm', {
+    options: {
+
+    },
+    _create: function () {
+        this.createHeader();
+        this.createBlock();
+    },
+
+    createHeader: function() {
+        this.element.addClass('panel panel-default');
+        this.element.attr('name', 'attachmentsPanel');
+
+        var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
+        var panelTitle = $('<div class="panel-title">Резолюция на исполнение</div>').appendTo(panelHeader);
+        var panelBody = $('<div class="panel-body"></div>');
+        panelBody.appendTo(this.element);
+        this.panelBody = panelBody;
+    },
+
+    createBlock: function () {
+        if (this.form) {
+            this.form.destroy();
+        }
+        this.form = $.sokol.form({
+            mode: (this.options.mode == 'create' || this.options.mode == 'edit') ? 'edit' : 'read',
+            data: this.options.data ? this.options.data : {},
+            form: {
+                "id": "task",
+                "fields": [
+                    {
+                        "items": [
+                            {
+                                "id": "author",
+                                "title": "Автор",
+                                "type": "users",
+                                "multiple": false,
+                                ar: 'read',
+                                hideIfEmpty: true
+                            },
+                            {
+                                "id": "created",
+                                "title": "Дата",
+                                "type": "date",
+                                ar: 'read',
+                                hideIfEmpty: true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "executors",
+                        "title": "Исполнители",
+                        "type": "dictionary",
+                        "multiple": true,
+                        "mandatory": true,
+                        "dictionary": "organizationPersons"
+                    },
+                    {
+                        "id": "description",
+                        "title": "Резолюция",
+                        "type": "text",
+                        "mandatory": true
+                    }
+                ]
+            },
+            usePanel: false,
+            dispatcher: this.options.dispatcher,
+            containerType: 'execution'
+        }, $('<div></div>').appendTo(this.panelBody));
+
+        this.createButtons();
+    },
+
+    createButtons: function() {
+        var buttons = $(this.element).find('[name="buttons"]');
+        if (buttons.length == 0) {
+            buttons = $('<div name="buttons" class="panel-body execution-report-form-buttons"></div>').appendTo(this.element);
+        }
+        buttons.empty();
+
+        var executionButton = $('<button type="button" name="executionButton" style="display: none;" class="btn btn-info controlElementLeftMargin">Создать резолюцию</button>');
+        executionButton.click($.proxy(function() {
+
+        }, this));
+        executionButton.appendTo(buttons);
+
+        var reportButton = $('<button type="button" name="reportButton" style="display: none;" class="btn btn-success controlElementLeftMargin">Создать отчет</button>');
+        reportButton.click($.proxy(function() {
+
+        }, this));
+        reportButton.appendTo(buttons);
+
+        this.manageButtons();
+    },
+
+    manageButtons: function() {
+        var buttons = $(this.element).find('[name="buttons"]');
+        buttons.children().hide();
+        var mode = this.options.mode;
+        buttons.children('[name="executionButton"]').show();
+        buttons.children('[name="reportButton"]').show();
+    },
+
+    _destroy: function () {
+        this.element.detach();
+    }
+});
 var primary = $.fn.filter;
 $.widget('sokol.filter', {
     options: {
@@ -1707,7 +1826,7 @@ $.widget('sokol.form', {
     createBlock: function(container, title) {
         var panel = $('<div class="panel panel-default"></div>');
         panel.appendTo(container);
-        var panelHeader = $('<div class="panel-heading">' + title + '</div>');
+        var panelHeader = $('<div class="panel-heading"><div class="panel-title">' + title + '</div></div>');
         panelHeader.appendTo(panel);
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(panel);
@@ -2656,7 +2775,7 @@ $.widget("sokol.grid", {
                         var td = $('<td><a href="#' + linkType + '/' + id + '" target="_blank">' + val + '</a></td>');
                         td.appendTo(row);
                     } else if (column.render == 'datetime') {
-                        val = moment(val).format('L LT');
+                        val = moment(val, 'DD.MM.YYYY HH:mm').format('L LT');
 
                         var td = $('<td>' + (val ? val : '') + '</td>');
                         td.appendTo(row);
@@ -2810,7 +2929,7 @@ $.widget("sokol.grid", {
     },
 
     createEditorDate: function (formNode, field, value) {
-        value = value ? moment(value).format("L LT") : '';
+        value = value ? moment(value, 'DD.MM.YYYY HH:mm').format("L LT") : '';
         var dateNode = $('<td>' +
             '<div class="' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="width: 200px;">' +
             '<div class="input-group date">' +

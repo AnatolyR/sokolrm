@@ -124,6 +124,7 @@ public class TaskServiceImpl implements TaskService {
             } else {
                 BeanUtils.copyProperties(task, existTask, Utils.getNullPropertyNames(task));
                 task = existTask;
+                task.setDescription(tasksList.getComment());
             }
         }
         taskRepository.save(task);
@@ -167,6 +168,24 @@ public class TaskServiceImpl implements TaskService {
 
         Page<Task> page = new Page<>(repoPage.getTotalElements(), repoPage.getContent());
         return page;
+    }
+
+    @Override
+    public Task getTaskById(UUID uuid) {
+        Task task = taskRepository.findOne(uuid);
+        return task;
+    }
+
+    @Override
+    public TasksList getExecutionListById(UUID id) {
+        TasksList tasksList = tasksListRepository.findOne(id);
+
+        if (tasksList != null) {
+            List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());
+            tasksList.setTasks(tasks);
+        }
+
+        return tasksList;
     }
 
     public void setTaskRepository(TaskRepository taskRepository) {

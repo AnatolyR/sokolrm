@@ -13,14 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.kattysoft.core.SokolException;
-import com.kattysoft.core.TaskService;
-import com.kattysoft.core.UserService;
-import com.kattysoft.core.Utils;
-import com.kattysoft.core.model.Page;
-import com.kattysoft.core.model.Task;
-import com.kattysoft.core.model.TasksList;
-import com.kattysoft.core.model.User;
+import com.kattysoft.core.*;
+import com.kattysoft.core.model.*;
 import com.kattysoft.core.specification.*;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -43,10 +39,22 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private DocumentService documentService;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private UserService userService;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+    public TaskController() {
+        mapper.setDateFormat(dateFormat);
+    }
 
     @RequestMapping(value = "/saveExecutionList")
     public String saveExecution(Reader reader) throws IOException {
@@ -86,7 +94,7 @@ public class TaskController {
         return id;
     }
 
-    public static List<String> types = Arrays.asList("resolution");
+    public static List<String> types = Arrays.asList("execution");
     @RequestMapping(value = "/getExecutionList")
     public ObjectNode getExecutionList(String documentId, String type) {
         if (documentId == null || documentId.isEmpty()) {
@@ -168,11 +176,98 @@ public class TaskController {
         return page;
     }
 
+    @RequestMapping(value = "/taskcard", produces = "application/json; charset=utf-8")
+    public String getTaskCard(String id) {
+        if (id == null || !Utils.isUUID(id)) {
+            throw new SokolException("Task id wrong");
+        }
+        Task task = taskService.getTaskById(UUID.fromString(id));
+        User currentUser = userService.getCurrentUser();
+        if (!task.getUserId().equals(currentUser.getId())) {
+            throw new NoAccessRightsException("Current user not executor of this task");
+        }
+        UUID documentId = task.getDocumentId();
+
+        Document document = documentService.getDocument(documentId.toString());
+        if (document == null) {
+            throw new SokolException("Документ не найден");
+        }
+
+        String typeId = document.getType();
+        JsonNode typeConfig = configService.getConfig2("types/" + typeId + "Type");
+        JsonNode formConfig = configService.getConfig2("forms/" + typeId + "Form");
+        Map<String, JsonNode> fieldTypes = new HashMap<>();
+        typeConfig.get("fields").forEach(jsonNode -> fieldTypes.put(jsonNode.get("id").asText(), jsonNode));
+        Consumer<JsonNode> merge = new Consumer<JsonNode>() {
+            @Override
+            public void accept(JsonNode jsonNode) {
+                if (jsonNode.get("id") != null) {
+                    JsonNode fieldType = fieldTypes.get(jsonNode.get("id").asText());
+                    ((ObjectNode) jsonNode).putAll((ObjectNode) fieldType);
+                } else if (jsonNode.get("items") != null) {
+                    jsonNode.get("items").forEach(this);
+                }
+            }
+        };
+        formConfig.get("fields").forEach(merge);
+
+        ((ObjectNode) formConfig).put("typeTitle", typeConfig.get("title"));
+
+        ((ObjectNode) formConfig).remove("actions");
+
+
+        ObjectNode card = mapper.createObjectNode();
+        card.put("form", formConfig);
+
+        ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(document);
+        ObjectNode fields = (ObjectNode) data.get("fields");
+        data.remove("fields");
+        data.putAll(fields);
+        card.put("data", data);
+
+        ArrayNode subforms = mapper.createArrayNode();
+        ObjectNode subformCard = mapper.createObjectNode();
+        ObjectNode taskForm = mapper.createObjectNode();
+        taskForm.put("id", "task");
+        subformCard.set("form", taskForm);
+        ObjectNode taskData = (ObjectNode) mapper.<JsonNode>valueToTree(task);
+        if (taskData.has("author") && !taskData.get("author").isNull()) {
+            String author = taskData.get("author").asText();
+            if (Utils.isUUID(author)) {
+                User user = userService.getUserById(author);
+                taskData.put("authorTitle", user.getTitle());
+            }
+        }
+
+        TasksList executionList = taskService.getExecutionListById(task.getListId());
+        List<String> executors = executionList.getTasks().stream()
+            .map(Task::getUserId).map(UUID::toString).collect(Collectors.toList());
+        List<String> executorsTitle = executors.stream()
+            .map(u -> userService.getUserById(u).getTitle()).collect(Collectors.toList());
+
+        taskData.set("executors", mapper.valueToTree(executors));
+        taskData.set("executorsTitle", mapper.valueToTree(executorsTitle));
+        subformCard.set("data", taskData);
+        subforms.add(subformCard);
+        card.set("subforms", subforms);
+
+        return card.toString();
+    }
+
+
     public void setTaskService(TaskService taskService) {
         this.taskService = taskService;
     }
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
+
+    public void setDocumentService(DocumentService documentService) {
+        this.documentService = documentService;
     }
 }

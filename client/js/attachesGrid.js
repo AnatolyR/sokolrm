@@ -117,7 +117,7 @@ $.widget('sokol.attachesGrid', {
         this.element.addClass('panel panel-default');
         this.element.attr('name', 'attachmentsPanel');
 
-        var panelHeader = $('<div class="panel-heading">Вложения</div>');
+        var panelHeader = $('<div class="panel-heading"><div class="panel-title">Вложения</div></div>');
         panelHeader.appendTo(this.element);
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(this.element);

@@ -357,7 +357,7 @@ $.widget("sokol.grid", {
                         var td = $('<td><a href="#' + linkType + '/' + id + '" target="_blank">' + val + '</a></td>');
                         td.appendTo(row);
                     } else if (column.render == 'datetime') {
-                        val = moment(val).format('L LT');
+                        val = moment(val, 'DD.MM.YYYY HH:mm').format('L LT');
 
                         var td = $('<td>' + (val ? val : '') + '</td>');
                         td.appendTo(row);
@@ -511,7 +511,7 @@ $.widget("sokol.grid", {
     },
 
     createEditorDate: function (formNode, field, value) {
-        value = value ? moment(value).format("L LT") : '';
+        value = value ? moment(value, 'DD.MM.YYYY HH:mm').format("L LT") : '';
         var dateNode = $('<td>' +
             '<div class="' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="width: 200px;">' +
             '<div class="input-group date">' +

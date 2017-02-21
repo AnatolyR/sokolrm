@@ -19,7 +19,7 @@ modules["grid"] = (function() {
                 status: "Draft",
                 title: "Document " + i,
                 //registrationDate: this.dateFormat(new Date (1479723927756), "%Y.%m.%d %H:%M", false)
-                registrationDate: new Date (1479723927756).toISOString()
+                registrationDate: moment(new Date (1479723927756)).format('L LT')
             });
         }
 

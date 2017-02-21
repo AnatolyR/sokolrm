@@ -151,7 +151,7 @@ var configResponses = configResponses || [];
             type: "Test",
             status: "Draft",
             title: "Document " + i,
-            registrationDate: new Date (1479723927756).toISOString(),
+            registrationDate: moment(new Date (1479723927756)).format('L LT'),
             "correspondent" : "65208064-e1ef-4bf5-be7b-39a3839668d3",
             "correspondentTitle" : "КВАЛИТЕТ, строительная экспертиза",
             "addressee" : [ "bbb3bfbf-66af-41b8-8a6d-24f6e527386a", "be547579-8664-4221-8dde-029ef242b517", "137e29ed-acb2-4f06-b6f6-74ed1b332caa" ],

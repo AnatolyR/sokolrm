@@ -25,4 +25,8 @@ public interface TaskService {
     TasksList getExecutionList(UUID documentId, String type);
 
     Page<Task> getTasks(Specification spec);
+
+    Task getTaskById(UUID uuid);
+
+    TasksList getExecutionListById(UUID id);
 }

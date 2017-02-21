@@ -48,3 +48,7 @@ body {
 .dropdown-menu {
     z-index: 10001 !important;
 }
+
+.execution-report-form-buttons {
+    border-top: 1px solid #ddd;
+}

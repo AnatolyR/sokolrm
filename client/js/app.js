@@ -68,6 +68,9 @@ $.widget('sokol.app', {
         } else if (id.startsWith('user/')) {
             this.createForm('user', id.substring(5), mode, 'Не удалось загрузить карточку пользователя');
 
+        } else if (id.startsWith('task/')) {
+            this.createForm('task', id.substring(5), mode, 'Не удалось загрузить карточку задачи');
+
         } else if (id.startsWith('new/group')) {
             this.createForm('group', 'new/group', 'edit', 'Не удается создать карточку группы');
         } else if (id.startsWith('group/')) {

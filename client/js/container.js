@@ -43,7 +43,7 @@ $.widget('sokol.container', {
                 title: data.title,
                 subtitle: data.fullName
             }, $('<div></div>').appendTo(this.element));
-        } else if (this.options.containerType == 'document') {
+        } else if (this.options.containerType == 'document' || this.options.containerType == 'task') {
             this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
         } else {
             this.header = $.sokol.titleHeader({
@@ -51,13 +51,15 @@ $.widget('sokol.container', {
             }, $('<div></div>').appendTo(this.element));
         }
 
-        this.formButtons = $.sokol.formButtons({
-            mode: this.options.mode,
-            dispatcher: this,
-            containerType: this.options.containerType,
-            actions: this.options.form.actions,
-            id: this.options.id
-        }, $('<div></div>').prependTo(this.element));
+        if (this.options.containerType != 'task') {
+            this.formButtons = $.sokol.formButtons({
+                mode: this.options.mode,
+                dispatcher: this,
+                containerType: this.options.containerType,
+                actions: this.options.form.actions,
+                id: this.options.id
+            }, $('<div></div>').prependTo(this.element));
+        }
 
         this.form = $.sokol.form({
             mode: this.options.mode,
@@ -103,7 +105,7 @@ $.widget('sokol.container', {
     createExecutionListIfExist: function() {
         $.getJSON('app/getExecutionList', {
             documentId: this.options.id,
-            type: 'resolution'
+            type: 'execution'
         }, $.proxy(function(data) {
             if (!$.isEmptyObject(data)) {
                 this.executionForm = $.sokol.executionForm({
@@ -122,6 +124,13 @@ $.widget('sokol.container', {
                 groupId: this.options.id
             }, $('<div></div>').appendTo(this.element));
             this.childs.push(arGrid);
+            return;
+        }
+        if (subform.form.id == 'task') {
+            var executionReportForm = $.sokol.executionReportForm({
+                data: subform.data
+            }, $('<div></div>').insertAfter(this.header.element));
+            this.childs.push(executionReportForm);
             return;
         }
         var form = $.sokol.form({

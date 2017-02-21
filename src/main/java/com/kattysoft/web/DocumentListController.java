@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -48,6 +49,12 @@ public class DocumentListController {
     private UserService userService;
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+    public DocumentListController() {
+        mapper.setDateFormat(dateFormat);
+    }
 
     @RequestMapping(value = "/documents")
     public Object listDocuments(String listId, Integer offset, Integer size, String conditions, String sort, String sortAsc) throws IOException {
