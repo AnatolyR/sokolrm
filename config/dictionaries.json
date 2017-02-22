@@ -2,5 +2,6 @@
   "organizationPersons",
   "contragents",
   "documentKind",
-  "documentTitles"
+  "documentTitles",
+  "executionReportStatus"
 ]

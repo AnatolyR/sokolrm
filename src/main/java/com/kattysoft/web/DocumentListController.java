@@ -13,10 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.DocumentService;
-import com.kattysoft.core.UserService;
-import com.kattysoft.core.Utils;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.specification.*;
@@ -47,6 +44,9 @@ public class DocumentListController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TitleService titleService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -88,16 +88,9 @@ public class DocumentListController {
                     String value = jsonNode.get("value").asText();
                     String render = fieldsRenders.get(column);
                     if (render != null) {
-                        if ("executionType".equals(render)) {
-                            if ("Исполнение".equals(value)) {
-                                ((ObjectNode) jsonNode).put("value", "execution");
-                            }
-                        } else if ("executionStatus".equals(render)) {
-                            if ("Выполняется".equals(value)) {
-                                ((ObjectNode) jsonNode).put("value", "run");
-                            } else if ("Завершено".equals(value)) {
-                                ((ObjectNode) jsonNode).put("value", "complete");
-                            }
+                        if ("executionType".equals(render) || "executionStatus".equals(render)) {
+                            String name = titleService.getName(render, value);
+                            ((ObjectNode) jsonNode).put("value", name);
                         } else if ("user".equals(render)) {
                             if (!Utils.isUUID(value)) {
                                 List<User> users = userService.getUsersByShortTitle(value);
@@ -187,22 +180,9 @@ public class DocumentListController {
                     }
                     String typeTitle = typeTitleCash.get(type);
                     document.put(name, typeTitle);
-                } else if ("executionType".equals(renderer)) {
-                    if ("execution".equals(value)) {
-                        value = "Исполнение";
-                    } else {
-                        value = "[" + value + "]";
-                    }
-                    document.put(name, value);
-                } else if ("executionStatus".equals(renderer)) {
-                    if ("run".equals(value)) {
-                        value = "Выполняется";
-                    } else if ("complete".equals(value)){
-                        value = "Завершено";
-                    } else {
-                        value = "[" + value + "]";
-                    }
-                    document.put(name, value);
+                } else if ("executionType".equals(renderer) || "executionStatus".equals(renderer)) {
+                    String titleValue = titleService.getTitleNotNull(renderer, value);
+                    document.put(name, titleValue);
                 } else if ("user".equals(renderer)) {
                     if (Utils.isUUID(value)) {
                         User user = userService.getUserById(value);
@@ -225,5 +205,9 @@ public class DocumentListController {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public void setTitleService(TitleService titleService) {
+        this.titleService = titleService;
     }
 }

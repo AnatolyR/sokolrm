@@ -29,4 +29,6 @@ public interface TaskService {
     Task getTaskById(UUID uuid);
 
     TasksList getExecutionListById(UUID id);
+
+    void completeTask(Task task);
 }

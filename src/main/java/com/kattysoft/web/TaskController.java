@@ -45,6 +45,9 @@ public class TaskController {
     @Autowired
     private DocumentService documentService;
 
+    @Autowired
+    private TitleService titleService;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
@@ -124,6 +127,10 @@ public class TaskController {
                     ((ObjectNode) t).put("userTitle", taskUser.getTitle());
                 } else {
                     ((ObjectNode) t).put("userTitle", "[Пользователь не найден]");
+                }
+                if (t.has("status") && !t.get("status").isNull() &&!t.get("status").asText().isEmpty()) {
+                    String statusTitle = titleService.getTitleNotNull("executionStatus", t.get("status").asText());
+                    ((ObjectNode) t).put("status", statusTitle);
                 }
             });
 
@@ -254,6 +261,32 @@ public class TaskController {
         return card.toString();
     }
 
+    @RequestMapping(value = "/saveTaskReport")
+    public Task saveTaskReport(Reader reader) throws IOException {
+        String requestBody = IOUtils.toString(reader);
+        ObjectNode data = (ObjectNode) mapper.readTree(requestBody);
+        UUID uuid = data.has("id") && !data.get("id").asText().isEmpty() && !data.get("id").isNull() ? UUID.fromString(data.get("id").asText()) : null;
+
+        if (uuid == null) {
+            throw new SokolException("Task id is null");
+        }
+
+        ObjectNode fields = (ObjectNode) data.get("fields");
+
+        Task task = new Task();
+        task.setId(uuid);
+
+        String comment = fields.get("comment").asText();
+        task.setComment(comment);
+
+        String result = fields.get("result").asText();
+        task.setResult(result);
+
+        taskService.completeTask(task);
+        Task savedTask = taskService.getTaskById(uuid);
+
+        return savedTask;
+    }
 
     public void setTaskService(TaskService taskService) {
         this.taskService = taskService;
@@ -269,5 +302,9 @@ public class TaskController {
 
     public void setDocumentService(DocumentService documentService) {
         this.documentService = documentService;
+    }
+
+    public void setTitleService(TitleService titleService) {
+        this.titleService = titleService;
     }
 }

@@ -58,6 +58,8 @@ public class Task {
 
     private String comment;
 
+    private String result;
+
     public UUID getId() {
         return id;
     }
@@ -168,5 +170,13 @@ public class Task {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

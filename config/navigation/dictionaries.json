@@ -18,6 +18,10 @@
     {
       "id": "documentTitles",
       "title": "Заголовки документов"
+    },
+    {
+      "id": "executionReportStatus",
+      "title": "Статусы отчета по исполнению"
     }
   ]
 }

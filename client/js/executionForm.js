@@ -69,7 +69,9 @@ $.widget('sokol.executionForm', {
                 "columnsVisible": [
                     "userTitle",
                     "dueDate",
-                    "executed"
+                    "executedDate",
+                    "status",
+                    "result"
                 ],
                 "columns": [
                     {
@@ -94,9 +96,19 @@ $.widget('sokol.executionForm', {
                         "editor": "date"
                     },
                     {
-                        "id": "executed",
+                        "id": "executedDate",
                         "title": "Выполнено",
                         render: 'datetime'
+                    },
+                    {
+                        "id": "status",
+                        "title": "Статус"
+                    },
+                    {
+                        "id": "result",
+                        "title": "Отчет",
+                        "render": "expand",
+                        "dataColumn": "comment"
                     }
                 ],
                 "id": "tasks",

@@ -188,6 +188,25 @@ public class TaskServiceImpl implements TaskService {
         return tasksList;
     }
 
+    @Override
+    public void completeTask(Task task) {
+        Task existedTask = taskRepository.findOne(task.getId());
+        if (existedTask == null) {
+            throw new SokolException("Task for complete not exist");
+        }
+        if ("complete".equals(existedTask.getStage())) {
+            throw new SokolException("Task already completed");
+        }
+        existedTask.setStatus("complete");
+        existedTask.setResult(task.getResult());
+        existedTask.setComment(task.getComment());
+        existedTask.setExecutedDate(new Date());
+        User currentUser = userService.getCurrentUser();
+        existedTask.setExecutedByUser(currentUser.getId());
+
+        taskRepository.save(existedTask);
+    }
+
     public void setTaskRepository(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }

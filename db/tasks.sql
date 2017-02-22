@@ -14,5 +14,6 @@ CREATE TABLE tasks (
   author uuid,
   dueDate timestamp,
   executedDate timestamp,
-  comment text
+  comment text,
+  result varchar(255)
 );

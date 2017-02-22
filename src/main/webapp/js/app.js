@@ -1393,7 +1393,9 @@ $.widget('sokol.executionForm', {
                 "columnsVisible": [
                     "userTitle",
                     "dueDate",
-                    "executed"
+                    "executedDate",
+                    "status",
+                    "result"
                 ],
                 "columns": [
                     {
@@ -1418,9 +1420,19 @@ $.widget('sokol.executionForm', {
                         "editor": "date"
                     },
                     {
-                        "id": "executed",
+                        "id": "executedDate",
                         "title": "Выполнено",
                         render: 'datetime'
+                    },
+                    {
+                        "id": "status",
+                        "title": "Статус"
+                    },
+                    {
+                        "id": "result",
+                        "title": "Отчет",
+                        "render": "expand",
+                        "dataColumn": "comment"
                     }
                 ],
                 "id": "tasks",
@@ -1565,11 +1577,17 @@ $.widget('sokol.executionForm', {
 });
 $.widget('sokol.executionReportForm', {
     options: {
-
+        mode: 'read'
     },
     _create: function () {
+        this.options.mode = this.options.data.status == "complete" ? "complete" : "read";
+
         this.createHeader();
         this.createBlock();
+
+        if (this.options.mode == "complete") {
+            this.renderReportForm();
+        }
     },
 
     createHeader: function() {
@@ -1636,12 +1654,117 @@ $.widget('sokol.executionReportForm', {
         this.createButtons();
     },
 
+    renderReportForm: function() {
+        //var edit = true;
+        //var value = '';
+        //var field = {
+        //    title: 'Отчет',
+        //    mandatory: true,
+        //    id: 'report'
+        //};
+        //this.reportForm = $('<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
+        //    '<label class="control-label">' + field.title + ':</label>' +
+        //    (edit ? ('<textarea rows="3" name="' + field.id + '" class="form-control">' + value + '</textarea>') :
+        //        ('<div>' + value + '</div>')) +
+        //    '</div>').insertAfter(this.form.element);
+        //this.manageButtons();
+
+        var panelHeader = $('<div data-name="reportHeader" class="panel-heading panel-footer" style="border-radius: 0;"></div>');
+        var panelTitle = $('<div>Отчет об исполнении</div>');
+        panelTitle.appendTo(panelHeader);
+        panelHeader.insertAfter($(this.form.element).parent());
+
+        var reportBody = $('<div data-name="reportBody" class="panel-body"></div>').insertAfter(panelHeader);
+
+        this.reportForm = $.sokol.form({
+            mode: this.options.mode == "complete" ? "read" : 'edit',
+            data: this.options.data ? this.options.data : {},
+            form: {
+                "id": "task",
+                "fields": [
+                    {
+                        "items": [
+                            {
+                                "id": "result",
+                                "title": "Статус",
+                                "type": "select",
+                                "dictionary": "executionReportStatus",
+                                "width": "200px",
+                                "mandatory": true
+                            },
+                            {
+                                "id": "executedDate",
+                                "title": "Дата",
+                                "type": "date",
+                                "ar": "read",
+                                "hideIfEmpty": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "comment",
+                        "title": "Отчет",
+                        "type": "text",
+                        "mandatory": true
+                    }
+                ]
+            },
+            usePanel: false,
+            dispatcher: this.options.dispatcher,
+            containerType: 'report'
+        }, $('<div></div>').appendTo(reportBody));
+        this.manageButtons();
+    },
+
+    removeReportForm: function() {
+        if (this.reportForm) {
+            this.reportForm.destroy();
+        }
+        this.element.find("[data-name='reportHeader']").remove();
+        this.element.find("[data-name='reportBody']").remove();
+        this.manageButtons();
+    },
+
+    saveReportForm: function() {
+        if (!this.reportForm.validateForm()) {
+            return;
+        }
+        var data = this.reportForm.getData();
+        data.id = this.options.data.id;
+
+        var saveUrl = 'app/saveTaskReport';
+        var message = 'Не удалось сохранить отчет. Обратитесь к администратору.';
+
+        $.post(saveUrl, JSON.stringify(data), $.proxy(function (response) {
+            $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
+            this.options.mode = 'complete';
+
+            this.reportForm.options.data.comment = response.comment;
+            this.reportForm.options.data.result = response.result;
+
+            this.reportForm.setMode('read');
+            var buttons = $(this.element).find('[name="buttons"]');
+            buttons.remove();
+        }, this)).fail($.proxy(function() {
+            $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
+        }, this));
+    },
+
     createButtons: function() {
+        if (this.options.mode == 'complete') {
+            return;
+        }
         var buttons = $(this.element).find('[name="buttons"]');
         if (buttons.length == 0) {
             buttons = $('<div name="buttons" class="panel-body execution-report-form-buttons"></div>').appendTo(this.element);
         }
         buttons.empty();
+
+        var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">Сохранить отчет</button>');
+        saveButton.click($.proxy(function() {
+            this.saveReportForm();
+        }, this));
+        saveButton.appendTo(buttons);
 
         var executionButton = $('<button type="button" name="executionButton" style="display: none;" class="btn btn-info controlElementLeftMargin">Создать резолюцию</button>');
         executionButton.click($.proxy(function() {
@@ -1649,9 +1772,17 @@ $.widget('sokol.executionReportForm', {
         }, this));
         executionButton.appendTo(buttons);
 
+        var cancelButton = $('<button type="button" name="cancel" style="display: none;" class="btn btn-default controlElementLeftMargin">Отмена</button>');
+        cancelButton.click($.proxy(function() {
+            this.options.mode = 'read';
+            this.removeReportForm();
+        }, this));
+        cancelButton.appendTo(buttons);
+
         var reportButton = $('<button type="button" name="reportButton" style="display: none;" class="btn btn-success controlElementLeftMargin">Создать отчет</button>');
         reportButton.click($.proxy(function() {
-
+            this.options.mode = 'edit';
+            this.renderReportForm();
         }, this));
         reportButton.appendTo(buttons);
 
@@ -1662,8 +1793,14 @@ $.widget('sokol.executionReportForm', {
         var buttons = $(this.element).find('[name="buttons"]');
         buttons.children().hide();
         var mode = this.options.mode;
-        buttons.children('[name="executionButton"]').show();
-        buttons.children('[name="reportButton"]').show();
+
+        if (mode == 'read') {
+            buttons.children('[name="executionButton"]').show();
+            buttons.children('[name="reportButton"]').show();
+        } else if (mode == 'edit') {
+            buttons.children('[name="save"]').show();
+            buttons.children('[name="cancel"]').show();
+        }
     },
 
     _destroy: function () {
@@ -2778,6 +2915,23 @@ $.widget("sokol.grid", {
                         val = moment(val, 'DD.MM.YYYY HH:mm').format('L LT');
 
                         var td = $('<td>' + (val ? val : '') + '</td>');
+                        td.appendTo(row);
+                    } else if (column.render == 'expand') {
+                        var td = $('<td></td>');
+                        var a = $('<a href="#">' + (val ? val : '') + '</a>').appendTo(td);
+                        a.click((function(row, column) {
+                            return function(e) {
+                                e.preventDefault();
+                                var expandTr = $(row).next();
+                                if (expandTr.attr("data-name") == "reportComment") {
+                                    expandTr.remove();
+                                } else {
+                                    var expandData = rowObj[column.dataColumn];
+                                    expandTr = $('<tr data-name="reportComment"><td colspan="100">' + (expandData ? expandData : '') + '</td></tr>');
+                                    expandTr.insertAfter(row);
+                                }
+                            };
+                            })(row, column));
                         td.appendTo(row);
                     } else {
                         if(Object.prototype.toString.call(val) === '[object Array]' ) {

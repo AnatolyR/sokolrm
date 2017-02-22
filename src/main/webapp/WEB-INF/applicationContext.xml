@@ -102,4 +102,8 @@
 
     </bean>
 
+    <bean class="com.kattysoft.core.impl.TitleServiceImpl">
+
+    </bean>
+
 </beans>
