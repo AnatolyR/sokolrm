@@ -68,6 +68,9 @@ public class DocumentServiceImpl implements DocumentService {
 
     private void fillTitleFields(Document document) {
         String typeId = document.getType();
+        if (typeId == null) {
+            return;
+        }
         JsonNode typeConfig = configService.getConfig("types/" + typeId + "Type");
         Map<String, JsonNode> fieldsInfo = new HashMap<>();
         typeConfig.get("fields").forEach(jsonNode -> fieldsInfo.put(jsonNode.get("id").asText(), jsonNode));

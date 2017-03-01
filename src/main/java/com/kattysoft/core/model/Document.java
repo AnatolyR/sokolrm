@@ -31,6 +31,8 @@ public class Document {
 
     private String kind;
 
+    private String status;
+
     private Map<String, Object> fields;
 
     public String getId() {
@@ -82,5 +84,13 @@ public class Document {
 
     public void setFields(Map<String, Object> fields) {
         this.fields = fields;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

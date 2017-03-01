@@ -11,11 +11,11 @@ package com.kattysoft.web;
 
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.model.User;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.StreamSupport;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -43,19 +44,27 @@ public class DocumentCardController {
     @Autowired
     private AccessRightService accessRightService;
 
+    @Autowired
+    private UserService userService;
+
     private ObjectMapper mapper = new ObjectMapper();
+
+    private com.fasterxml.jackson.databind.ObjectMapper mapper2 = new com.fasterxml.jackson.databind.ObjectMapper();
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
     public DocumentCardController() {
         mapper.setDateFormat(dateFormat);
+        mapper2.setDateFormat(dateFormat);
     }
 
     @RequestMapping(value = "/createdocument")
     public String createDocument(String type) {
         Document document = new Document();
         document.setType(type);
-        document.getFields().put("status", "Черновик");
+        document.getFields().put("status", "draft");
+        User currentUser = userService.getCurrentUser();
+        document.getFields().put("author", currentUser.getId());
         String id = documentService.saveDocument(document);
         return id;
     }
@@ -68,16 +77,16 @@ public class DocumentCardController {
         }
 
         String typeId = document.getType();
-        JsonNode typeConfig = configService.getConfig("types/" + typeId + "Type");
-        JsonNode formConfig = configService.getConfig("forms/" + typeId + "Form");
-        Map<String, JsonNode> fieldTypes = new HashMap<>();
+        com.fasterxml.jackson.databind.JsonNode typeConfig = configService.getConfig2("types/" + typeId + "Type");
+        com.fasterxml.jackson.databind.JsonNode formConfig = configService.getConfig2("forms/" + typeId + "Form");
+        Map<String, com.fasterxml.jackson.databind.JsonNode> fieldTypes = new HashMap<>();
         typeConfig.get("fields").forEach(jsonNode -> fieldTypes.put(jsonNode.get("id").asText(), jsonNode));
-        Consumer<JsonNode> merge = new Consumer<JsonNode>() {
+        Consumer<com.fasterxml.jackson.databind.JsonNode> merge = new Consumer<com.fasterxml.jackson.databind.JsonNode>() {
             @Override
-            public void accept(JsonNode jsonNode) {
+            public void accept(com.fasterxml.jackson.databind.JsonNode jsonNode) {
                 if (jsonNode.get("id") != null) {
-                    JsonNode fieldType = fieldTypes.get(jsonNode.get("id").asText());
-                    ((ObjectNode) jsonNode).putAll((ObjectNode) fieldType);
+                    com.fasterxml.jackson.databind.JsonNode fieldType = fieldTypes.get(jsonNode.get("id").asText());
+                    ((com.fasterxml.jackson.databind.node.ObjectNode) jsonNode).setAll((com.fasterxml.jackson.databind.node.ObjectNode) fieldType);
                 } else if (jsonNode.get("items") != null) {
                     jsonNode.get("items").forEach(this);
                 }
@@ -85,27 +94,49 @@ public class DocumentCardController {
         };
         formConfig.get("fields").forEach(merge);
 
-        ((ObjectNode) formConfig).put("typeTitle", typeConfig.get("title"));
-        if (formConfig.has("actions")) {
-            ArrayNode filteredActions = mapper.createArrayNode();
-            formConfig.get("actions").forEach(a -> {
-                if (accessRightService.checkDocumentRights(document, a.asText(), AccessRightLevel.CREATE)) {
+        ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).set("typeTitle", typeConfig.get("title"));
+
+        addActions(formConfig, typeConfig, document);
+
+        com.fasterxml.jackson.databind.node.ObjectNode card = mapper2.createObjectNode();
+        card.put("form", formConfig);
+
+        com.fasterxml.jackson.databind.node.ObjectNode data = (com.fasterxml.jackson.databind.node.ObjectNode) mapper2.<com.fasterxml.jackson.databind.JsonNode>valueToTree(document);
+        com.fasterxml.jackson.databind.node.ObjectNode fields = (com.fasterxml.jackson.databind.node.ObjectNode) data.get("fields");
+        data.remove("fields");
+        data.setAll(fields);
+        card.set("data", data);
+
+        return card.toString();
+    }
+
+    private void addActions(com.fasterxml.jackson.databind.JsonNode formConfig, com.fasterxml.jackson.databind.JsonNode typeConfig, Document document) {
+        String typeId = typeConfig.get("flow").textValue();
+        if (typeId != null) {
+            com.fasterxml.jackson.databind.JsonNode flow = configService.getConfig2("flows/" + typeId);
+            String status = document.getStatus();
+            if (status == null || status.isEmpty()) {
+                return;
+            }
+            com.fasterxml.jackson.databind.JsonNode states = flow.get("states");
+            com.fasterxml.jackson.databind.JsonNode state = StreamSupport.stream(states.spliterator(), false).filter(s -> status.equals(s.get("id").textValue())).findFirst().orElse(null);
+            if (state == null) {
+                return;
+            }
+            document.getFields().put("status", state.get("title").textValue());
+            if (!state.has("actions")) {
+                return;
+            }
+            com.fasterxml.jackson.databind.node.ArrayNode actions = (com.fasterxml.jackson.databind.node.ArrayNode) state.get("actions");
+            com.fasterxml.jackson.databind.node.ArrayNode filteredActions = mapper2.createArrayNode();
+            actions.forEach(a -> {
+                String actionId = a.get("id").textValue();
+                if (accessRightService.checkDocumentRights(document, actionId, AccessRightLevel.CREATE)) {
                     filteredActions.add(a);
                 }
             });
-            ((ObjectNode) formConfig).put("actions", filteredActions);
+            ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).set("actions", filteredActions);
         }
-
-        ObjectNode card = mapper.createObjectNode();
-        card.put("form", formConfig);
-
-        ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(document);
-        ObjectNode fields = (ObjectNode) data.get("fields");
-        data.remove("fields");
-        data.putAll(fields);
-        card.put("data", data);
-
-        return card.toString();
     }
 
     @RequestMapping(value = "/savedocument")
@@ -234,5 +265,13 @@ public class DocumentCardController {
 
     public void setAccessRightService(AccessRightService accessRightService) {
         this.accessRightService = accessRightService;
+    }
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

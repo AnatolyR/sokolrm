@@ -26,7 +26,8 @@
       },
       {
         "id": "status",
-        "title": "Статус"
+        "title": "Статус",
+        "render": "status"
       },
       {
         "id": "title",

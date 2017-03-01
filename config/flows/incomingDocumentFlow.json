@@ -1,0 +1,67 @@
+{
+  "states": [
+    {
+      "id": "draft",
+      "title": "Черновик",
+      "actions": [
+        {
+          "id": "doregistration",
+          "title": "Зарегистрировать",
+          "state": "registered"
+        }
+      ]
+    },
+    {
+      "id": "registered",
+      "title": "Зарегистрирован",
+      "actions": [
+        {
+          "id": "toreview",
+          "title": "На рассмотрение",
+          "state": "review"
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "title": "Рассмотрение",
+      "actions": [
+        {
+          "id": "doresolution",
+          "title": "Резолюция",
+          "form": "resolution"
+        }
+      ]
+    },
+    {
+      "id": "execution",
+      "title": "Исполнение"
+    },
+    {
+      "id": "executed",
+      "title": "Исполнено",
+      "actions": [
+        {
+          "id": "tocase",
+          "title": "В дело",
+          "state": "tocase"
+        }
+      ]
+    },
+    {
+      "id": "tocase",
+      "title": "В дело",
+      "actions": [
+        {
+          "id": "toarchive",
+          "title": "В архив",
+          "state": "archive"
+        }
+      ]
+    },
+    {
+      "id": "archive",
+      "title": "Архив"
+    }
+  ]
+}

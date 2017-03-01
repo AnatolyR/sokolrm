@@ -106,4 +106,8 @@
 
     </bean>
 
+    <bean class="com.kattysoft.core.impl.ActionServiceImpl">
+
+    </bean>
+
 </beans>

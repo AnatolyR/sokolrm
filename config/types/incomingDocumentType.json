@@ -1,6 +1,7 @@
 {
   "title": "Входящий",
-  "actions": ["doresolution"],
+  "actions": ["doresolution", "toreview", "doregistration", "tocase", "toarchive"],
+  "flow": "incomingDocumentFlow",
   "fields": [
     {
       "id": "title",

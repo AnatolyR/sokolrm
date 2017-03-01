@@ -58,6 +58,9 @@ public class DocumentDaoPg implements DocumentDao {
                 String space = resultSet.getString("space");
                 document.setSpace(space);
 
+                String status = resultSet.getString("status");
+                document.setStatus(status);
+
                 Map<String, Object> fields = new HashMap<>();
 
                 for (int i = 1; i <= metaData.getColumnCount(); i++) {

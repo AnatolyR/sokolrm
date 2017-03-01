@@ -88,7 +88,7 @@ public class DocumentListController {
                     String value = jsonNode.get("value").asText();
                     String render = fieldsRenders.get(column);
                     if (render != null) {
-                        if ("executionType".equals(render) || "executionStatus".equals(render)) {
+                        if ("executionType".equals(render) || "executionStatus".equals(render) || "status".equals(render)) {
                             String name = titleService.getName(render, value);
                             ((ObjectNode) jsonNode).put("value", name);
                         } else if ("user".equals(render)) {
@@ -124,6 +124,7 @@ public class DocumentListController {
         spec.setFields(fields);
 
         final Map<String, String> typeTitleCash = new HashMap<>();
+        final Map<String, Map<String, String>> flowStatusTitleCash = new HashMap<>();
 
         ContainerCondition condition = new ContainerCondition();
         String listConditionSql = config.get("condition").asText();
@@ -154,7 +155,7 @@ public class DocumentListController {
             document.remove("fields");
             document.setAll(docFields);
 
-            processServerRenders(document, fieldsRenders, typeTitleCash);
+            processServerRenders(document, fieldsRenders, typeTitleCash, flowStatusTitleCash);
 
             return document;
         }).collect(Collectors.toList());
@@ -165,7 +166,8 @@ public class DocumentListController {
         return page;
     }
 
-    protected void processServerRenders(ObjectNode document, Map<String, String> fieldsRenders, final Map<String, String> typeTitleCash) {
+    protected void processServerRenders(ObjectNode document, Map<String, String> fieldsRenders, final Map<String, String> typeTitleCash, Map<String, Map<String, String>> flowStatusTitleCash) {
+        String typeId = document.has("type") ? document.get("type").textValue() : null;
         fieldsRenders.entrySet().forEach(e -> {
             String name = e.getKey();
             String renderer = e.getValue();
@@ -173,13 +175,14 @@ public class DocumentListController {
                 String value = document.get(name).asText();
                 if ("doctype".equals(renderer)) {
                     String type = value;
-                    if (!typeTitleCash.containsKey(type)) {
-                        JsonNode typeConfig = configService.getConfig2("types/" + type + "Type");
-                        String typeTitle = typeConfig != null ? typeConfig.get("title").asText() : "[" + type + "]";
-                        typeTitleCash.put(type, typeTitle);
-                    }
+                    cacheTypeData(type, typeTitleCash, flowStatusTitleCash);
                     String typeTitle = typeTitleCash.get(type);
                     document.put(name, typeTitle);
+                } else if ("status".equals(renderer)) {
+                    cacheTypeData(typeId, typeTitleCash, flowStatusTitleCash);
+                    String status = value;
+                    String statusTitle = status != null && flowStatusTitleCash.containsKey(typeId) ? flowStatusTitleCash.get(typeId).get(status) : "";
+                    document.put(name, statusTitle);
                 } else if ("executionType".equals(renderer) || "executionStatus".equals(renderer)) {
                     String titleValue = titleService.getTitleNotNull(renderer, value);
                     document.put(name, titleValue);
@@ -194,6 +197,29 @@ public class DocumentListController {
             }
         });
     }
+
+    private void cacheTypeData(String type, Map<String, String> typeTitleCash, Map<String, Map<String, String>> flowStatusTitleCash) {
+        if (!typeTitleCash.containsKey(type)) {
+            JsonNode typeConfig = configService.getConfig2("types/" + type + "Type");
+            String typeTitle = typeConfig != null ? typeConfig.get("title").asText() : "[" + type + "]";
+            typeTitleCash.put(type, typeTitle);
+
+            String flowId = typeConfig != null && typeConfig.has("flow") ? typeConfig.get("flow").textValue() : null;
+            if (flowId != null) {
+                JsonNode flow = configService.getConfig2("flows/" + flowId);
+                JsonNode states = flow.get("states");
+                states.forEach(state -> {
+                    String stateId = state.get("id").textValue();
+                    String stateTitle = state.get("title").textValue();
+                    if (!flowStatusTitleCash.containsKey(type)) {
+                        flowStatusTitleCash.put(type, new HashMap<>());
+                    }
+                    flowStatusTitleCash.get(type).put(stateId, stateTitle);
+                });
+            }
+        }
+    }
+
 
     public void setDocumentService(DocumentService documentService) {
         this.documentService = documentService;

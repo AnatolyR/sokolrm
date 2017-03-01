@@ -9,14 +9,8 @@
  */
 package com.kattysoft.core.impl;
 
-import com.kattysoft.core.SokolException;
-import com.kattysoft.core.TaskService;
-import com.kattysoft.core.UserService;
-import com.kattysoft.core.Utils;
-import com.kattysoft.core.model.Page;
-import com.kattysoft.core.model.Task;
-import com.kattysoft.core.model.TasksList;
-import com.kattysoft.core.model.User;
+import com.kattysoft.core.*;
+import com.kattysoft.core.model.*;
 import com.kattysoft.core.repository.TaskRepository;
 import com.kattysoft.core.repository.TasksListRepository;
 import com.kattysoft.core.specification.SortOrder;
@@ -42,6 +36,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private TasksListRepository tasksListRepository;
+
+    @Autowired
+    private DocumentService documentService;
 
     @Autowired
     private UserService userService;
@@ -77,7 +74,30 @@ public class TaskServiceImpl implements TaskService {
         saveTasks(tasks, tasksList);
         deleteNotMoreExistsTasks(tasks, tasksList);
 
+        updateDocumentStatus(tasksList.getId(), tasksList.getDocumentId().toString());
+
         return tasksList.getId().toString();
+    }
+
+    private void updateDocumentStatus(UUID id, String documentId) {
+        List<Task> tasks = taskRepository.findAllByListId(id);
+        Document document = documentService.getDocument(documentId);
+        boolean runningTasks = tasks.stream().filter(t -> "run".equals(t.getStatus())).findFirst().isPresent();
+        if (runningTasks) {
+            if (!"execution".equals(document.getStatus())) {
+                Document holder = new Document();
+                holder.setId(documentId);
+                holder.getFields().put("status", "execution");
+                documentService.saveDocument(holder);
+            }
+        } else {
+            if (!"executed".equals(document.getStatus())) {
+                Document holder = new Document();
+                holder.setId(documentId);
+                holder.getFields().put("status", "executed");
+                documentService.saveDocument(holder);
+            }
+        }
     }
 
     private void deleteNotMoreExistsTasks(List<Task> tasks, TasksList tasksList) {
@@ -203,8 +223,10 @@ public class TaskServiceImpl implements TaskService {
         existedTask.setExecutedDate(new Date());
         User currentUser = userService.getCurrentUser();
         existedTask.setExecutedByUser(currentUser.getId());
-
         taskRepository.save(existedTask);
+
+        updateDocumentStatus(existedTask.getListId(), existedTask.getDocumentId().toString());
+
     }
 
     public void setTaskRepository(TaskRepository taskRepository) {
@@ -217,5 +239,9 @@ public class TaskServiceImpl implements TaskService {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public void setDocumentService(DocumentService documentService) {
+        this.documentService = documentService;
     }
 }

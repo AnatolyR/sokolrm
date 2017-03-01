@@ -97,8 +97,8 @@ $.widget('sokol.executionForm', {
                     },
                     {
                         "id": "executedDate",
-                        "title": "Выполнено",
-                        render: 'datetime'
+                        "title": "Завершено",
+                        "render": "datetime"
                     },
                     {
                         "id": "status",
@@ -184,8 +184,9 @@ $.widget('sokol.executionForm', {
         data.documentId = this.options.documentId;
 
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
+            //this.options.dispatcher.refreshExecutionList('resolution');
+            this.options.dispatcher.reopen();
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
-            this.options.dispatcher.refreshExecutionList('resolution');
         }, this)).fail($.proxy(function() {
             $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
         }, this));

@@ -22,8 +22,24 @@
     "title": "[Документы]",
     "actions": [
       {
+        "id": "doregistration",
+        "title": "Зарегистрировать"
+      },
+      {
+        "id": "toreview",
+        "title": "На рассмотрение"
+      },
+      {
         "id": "doresolution",
         "title": "Резолюция"
+      },
+      {
+        "id": "tocase",
+        "title": "В дело"
+      },
+      {
+        "id": "toarchive",
+        "title": "В архив"
       }
     ]
   },

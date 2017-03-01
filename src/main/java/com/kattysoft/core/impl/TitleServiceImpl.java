@@ -33,6 +33,16 @@ public class TitleServiceImpl implements TitleService {
         Map<String, String> executionType = new HashMap<>();
         executionType.put("execution", "Исполнение");
         values.put("executionType", executionType);
+
+        Map<String, String> status = new HashMap<>();
+        status.put("draft", "Черновик");
+        status.put("registered", "Зарегистрирован");
+        status.put("review", "Рассмотрение");
+        status.put("resolution", "Исполнение");
+        status.put("executed", "Исполнено");
+        status.put("tocase", "В дело");
+        status.put("archive", "Архив");
+        values.put("status", status);
     }
 
     @Override

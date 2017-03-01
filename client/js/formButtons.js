@@ -8,41 +8,59 @@ $.widget('sokol.formButtons', {
         var buttons = this.element;
         buttons.addClass('formMainPanel');
 
-        var saveButton = $('<button type="button" name="save" style="margin-right: 5px; display: none;" class="btn btn-success">Сохранить</button>');
+        var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
         saveButton.click($.proxy(function() {
             this.options.dispatcher.saveForm();
         }, this));
         saveButton.appendTo(buttons);
 
-        var editButton = $('<button type="button" name="edit" style="margin-right: 5px; display: none;" class="btn btn-default">Редактировать</button>');
+        var editButton = $('<button type="button" name="edit" style="display: none;" class="btn btn-default controlElementLeftMargin">Редактировать</button>');
         editButton.click($.proxy(function() {
             this.options.dispatcher.goToMode("edit");
         }, this));
         editButton.appendTo(buttons);
 
         if (this.options.id) {
-            var cancelButton = $('<button type="button" name="cancel" style="margin-right: 5px; display: none;" class="btn btn-default">Отменить</button>');
+            var cancelButton = $('<button type="button" name="cancel" style="display: none;" class="btn btn-default controlElementLeftMargin">Отменить</button>');
             cancelButton.click($.proxy(function () {
                 this.options.dispatcher.goToMode("read");
             }, this));
             cancelButton.appendTo(buttons);
         }
 
-        var deleteButton = $('<button type="button" name="delete" style="margin-right: 5px; display: none;" class="btn btn-danger">Удалить</button>');
+        var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
         deleteButton.click($.proxy(function() {
             this.options.dispatcher.deleteDocument();
         }, this));
         deleteButton.appendTo(buttons);
 
-        if (this.options.actions.indexOf('doresolution') >= 0) {
-            var resolutionButton = $('<button type="button" name="doresolution" style="margin-right: 5px; display: none;" class="btn btn-default">Резолюция</button>');
-            resolutionButton.click($.proxy(function() {
-                this.options.dispatcher.resolution();
+        var actions = this.options.actions;
+
+        $.each(actions, $.proxy(function(i, a) {
+            var actionButton = $('<button data-type="action" type="button" name="' + a.id + '" style="display: none;" class="btn btn-default controlElementLeftMargin">' + a.title + '</button>');
+            actionButton.click($.proxy(function() {
+                if (a.form) {
+                    if (a.form == 'resolution') {
+                        this.options.dispatcher.resolution();
+                    }
+                } else {
+                    this.doAction(a);
+                }
             }, this));
-            resolutionButton.appendTo(buttons);
-        }
+            actionButton.appendTo(buttons);
+        }, this));
 
         this.manageButtons();
+    },
+
+    doAction: function(action) {
+        $.post('app/doAction', JSON.stringify({documentId: this.options.id, action: action.id}), $.proxy(function(result) {
+            if (result == 'true') {
+                this.options.dispatcher.reopen();
+            }
+        }, this)).fail($.proxy(function() {
+            $.notify({message: 'Не удалось выполнить действие.'},{type: 'danger', delay: 0, timer: 0});
+        }, this));
     },
 
     setMode: function(mode) {
@@ -56,7 +74,7 @@ $.widget('sokol.formButtons', {
         if (this.options.mode == 'read') {
             buttons.children().each(function(i, c) {
                 var $c = $(c);
-                if ($c.attr('name').indexOf('do') == 0) {
+                if ($c.attr('data-type') == 'action') {
                     $c.show();
                 }
             });

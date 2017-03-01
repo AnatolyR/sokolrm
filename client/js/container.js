@@ -214,6 +214,10 @@ $.widget('sokol.container', {
         }, this));
     },
 
+    reopen: function() {
+        this.options.dispatcher.open(this.options.containerType + '/' + this.options.id);
+    },
+
     deleteDocument: function() {
         $.sokol.smodal({
             title: 'Подтверждение удаления',
