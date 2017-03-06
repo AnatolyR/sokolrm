@@ -59,6 +59,9 @@ public class GroupController {
     private AccessRightService accessRightService;
 
     @Autowired
+    private TitleService titleService;
+
+    @Autowired
     private UserService userService;
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -197,31 +200,9 @@ public class GroupController {
             });
         });
 
-
-        Map<String, String> actionsTitles = new HashMap<>();
         JsonNode accessRightsElements = configService.getConfig2("accessRightsElements");
-        JsonNode documentActions = accessRightsElements.get(1).get("actions");
-        documentActions.forEach(n -> actionsTitles.put(n.get("id").asText(), n.get("title").asText()));
 
-        ArrayNode actions = anyDocumentType.putArray("actions");
-        Set<String> actionsIdsSet = new HashSet<>();
-        documentTypesNode.forEach(node -> {
-            ArrayNode titledActions = mapper.createArrayNode();
-            if (node.has("actions")) {
-                node.get("actions").forEach(a -> {
-                    String actionId = a.asText();
-                    if (!actionsIdsSet.contains(actionId)) {
-                        actionsIdsSet.add(actionId);
-                        ObjectNode action = mapper.createObjectNode();
-                        action.put("id", actionId);
-                        action.put("title", actionsTitles.get(actionId));
-                        actions.add(action);
-                        titledActions.add(action);
-                    }
-                });
-            }
-            ((ObjectNode) node).set("actions", titledActions);
-        });
+        addActions(documentTypesNode, anyDocumentType);
 
         ((ArrayNode) documentTypesNode).insert(0, anyDocumentType);
         settings.set("documentTypes", documentTypesNode);
@@ -241,6 +222,39 @@ public class GroupController {
         ac.addAll(Arrays.asList("NONE", "READ", "WRITE", "CREATE", "ADD", "DELETE", "LIST").stream().map(s -> (JsonNode) mapper.valueToTree(s)).collect(Collectors.toList()));
 
         return settings;
+    }
+
+    private void addActions(JsonNode documentTypesNode, ObjectNode anyDocumentType) {
+        ArrayNode anyTypeActions = anyDocumentType.putArray("actions");
+        Set<String> anyTypeActionIdSet = new HashSet<>();
+        documentTypesNode.forEach(type -> {
+            ArrayNode typeActions = mapper.createArrayNode();
+            if (type.has("flow") && !type.get("flow").isNull()) {
+                String flowId = type.get("flow").textValue();
+                JsonNode flow = configService.getConfig2("flows/" + flowId);
+                Set<String> typeActionIdSet = new HashSet<>();
+                flow.get("states").forEach(s -> {
+                    if (s.has("actions")) {
+                        s.get("actions").forEach(a -> {
+                            String actionId = a.get("id").textValue();
+                            if (!typeActionIdSet.contains(actionId)) {
+                                typeActionIdSet.add(actionId);
+                                ObjectNode action = mapper.createObjectNode();
+                                action.put("id", actionId);
+                                String actionTitle = titleService.getTitleNotNull("action", actionId);
+                                action.put("title", actionTitle);
+                                typeActions.add(action);
+                                if (!anyTypeActionIdSet.contains(actionId)) {
+                                    anyTypeActionIdSet.add(actionId);
+                                    anyTypeActions.add(action);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            ((ObjectNode) type).set("actions", typeActions);
+        });
     }
 
     @RequestMapping(value = "getAccessRightsRecordsForGroup")
@@ -361,7 +375,12 @@ public class GroupController {
             ((ObjectNode) rn).put("elementTitle", elementTitle);
 
             String subelement = rn.has("subelement") ? rn.get("subelement").asText() : null;
-            String subelementTitle = subelement != null ? subelementTitles.get(subelement) : null;
+            String subelementTitle;
+            if (subelement != null && subelement.startsWith("*")) {
+                subelementTitle = titleService.getTitleNotNull("action", subelement.substring(1));
+            } else {
+                subelementTitle = subelement != null ? subelementTitles.get(subelement) : null;
+            }
             ((ObjectNode) rn).put("subelementTitle", subelementTitle);
         });
 
@@ -398,5 +417,9 @@ public class GroupController {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public void setTitleService(TitleService titleService) {
+        this.titleService = titleService;
     }
 }

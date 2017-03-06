@@ -174,26 +174,65 @@ $.widget('sokol.accessRightsGrid', {
 
                 var actions = documentType.actions;
                 for (var p = 0; p < actions.length; p++) {
-                    subelementSelector.append($('<option value="' + actions[p].id + '">{' + actions[p].title + '}</option>'));
+                    subelementSelector.append($('<option value="*' + actions[p].id + '">{' + actions[p].title + '}</option>'));
                 }
             }
             subelementSelector.selectpicker('refresh');
+            refreshAR();
         });
+
+        var refreshAR = function() {
+            arSelector.empty();
+            arSelector.append($('<option value="DENY" checked=true>DENY</option>'));
+            var space = spaceSelector.val();
+            var element = elementSelector.val();
+            var subelement = subelementSelector.val();
+            if ("_system" == space) {
+                if ("users" == element || "groups" == element) {
+                    addAr(["CREATE", "READ", "WRITE", "DELETE", "LIST"]);
+                } else if ("documentGroups" == element) {
+                    addAr(["ADD", "DELETE", "LIST"]);
+                }
+            } else if ("_dictionaries" == space) {
+                if ("organizationPersons" == element) {
+                    addAr(["READ", "LIST"]);
+                } else if ("contragents" == element) {
+                    addAr(["CREATE", "READ", "WRITE", "DELETE", "LIST"]);
+                } else {
+                    addAr(["ADD", "DELETE", "LIST"]);
+                }
+            } else {
+                if ("" == subelement) {
+                    addAr(["CREATE", "READ", "WRITE", "DELETE", "LIST"]);
+                } else if (subelement.indexOf("*") == 0) {
+                    addAr(["ALLOW"]);
+                } else {
+                    addAr(["READ", "WRITE"]);
+                }
+            }
+            arSelector.selectpicker('refresh');
+        };
+        var addAr = function(ac) {
+            for (var i = 0; i < ac.length; i++) {
+                var ar = ac[i];
+                arSelector.append($('<option value="' + ar + '">' + ar + '</option>'));
+            }
+        };
 
         var subelementSelector = $('<select name="subelementSelector" class="selectpicker controlElementLeftMargin"></select>').appendTo(condition);
         subelementSelector.selectpicker({
             noneSelectedText: ''
         });
+        subelementSelector.on('change', function(event){
+            refreshAR();
+        });
 
         var ac = settings.ac;
         var arSelector = $('<select name="arSelector" class="selectpicker controlElementLeftMargin"></select>').appendTo(condition);
-        arSelector.append($('<option value="' + ac[0] + '" checked=true>' + ac[0] + '</option>'));
-        for (var i = 1; i < ac.length; i++) {
-            var ar = ac[i];
-            arSelector.append($('<option value="' + ar + '">' + ar + '</option>'));
-        }
+
         arSelector.selectpicker({
-            width: 'auto'
+            noneSelectedText: '',
+            width: '120px'
         });
 
         var addButton = $('<div class="btn-group " style=""><button type="button" class="form-control btn btn-success controlElementLeftMargin" >' +

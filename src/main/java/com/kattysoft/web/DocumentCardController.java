@@ -47,6 +47,9 @@ public class DocumentCardController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TitleService titleService;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     private com.fasterxml.jackson.databind.ObjectMapper mapper2 = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -64,7 +67,7 @@ public class DocumentCardController {
         document.setType(type);
         document.getFields().put("status", "draft");
         User currentUser = userService.getCurrentUser();
-        document.getFields().put("author", currentUser.getId());
+        document.getFields().put("author", currentUser.getId().toString());
         String id = documentService.saveDocument(document);
         return id;
     }
@@ -98,6 +101,8 @@ public class DocumentCardController {
 
         addActions(formConfig, typeConfig, document);
 
+        fillTitles(document);
+
         com.fasterxml.jackson.databind.node.ObjectNode card = mapper2.createObjectNode();
         card.put("form", formConfig);
 
@@ -110,8 +115,14 @@ public class DocumentCardController {
         return card.toString();
     }
 
+    private void fillTitles(Document document) {
+        String statusId = document.getStatus();
+        String statusTitle = titleService.getTitle("status", statusId);
+        document.getFields().put("status", statusTitle);
+    }
+
     private void addActions(com.fasterxml.jackson.databind.JsonNode formConfig, com.fasterxml.jackson.databind.JsonNode typeConfig, Document document) {
-        String typeId = typeConfig.get("flow").textValue();
+        String typeId = typeConfig.has("flow") ? typeConfig.get("flow").textValue() : null;
         if (typeId != null) {
             com.fasterxml.jackson.databind.JsonNode flow = configService.getConfig2("flows/" + typeId);
             String status = document.getStatus();
@@ -120,18 +131,14 @@ public class DocumentCardController {
             }
             com.fasterxml.jackson.databind.JsonNode states = flow.get("states");
             com.fasterxml.jackson.databind.JsonNode state = StreamSupport.stream(states.spliterator(), false).filter(s -> status.equals(s.get("id").textValue())).findFirst().orElse(null);
-            if (state == null) {
-                return;
-            }
-            document.getFields().put("status", state.get("title").textValue());
-            if (!state.has("actions")) {
+            if (state == null || !state.has("actions")) {
                 return;
             }
             com.fasterxml.jackson.databind.node.ArrayNode actions = (com.fasterxml.jackson.databind.node.ArrayNode) state.get("actions");
             com.fasterxml.jackson.databind.node.ArrayNode filteredActions = mapper2.createArrayNode();
             actions.forEach(a -> {
                 String actionId = a.get("id").textValue();
-                if (accessRightService.checkDocumentRights(document, actionId, AccessRightLevel.CREATE)) {
+                if (accessRightService.checkDocumentRights(document, "*" + actionId, AccessRightLevel.ALLOW)) {
                     filteredActions.add(a);
                 }
             });
@@ -273,5 +280,9 @@ public class DocumentCardController {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public void setTitleService(TitleService titleService) {
+        this.titleService = titleService;
     }
 }

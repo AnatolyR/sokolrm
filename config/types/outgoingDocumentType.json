@@ -1,5 +1,6 @@
 {
   "title": "Исходящий",
+  "flow": "outgoingDocumentFlow",
   "fields": [
     {
       "id": "title",

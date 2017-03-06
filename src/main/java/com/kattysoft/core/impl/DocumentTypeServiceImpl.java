@@ -49,6 +49,8 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
             DocumentType documentType = new DocumentType();
             documentType.setId(typeName);
             documentType.setTitle(typeTitle);
+            String flowId = typeNode.has("flow") ? typeNode.get("flow").textValue() : null;
+            documentType.setFlow(flowId);
             documentType.setFieldsTypes(fieldsTypes);
 
             if (typeNode.has("actions")) {

@@ -26,11 +26,14 @@
       },
       {
         "id": "status",
-        "title": "Статус"
+        "title": "Статус",
+        "render": "status"
       },
       {
         "id": "title",
-        "title": "Заголовок"
+        "title": "Заголовок",
+        "render": "link",
+        "linkType": "document"
       },
       {
         "id": "registrationDate",

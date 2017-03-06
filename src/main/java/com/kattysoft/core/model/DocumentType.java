@@ -21,6 +21,8 @@ public class DocumentType {
 
     private String title;
 
+    private String flow;
+
     private List<FieldType> fieldsTypes;
 
     private List<String> actions;
@@ -61,6 +63,14 @@ public class DocumentType {
 
     public void setActions(List<String> actions) {
         this.actions = actions;
+    }
+
+    public String getFlow() {
+        return flow;
+    }
+
+    public void setFlow(String flow) {
+        this.flow = flow;
     }
 
     @Override

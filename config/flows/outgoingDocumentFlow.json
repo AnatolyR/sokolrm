@@ -1,0 +1,105 @@
+{
+  "states": [
+    {
+      "id": "draft",
+      "title": "Черновик",
+      "actions": [
+        {
+          "id": "toproject",
+          "title": "Опуликовать",
+          "state": "project"
+        }
+      ]
+    },
+    {
+      "id": "project",
+      "title": "Проект",
+      "actions": [
+        {
+          "id": "toapproval",
+          "title": "На согласование",
+          "state": "approval"
+        }
+      ]
+    },
+    {
+      "id": "approval",
+      "title": "Согласование"
+    },
+    {
+      "id": "agreed",
+      "title": "Согласовано",
+      "actions": [
+        {
+          "id": "tosign",
+          "title": "На подписание",
+          "state": "sign"
+        }
+      ]
+    },
+    {
+      "id": "sign",
+      "title": "На подписании",
+      "actions": [
+        {
+          "id": "sign",
+          "title": "Подписать",
+          "state": "signed"
+        },
+        {
+          "id": "reject",
+          "title": "Вернуть",
+          "state": "project"
+        }
+      ]
+    },
+    {
+      "id": "signed",
+      "title": "Подписано",
+      "actions": [
+        {
+          "id": "doregistration",
+          "title": "Зарегистрировать",
+          "state": "registered"
+        }
+      ]
+    },
+    {
+      "id": "registered",
+      "title": "Зарегистрирован",
+      "actions": [
+        {
+          "id": "send",
+          "title": "Отправлено",
+          "state": "sent"
+        }
+      ]
+    },
+    {
+      "id": "sent",
+      "title": "Отправлено",
+      "actions": [
+        {
+          "id": "tocase",
+          "title": "В дело",
+          "state": "tocase"
+        }
+      ]
+    },
+    {
+      "id": "tocase",
+      "title": "В дело",
+      "actions": [
+        {
+          "id": "toarchive",
+          "title": "В архив",
+          "state": "archive"
+        }
+      ]
+    },
+    {
+      "id": "archive",
+      "title": "Архив"
+    }
+  ]
+}

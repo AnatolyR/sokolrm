@@ -5,5 +5,5 @@ package com.kattysoft.core;
  * Date: 04.02.2017
  */
 public enum AccessRightLevel {
-    NONE, READ, WRITE, CREATE, ADD, DELETE, LIST
+    DENY, ALLOW, READ, WRITE, CREATE, ADD, DELETE, LIST
 }

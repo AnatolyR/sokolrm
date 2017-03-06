@@ -80,6 +80,9 @@ public class DocumentServiceImpl implements DocumentService {
             String name = e.getKey();
             Object value = e.getValue();
             JsonNode fieldInfo = fieldsInfo.get(name);
+            if (fieldInfo == null) {
+                return;
+            }
             String type = fieldInfo.get("type").asText();
             if ("dictionary".equals(type)) {
                 String dictionaryName = fieldInfo.get("dictionary").asText();

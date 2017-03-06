@@ -22,10 +22,6 @@
       "title": "Мои документы"
     },
     {
-      "id": "favoriteDocuments",
-      "title": "Избранное"
-    },
-    {
       "id": "incomingTasks",
       "title": "Входящие задачи",
       "type": "header"

@@ -1,5 +1,5 @@
 {
-  "condition": "author IS NULL",
+  "condition": "author = '${currentUser}'",
   "gridConfig": {
     "title": "Мои документы",
     "columnsVisible": [

@@ -42,7 +42,28 @@ public class TitleServiceImpl implements TitleService {
         status.put("executed", "Исполнено");
         status.put("tocase", "В дело");
         status.put("archive", "Архив");
+
+        status.put("project", "Проект");
+        status.put("approval", "Согласование");
+        status.put("agreed", "Согласовано");
+        status.put("sign", "На подписании");
+        status.put("signed", "Подписано");
+        status.put("sent", "Отправлено");
         values.put("status", status);
+
+        Map<String, String> actionTitles = new HashMap<>();
+        actionTitles.put("doregistration", "Зарегистрировать");
+        actionTitles.put("toreview", "На рассмотрение");
+        actionTitles.put("doresolution", "Резолюция");
+        actionTitles.put("tocase", "В дело");
+        actionTitles.put("toarchive", "В архив");
+        actionTitles.put("toproject", "Опуликовать");
+        actionTitles.put("toapproval", "На согласование");
+        actionTitles.put("tosign", "На подписание");
+        actionTitles.put("sign", "Подписать");
+        actionTitles.put("reject", "Вернуть");
+        actionTitles.put("send", "Отправлено");
+        values.put("action", actionTitles);
     }
 
     @Override

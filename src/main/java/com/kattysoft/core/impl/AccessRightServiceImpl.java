@@ -92,7 +92,7 @@ public class AccessRightServiceImpl implements AccessRightService {
                 records.forEach(r -> log.debug("Record : {}", r));
             }
             List<String> levels = records.stream().map(AccessRightRecord::getLevel).collect(Collectors.toList());
-            if (levels.contains(AccessRightLevel.NONE.toString())) {
+            if (levels.contains(AccessRightLevel.DENY.toString())) {
                 return false;
             }
             if (levels.contains(level.toString())) {
@@ -106,7 +106,7 @@ public class AccessRightServiceImpl implements AccessRightService {
             if (generalLevels.contains(level.toString())) {
                 generalResult = true;
             }
-            if (generalLevels.contains(AccessRightLevel.NONE.toString())) {
+            if (generalLevels.contains(AccessRightLevel.DENY.toString())) {
                 generalNone = true;
             }
         }
@@ -139,19 +139,19 @@ public class AccessRightServiceImpl implements AccessRightService {
 
     @Override
     public boolean checkDocumentRights(Document document, String subelement, AccessRightLevel level) {
-        if (this.hasRights(document.getSpace(), document.getType(), subelement, AccessRightLevel.NONE)) {
+        if (this.hasRights(document.getSpace(), document.getType(), subelement, AccessRightLevel.DENY)) {
             return false;
         }
         if (this.hasRights(document.getSpace(), document.getType(), subelement, level)) {
             return true;
         }
-        if (this.hasRights(document.getSpace(), "_document", subelement, AccessRightLevel.NONE)) {
+        if (this.hasRights(document.getSpace(), "_document", subelement, AccessRightLevel.DENY)) {
             return false;
         }
         if (this.hasRights(document.getSpace(), "_document", subelement, level)) {
             return true;
         }
-        if (this.hasRights("_space", "_document", subelement, AccessRightLevel.NONE)) {
+        if (this.hasRights("_space", "_document", subelement, AccessRightLevel.DENY)) {
             return false;
         }
         if (this.hasRights("_space", "_document", subelement, level)) {
@@ -162,7 +162,7 @@ public class AccessRightServiceImpl implements AccessRightService {
 
     @Override
     public List<AccessRightLevel> getRights(String space, String element, String subelement) {
-        return Arrays.asList(AccessRightLevel.NONE, AccessRightLevel.READ, AccessRightLevel.WRITE,
+        return Arrays.asList(AccessRightLevel.DENY, AccessRightLevel.READ, AccessRightLevel.WRITE,
             AccessRightLevel.CREATE, AccessRightLevel.ADD, AccessRightLevel.DELETE, AccessRightLevel.LIST);
     }
 
