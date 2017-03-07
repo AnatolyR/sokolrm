@@ -30,15 +30,24 @@ public class TitleServiceImpl implements TitleService {
         executionStatus.put("complete", "Завершено");
         values.put("executionStatus", executionStatus);
 
+        Map<String, String> executionResult = new HashMap<>();
+        executionResult.put("done", "Исполнено");
+        executionResult.put("not_done", "Не исполнено");
+        executionResult.put("agreed", "Согласовано");
+        executionResult.put("not_agreed", "Не согласовано");
+        executionResult.put("agreed_with_note", "Согласовано с замечаниями");
+        values.put("executionResult", executionResult);
+
         Map<String, String> executionType = new HashMap<>();
         executionType.put("execution", "Исполнение");
+        executionType.put("approval", "Согласование");
         values.put("executionType", executionType);
 
         Map<String, String> status = new HashMap<>();
         status.put("draft", "Черновик");
         status.put("registered", "Зарегистрирован");
         status.put("review", "Рассмотрение");
-        status.put("resolution", "Исполнение");
+        status.put("execution", "Исполнение");
         status.put("executed", "Исполнено");
         status.put("tocase", "В дело");
         status.put("archive", "Архив");
@@ -46,6 +55,7 @@ public class TitleServiceImpl implements TitleService {
         status.put("project", "Проект");
         status.put("approval", "Согласование");
         status.put("agreed", "Согласовано");
+        status.put("not_agreed", "Не согласовано");
         status.put("sign", "На подписании");
         status.put("signed", "Подписано");
         status.put("sent", "Отправлено");

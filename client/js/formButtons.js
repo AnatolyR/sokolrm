@@ -41,7 +41,9 @@ $.widget('sokol.formButtons', {
             actionButton.click($.proxy(function() {
                 if (a.form) {
                     if (a.form == 'resolution') {
-                        this.options.dispatcher.resolution();
+                        this.options.dispatcher.execution('resolution');
+                    } else if (a.form == 'approval') {
+                        this.options.dispatcher.execution('approval');
                     }
                 } else {
                     this.doAction(a);

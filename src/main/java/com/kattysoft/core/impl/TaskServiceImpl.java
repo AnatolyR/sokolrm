@@ -74,30 +74,50 @@ public class TaskServiceImpl implements TaskService {
         saveTasks(tasks, tasksList);
         deleteNotMoreExistsTasks(tasks, tasksList);
 
-        updateDocumentStatus(tasksList.getId(), tasksList.getDocumentId().toString());
+        updateDocumentStatus(tasksList.getId(), tasksList.getType(), tasksList.getDocumentId().toString());
 
         return tasksList.getId().toString();
     }
 
-    private void updateDocumentStatus(UUID id, String documentId) {
+    private void updateDocumentStatus(UUID id, String type, String documentId) {
         List<Task> tasks = taskRepository.findAllByListId(id);
         Document document = documentService.getDocument(documentId);
         boolean runningTasks = tasks.stream().filter(t -> "run".equals(t.getStatus())).findFirst().isPresent();
-        if (runningTasks) {
-            if (!"execution".equals(document.getStatus())) {
-                Document holder = new Document();
-                holder.setId(documentId);
-                holder.getFields().put("status", "execution");
-                documentService.saveDocument(holder);
+        if ("execution".equals(type)) {
+            if (runningTasks) {
+                if (!"execution".equals(document.getStatus())) {
+                    updateDocumentStatus(documentId, "execution");
+                }
+            } else {
+                if (!"executed".equals(document.getStatus())) {
+                    updateDocumentStatus(documentId, "executed");
+                }
             }
-        } else {
-            if (!"executed".equals(document.getStatus())) {
-                Document holder = new Document();
-                holder.setId(documentId);
-                holder.getFields().put("status", "executed");
-                documentService.saveDocument(holder);
+        } else if ("approval".equals(type)) {
+            if (runningTasks) {
+                if (!"approval".equals(document.getStatus())) {
+                    updateDocumentStatus(documentId, "approval");
+                }
+            } else {
+                boolean done = !tasks.stream().filter(t -> !"agreed".equals(t.getResult())).findFirst().isPresent();
+                if (done) {
+                    if (!"agreed".equals(document.getStatus())) {
+                        updateDocumentStatus(documentId, "agreed");
+                    }
+                } else {
+                    if (!"not_agreed".equals(document.getStatus())) {
+                        updateDocumentStatus(documentId, "not_agreed");
+                    }
+                }
             }
         }
+    }
+
+    private void updateDocumentStatus(String documentId, String status) {
+        Document holder = new Document();
+        holder.setId(documentId);
+        holder.getFields().put("status", status);
+        documentService.saveDocument(holder);
     }
 
     private void deleteNotMoreExistsTasks(List<Task> tasks, TasksList tasksList) {
@@ -225,7 +245,7 @@ public class TaskServiceImpl implements TaskService {
         existedTask.setExecutedByUser(currentUser.getId());
         taskRepository.save(existedTask);
 
-        updateDocumentStatus(existedTask.getListId(), existedTask.getDocumentId().toString());
+        updateDocumentStatus(existedTask.getListId(), existedTask.getType(), existedTask.getDocumentId().toString());
 
     }
 

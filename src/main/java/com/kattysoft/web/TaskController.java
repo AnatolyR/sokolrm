@@ -76,7 +76,14 @@ public class TaskController {
         String comment = fields.get("comment").asText();
         tasksList.setComment(comment);
 
-        tasksList.setType("execution");
+        String type = data.get("type").textValue();
+        if ("resolution".equals(type)) {
+            tasksList.setType("execution");
+        } else if ("approval".equals(type) || "acquaintance".equals(type)) {
+            tasksList.setType(type);
+        } else {
+            throw new SokolException("Wrong task list type");
+        }
 
         ArrayNode executors = (ArrayNode) data.get("executors");
         executors.forEach(e -> {
@@ -98,7 +105,7 @@ public class TaskController {
         return id;
     }
 
-    public static List<String> types = Arrays.asList("execution");
+    public static List<String> types = Arrays.asList("execution", "approval");
     @RequestMapping(value = "/getExecutionList")
     public ObjectNode getExecutionList(String documentId, String type) {
         if (documentId == null || documentId.isEmpty()) {
@@ -132,6 +139,10 @@ public class TaskController {
                 if (t.has("status") && !t.get("status").isNull() &&!t.get("status").asText().isEmpty()) {
                     String statusTitle = titleService.getTitleNotNull("executionStatus", t.get("status").asText());
                     ((ObjectNode) t).put("status", statusTitle);
+                }
+                if (t.has("result") && !t.get("result").isNull() &&!t.get("result").asText().isEmpty()) {
+                    String resultTitle = titleService.getTitleNotNull("executionResult", t.get("result").asText());
+                    ((ObjectNode) t).put("result", resultTitle);
                 }
             });
 

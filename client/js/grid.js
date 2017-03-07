@@ -363,20 +363,25 @@ $.widget("sokol.grid", {
                         td.appendTo(row);
                     } else if (column.render == 'expand') {
                         var td = $('<td></td>');
-                        var a = $('<a href="#">' + (val ? val : '') + '</a>').appendTo(td);
-                        a.click((function(row, column) {
-                            return function(e) {
-                                e.preventDefault();
-                                var expandTr = $(row).next();
-                                if (expandTr.attr("data-name") == "reportComment") {
-                                    expandTr.remove();
-                                } else {
-                                    var expandData = rowObj[column.dataColumn];
-                                    expandTr = $('<tr data-name="reportComment"><td colspan="100">' + (expandData ? expandData : '') + '</td></tr>');
-                                    expandTr.insertAfter(row);
-                                }
-                            };
+                        if (rowObj[column.dataColumn]) {
+                            var a = $('<a href="#">' + (val ? val : '') + '</a>').appendTo(td);
+                            a.click((function(row, column) {
+                                return function(e) {
+                                    e.preventDefault();
+                                    var expandTr = $(row).next();
+                                    if (expandTr.attr("data-name") == "reportComment") {
+                                        expandTr.remove();
+                                    } else {
+                                        var expandData = rowObj[column.dataColumn];
+                                        expandTr = $('<tr data-name="reportComment"><td colspan="100">' + (expandData ? expandData : '') + '</td></tr>');
+                                        expandTr.insertAfter(row);
+                                    }
+                                };
                             })(row, column));
+                        } else {
+                            var s = $('<span>' + (val ? val : '') + '</span>').appendTo(td);
+                        }
+
                         td.appendTo(row);
                     } else {
                         if(Object.prototype.toString.call(val) === '[object Array]' ) {

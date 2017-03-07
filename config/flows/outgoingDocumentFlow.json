@@ -18,7 +18,7 @@
         {
           "id": "toapproval",
           "title": "На согласование",
-          "state": "approval"
+          "form": "approval"
         }
       ]
     },

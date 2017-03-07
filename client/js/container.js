@@ -70,7 +70,8 @@ $.widget('sokol.container', {
         }, $('<div></div>').appendTo(this.element));
 
         if (this.options.containerType == 'document') {
-            this.createExecutionListIfExist();
+            this.createExecutionListIfExist('approval');
+            this.createExecutionListIfExist('execution');
         }
 
         if (this.options.subforms) {
@@ -85,34 +86,36 @@ $.widget('sokol.container', {
         }
     },
 
-    resolution: function() {
-        if (!this.executionForm) {
-            this.executionForm = $.sokol.executionForm({
+    execution: function(type) {
+        if (!this[type + "Form"]) {
+            this[type + "Form"] = $.sokol.executionForm({
                 dispatcher: this,
                 documentId: this.options.id,
-                mode: 'create'
+                mode: 'create',
+                type: type
             }, $("<div></div>").insertAfter(this.header.element));
         }
     },
 
     refreshExecutionList: function(type) {
-        if (this.executionForm) {
-            this.executionForm.destroy();
+        if (this[type + "Form"]) {
+            this[type + "Form"].destroy();
         }
-        this.createExecutionListIfExist();
+        this.createExecutionListIfExist(type);
     },
 
-    createExecutionListIfExist: function() {
+    createExecutionListIfExist: function(type) {
         $.getJSON('app/getExecutionList', {
             documentId: this.options.id,
-            type: 'execution'
+            type: type
         }, $.proxy(function(data) {
             if (!$.isEmptyObject(data)) {
-                this.executionForm = $.sokol.executionForm({
+                this[type + "Form"] = $.sokol.executionForm({
                     dispatcher: this,
                     data: data,
                     documentId: this.options.id,
-                    mode: 'read'
+                    mode: 'read',
+                    type: type
                 }, $("<div></div>").insertAfter(this.form.element));
             }
         }, this));

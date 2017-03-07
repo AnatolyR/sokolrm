@@ -1,9 +1,13 @@
 $.widget('sokol.executionForm', {
     options: {
-        mode: 'read'
+        mode: 'read',
+        type: null
     },
 
     _create: function () {
+        if (!this.options.type) {
+            new Error('Execution list type is not defined');
+        }
         this.createHeader();
         this.createBlock();
     },
@@ -13,7 +17,18 @@ $.widget('sokol.executionForm', {
         this.element.attr('name', 'attachmentsPanel');
 
         var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
-        var panelTitle = $('<div class="panel-title">Резолюция</div>').appendTo(panelHeader);
+
+        var title;
+        var type = this.options.type;
+        if (type == 'execution') {
+            title = 'Резолюция';
+        } else if (type == 'approval') {
+            title = 'Согласование';
+        } else if (type == 'acquaintance') {
+            title = 'Ознакомление';
+        }
+        var panelTitle = $('<div class="panel-title">' + title + '</div>').appendTo(panelHeader);
+
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(this.element);
         this.panelBody = panelBody;
@@ -28,7 +43,6 @@ $.widget('sokol.executionForm', {
             data: this.options.data ? this.options.data : {},
             form: {
                 "id": "userSystem",
-                "title": "Системные свойства",
                 "fields": [
                     {
                         "items": [
@@ -51,7 +65,7 @@ $.widget('sokol.executionForm', {
                     },
                     {
                         "id": "comment",
-                        "title": "Резолюция",
+                        "title": this.options.type == 'resolution' ? 'Резолюция' : 'Комментарий',
                         "type": "text",
                         "mandatory": true
                     }
@@ -62,58 +76,67 @@ $.widget('sokol.executionForm', {
             containerType: 'execution'
         }, $('<div></div>').appendTo(this.panelBody));
 
+        var executorsListTitle;
+        var executorTitle;
+        var type = this.options.type;
+        if (type == 'execution') {
+            executorsListTitle = 'Исполнители';
+            executorTitle = 'Исполнитель';
+        } else if (type = 'approval') {
+            executorsListTitle = 'Согласующие';
+            executorTitle = 'Согласующий';
+        } else if (type == 'acquaintance') {
+            executorsListTitle = 'Ознакамливающиеся';
+            executorTitle = 'Ознакамливающийся';
+        }
         var options = {
-                "title": "Исполнители",
-                "sortable": true,
+                'title': executorsListTitle,
+                'sortable': true,
                 mode: (this.options.mode == 'create' || this.options.mode == 'edit') ? 'edit' : 'read',
-                "columnsVisible": [
-                    "userTitle",
-                    "dueDate",
-                    "executedDate",
-                    "status",
-                    "result"
+                'columnsVisible': [
+                    'userTitle',
+                    'dueDate',
+                    'executedDate',
+                    'status',
+                    'result'
                 ],
-                "columns": [
+                'columns': [
                     {
-                        "id": "userId",
-                        "title": "Исполнитель (ИД)",
-                        "render": "link",
-                        "linkType": "user"
+                        'id': 'userId',
+                        'title': executorTitle + ' (ИД)',
+                        'render': 'link',
+                        'linkType': 'user'
                     },
                     {
-                        "id": "userTitle",
-                        "idColumn": "userId",
-                        "title": "Исполнитель",
-                        "render": "link",
-                        "linkType": "user",
-                        "editor": "user",
-                        "width": "500px"
+                        'id': 'userTitle',
+                        'idColumn': 'userId',
+                        'title': executorTitle,
+                        'render': 'link',
+                        'linkType': 'user',
+                        'editor': 'user',
+                        'width': '500px'
                     },
                     {
-                        "id": "dueDate",
-                        "title": "Срок",
-                        render: 'datetime',
-                        "editor": "date"
+                        'id': 'dueDate',
+                        'title': 'Срок',
+                        'render': 'datetime',
+                        'editor': 'date'
                     },
                     {
-                        "id": "executedDate",
-                        "title": "Завершено",
-                        "render": "datetime"
+                        'id': 'executedDate',
+                        'title': 'Завершено',
+                        'render': 'datetime'
                     },
                     {
-                        "id": "status",
-                        "title": "Статус"
-                    },
-                    {
-                        "id": "result",
-                        "title": "Отчет",
-                        "render": "expand",
-                        "dataColumn": "comment"
+                        'id': 'result',
+                        'title': 'Статус',
+                        'render': 'expand',
+                        'dataColumn': 'comment'
                     }
                 ],
-                "id": "tasks",
-                "filterable": false,
-                deleteMethod: $.proxy(this.doDelete, this)
+                'id': 'tasks',
+                'filterable': false,
+                'deleteMethod': $.proxy(this.doDelete, this)
         };
         options.data = (this.options.data && this.options.data.tasks) ? this.options.data.tasks : [];
         options.usePanel = false;
@@ -147,7 +170,16 @@ $.widget('sokol.executionForm', {
         var data = this.form.getData();
 
         var saveUrl = 'app/saveExecutionList';
-        var message = 'Не удалось сохранить список исполнителей. Обратитесь к администратору.';
+        var type = this.options.type;
+        var title;
+        if (type == 'execution') {
+            title = 'исполнителей';
+        } else if (type = 'approval') {
+            title = 'согласующих';
+        } else if (type == 'acquaintance') {
+            title = 'ознакамливающихся';
+        }
+        var message = 'Не удалось сохранить список ' + title + '. Обратитесь к администратору.';
 
         var rows = this.grid.element.find('tr');
         var rowsData = [];
@@ -180,7 +212,7 @@ $.widget('sokol.executionForm', {
         });
 
         data.executors = rowsData;
-        data.type = 'resolution';
+        data.type = this.options.type;
         data.documentId = this.options.documentId;
 
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
@@ -219,11 +251,20 @@ $.widget('sokol.executionForm', {
         }, this));
         cancelButton.appendTo(buttons);
 
+        var title;
+        var type = this.options.type;
+        if (type == 'execution') {
+            title = 'резолюции';
+        } else if (type = 'approval') {
+            title = 'согласования';
+        } else if (type == 'acquaintance') {
+            title = 'ознакомления';
+        }
         var cancelCreateButton = $('<button type="button" name="cancelCreate" style="display: none;" class="btn btn-default controlElementLeftMargin">Отмена</button>');
         cancelCreateButton.click($.proxy(function() {
             $.sokol.smodal({
                 title: 'Подтверждение отмены',
-                body: 'Отменить создание резолюции?',
+                body: 'Отменить создание ' + title + '?',
                 confirmButtonTitle: 'Подтвердить',
                 confirmAction: $.proxy(this.options.dispatcher.cancelExecution, this.options.dispatcher)
             });
