@@ -131,7 +131,8 @@ $.widget('sokol.container', {
         }
         if (subform.form.id == 'task') {
             var executionReportForm = $.sokol.executionReportForm({
-                data: subform.data
+                data: subform.data,
+                dispatcher: this
             }, $('<div></div>').insertAfter(this.header.element));
             this.childs.push(executionReportForm);
             return;
@@ -217,8 +218,8 @@ $.widget('sokol.container', {
         }, this));
     },
 
-    reopen: function() {
-        this.options.dispatcher.open(this.options.containerType + '/' + this.options.id);
+    reopen: function(id) {
+        this.options.dispatcher.open(this.options.containerType + '/' + (id ? id : this.options.id));
     },
 
     deleteDocument: function() {

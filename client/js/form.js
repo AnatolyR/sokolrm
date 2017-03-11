@@ -70,6 +70,10 @@ $.widget('sokol.form', {
     },
 
     createFieldText: function(formNode, field, value, edit) {
+        if (!value && field.hideIfEmpty) {
+            return;
+        }
+
         $(formNode).append('' +
             '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
             '<label class="control-label">' + field.title + ':</label>' +
@@ -112,7 +116,19 @@ $.widget('sokol.form', {
 
     },
     createFieldSelect: function(formNode, field, value, edit) {
+        if (!value && field.hideIfEmpty) {
+            return;
+        }
+
         if (!edit) {
+            if (field.options && field.valueField) {
+                var vo =field.options.find(function (o) {
+                    return o[field.valueField] == value;
+                });
+                if (vo) {
+                    value = vo.title;
+                }
+            }
             $(formNode).append('' +
                 '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
                 '<label class="control-label">' + field.title + ':</label>' +
@@ -131,26 +147,12 @@ $.widget('sokol.form', {
         this.element.find('[name=' + field.id + ']').selectize({
             maxItems: 1,
             //plugins: ['remove_button'],
-            valueField: 'title',
+            valueField: field.valueField ? field.valueField : 'title',
             labelField: 'title',
             searchField: 'title',
             preload: true,
-            options: [],
-            load: function(query, callback) {
-                //$.ajax({
-                //    url: 'app/simpledic',
-                //    type: 'GET',
-                //    dataType: 'json',
-                //    data: {
-                //        id: field.dictionary
-                //    },
-                //    error: function() {
-                //        callback();
-                //    },
-                //    success: function(res) {
-                //        callback(res);
-                //    }
-                //});
+            options: field.options ? field.options : [],
+            load: field.options ? null : function(query, callback) {
                 $.getJSON('app/simpledictionary', {
                                 id: field.dictionary
                             }, callback).fail(function() {

@@ -233,7 +233,7 @@ public class TaskController {
         ((ObjectNode) formConfig).put("typeTitle", typeConfig.get("title"));
 
         ((ObjectNode) formConfig).remove("actions");
-        fillDocumentTitles(formConfig, typeConfig, document);
+        fillDocumentTitles(document);
 
         ObjectNode card = mapper.createObjectNode();
         card.put("form", formConfig);
@@ -273,21 +273,10 @@ public class TaskController {
         return card.toString();
     }
 
-    private void fillDocumentTitles(com.fasterxml.jackson.databind.JsonNode formConfig, com.fasterxml.jackson.databind.JsonNode typeConfig, Document document) {
-        String typeId = typeConfig.get("flow").textValue();
-        if (typeId != null) {
-            com.fasterxml.jackson.databind.JsonNode flow = configService.getConfig2("flows/" + typeId);
-            String status = document.getStatus();
-            if (status == null || status.isEmpty()) {
-                return;
-            }
-            com.fasterxml.jackson.databind.JsonNode states = flow.get("states");
-            com.fasterxml.jackson.databind.JsonNode state = StreamSupport.stream(states.spliterator(), false).filter(s -> status.equals(s.get("id").textValue())).findFirst().orElse(null);
-            if (state == null) {
-                return;
-            }
-            document.getFields().put("status", state.get("title").textValue());
-        }
+    private void fillDocumentTitles(Document document) {
+        String statusId = document.getStatus();
+        String statusTitle = titleService.getTitle("status", statusId);
+        document.getFields().put("status", statusTitle);
     }
 
     @RequestMapping(value = "/saveTaskReport")
@@ -305,7 +294,7 @@ public class TaskController {
         Task task = new Task();
         task.setId(uuid);
 
-        String comment = fields.get("comment").asText();
+        String comment = fields.has("comment") ? fields.get("comment").asText() : "";
         task.setComment(comment);
 
         String result = fields.get("result").asText();
