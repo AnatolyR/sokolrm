@@ -20,12 +20,25 @@ $.widget('sokol.executionForm', {
 
         var title;
         var type = this.options.type;
+        var taskId = this.options.taskId;
         if (type == 'execution') {
-            title = 'Резолюция';
+            if (taskId) {
+                title = 'Внутренняя резолюция';
+            } else {
+                title = 'Резолюция';
+            }
         } else if (type == 'approval') {
-            title = 'Согласование';
+            if (taskId) {
+                title = 'Внутреннее согласование';
+            } else {
+                title = 'Согласование';
+            }
         } else if (type == 'acquaintance') {
-            title = 'Ознакомление';
+            if (taskId) {
+                title = 'Внутреннее ознакомление';
+            } else {
+                title = 'Ознакомление';
+            }
         }
         var panelTitle = $('<div class="panel-title">' + title + '</div>').appendTo(panelHeader);
 
@@ -214,6 +227,7 @@ $.widget('sokol.executionForm', {
         data.executors = rowsData;
         data.type = this.options.type;
         data.documentId = this.options.documentId;
+        data.taskId = this.options.taskId;
 
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
             //this.options.dispatcher.refreshExecutionList('resolution');

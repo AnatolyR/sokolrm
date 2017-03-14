@@ -231,15 +231,15 @@ $.widget('sokol.executionReportForm', {
         var saveTitle;
         var type = this.options.data.type;
         if (type == 'execution') {
-            executionsTitle = 'Создать резолюцию';
+            executionsTitle = 'Создать внутреннюю резолюцию';
             reportTitle = 'Создать отчет';
             saveTitle = 'Сохранить отчет';
         } else if (type = 'approval') {
-            executionsTitle = 'Создать согласование';
+            executionsTitle = 'Создать внутреннее согласование';
             reportTitle = 'Согласовать с замечанием';
             saveTitle = 'Согласовать';
         } else if (type == 'acquaintance') {
-            executionsTitle = 'Создать ознакомление';
+            executionsTitle = 'Создать внутреннее ознакомление';
             reportTitle = 'Ознакомиться с комментарием';
             saveTitle = 'Ознакомиться';
         }
@@ -258,7 +258,7 @@ $.widget('sokol.executionReportForm', {
 
         var executionButton = $('<button type="button" name="executionButton" style="display: none;" class="btn btn-info controlElementLeftMargin">' + executionsTitle + '</button>');
         executionButton.click($.proxy(function() {
-
+            this.options.dispatcher.execution(type, this.options.data.id);
         }, this));
         executionButton.appendTo(buttons);
 
@@ -304,7 +304,9 @@ $.widget('sokol.executionReportForm', {
             return;
         }
         if (mode == 'read') {
-            buttons.children('[name="executionButton"]').show();
+            if (!this.options.data.hasinternal) {
+                buttons.children('[name="executionButton"]').show();
+            }
             buttons.children('[name="reportButton"]').show();
             if (this.options.data.type == 'approval') {
                 buttons.children('[name="approveButton"]').show();

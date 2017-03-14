@@ -45,11 +45,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public String saveExecutionList(TasksList tasksList) {
-        TasksList existList = getExecutionList(tasksList.getDocumentId(), tasksList.getType());
+//        TasksList existList = getExecutionList(tasksList.getDocumentId(), tasksList.getType());
 
         List<Task> tasks = tasksList.getTasks();
 
-        if (tasksList.getId() == null && existList == null) {
+        if (tasksList.getId() == null) {
             UUID id = UUID.randomUUID();
             tasksList.setId(id);
 
@@ -59,9 +59,8 @@ public class TaskServiceImpl implements TaskService {
             Date date = new Date();
             tasksList.setCreated(date);
         } else {
-            if (existList == null) {
-                existList = tasksListRepository.findOne(tasksList.getId());
-            }
+            TasksList existList = tasksListRepository.findOne(tasksList.getId());
+
             if (existList == null) {
                 throw new SokolException("TasksList not found");
             } else {
@@ -85,6 +84,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void updateDocumentStatus(UUID id, String type, String documentId) {
+        TasksList mainExecutionList = getMainExecutionList(UUID.fromString(documentId), type);
+        if (!mainExecutionList.getId().equals(id)) {
+            return;
+        }
         List<Task> tasks = taskRepository.findAllByListId(id);
         Document document = documentService.getDocument(documentId);
         boolean runningTasks = tasks.stream().filter(t -> "run".equals(t.getStatus())).findFirst().isPresent();
@@ -176,9 +179,21 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TasksList getExecutionList(UUID documentId, String type) {
+    public TasksList getExecutionList(UUID parentListId, String type) {
         User currentUser = userService.getCurrentUser();
-        TasksList tasksList = tasksListRepository.findOneByDocumentIdAndUserIdAndType(documentId, currentUser.getId(), type);
+        TasksList tasksList = tasksListRepository.findOneByParentIdAndUserIdAndType(parentListId, currentUser.getId(), type);
+
+        if (tasksList != null) {
+            List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());
+            tasksList.setTasks(tasks);
+        }
+
+        return tasksList;
+    }
+
+    @Override
+    public TasksList getTaskExecutionList(UUID taskId) {
+        TasksList tasksList = tasksListRepository.findOneByParentTaskId(taskId);
 
         if (tasksList != null) {
             List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());

@@ -19,5 +19,7 @@ import java.util.UUID;
  */
 public interface TasksListRepository extends CrudRepository<TasksList, UUID>, JpaSpecificationExecutor<TasksList> {
     TasksList findOneByDocumentIdAndUserIdAndType(UUID documentId, UUID userId, String type);
-    TasksList findOneByDocumentIdAndParentIdAndType(UUID documentId, UUID userId, String type);
+    TasksList findOneByDocumentIdAndParentIdAndType(UUID documentId, UUID parentId, String type);
+    TasksList findOneByParentIdAndUserIdAndType(UUID parentId, UUID userId, String type);
+    TasksList findOneByParentTaskId(UUID parentTaskId);
 }

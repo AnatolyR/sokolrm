@@ -86,13 +86,14 @@ $.widget('sokol.container', {
         }
     },
 
-    execution: function(type) {
+    execution: function(type, taskId) {
         if (!this[type + "Form"]) {
             this[type + "Form"] = $.sokol.executionForm({
                 dispatcher: this,
                 documentId: this.options.id,
                 mode: 'create',
-                type: type
+                type: type,
+                taskId: taskId
             }, $("<div></div>").insertAfter(this.header.element));
         }
     },
@@ -104,10 +105,11 @@ $.widget('sokol.container', {
         this.createExecutionListIfExist(type);
     },
 
-    createExecutionListIfExist: function(type) {
+    createExecutionListIfExist: function(type, taskId) {
         $.getJSON('app/getExecutionList', {
             documentId: this.options.id,
-            type: type
+            type: type,
+            taskId: taskId
         }, $.proxy(function(data) {
             if (!$.isEmptyObject(data)) {
                 this[type + "Form"] = $.sokol.executionForm({
@@ -115,8 +117,9 @@ $.widget('sokol.container', {
                     data: data,
                     documentId: this.options.id,
                     mode: 'read',
-                    type: type
-                }, $("<div></div>").insertAfter(this.form.element));
+                    type: type,
+                    taskId: taskId
+                }, $("<div></div>").insertAfter(this.executionReportForm ? this.executionReportForm.element : this.form.element));
             }
         }, this));
     },
@@ -135,6 +138,10 @@ $.widget('sokol.container', {
                 dispatcher: this
             }, $('<div></div>').insertAfter(this.header.element));
             this.childs.push(executionReportForm);
+            var taskId = subform.data.id;
+            this.options.taskId = taskId;
+            this.executionReportForm = executionReportForm;
+            this.createExecutionListIfExist(subform.data.type, taskId);
             return;
         }
         var form = $.sokol.form({
@@ -219,7 +226,7 @@ $.widget('sokol.container', {
     },
 
     reopen: function(id) {
-        this.options.dispatcher.open(this.options.containerType + '/' + (id ? id : this.options.id));
+        this.options.dispatcher.open(this.options.containerType + '/' + (id ? id : (this.options.taskId ? this.options.taskId : this.options.id)));
     },
 
     deleteDocument: function() {

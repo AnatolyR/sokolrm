@@ -64,7 +64,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/saveExecutionList")
-    public String saveExecution(Reader reader) throws IOException {
+    public String saveExecutionList(Reader reader) throws IOException {
         String requestBody = IOUtils.toString(reader);
         ObjectNode data = (ObjectNode) mapper.readTree(requestBody);
         UUID uuid = data.has("id") && !data.get("id").asText().isEmpty() && !data.get("id").isNull() ? UUID.fromString(data.get("id").asText()) : null;
@@ -97,6 +97,19 @@ public class TaskController {
 
         TasksList tasksList = new TasksList();
         tasksList.setId(uuid);
+
+        UUID taskId = data.has("taskId") && !data.get("taskId").asText().isEmpty() && !data.get("taskId").isNull() ? UUID.fromString(data.get("taskId").asText()) : null;
+        if (taskId != null) {
+            Task task = taskService.getTaskById(taskId);
+            User currentUser = userService.getCurrentUser();
+            if (!task.getUserId().equals(currentUser.getId())) {
+                throw new NoAccessRightsException("Current user not executor of this task");
+            }
+
+            tasksList.setParentTaskId(task.getId());
+            tasksList.setParentId(task.getListId());
+        }
+
 
         tasksList.setDocumentId(UUID.fromString(documentId));
 
@@ -133,7 +146,7 @@ public class TaskController {
 
     public static List<String> types = Arrays.asList("execution", "approval");
     @RequestMapping(value = "/getExecutionList")
-    public ObjectNode getExecutionList(String documentId, String type) {
+    public ObjectNode getExecutionList(String documentId, String type, String taskId) {
         if (documentId == null || documentId.isEmpty()) {
             throw new SokolException("Empty documentId");
         }
@@ -146,7 +159,22 @@ public class TaskController {
             throw new SokolException("Wrong executionlist type");
         }
 
-        TasksList taskList = taskService.getMainExecutionList(UUID.fromString(documentId), type);
+        User currentUser = userService.getCurrentUser();
+        TasksList taskList;
+
+        if (taskId != null) {
+            Task task = taskService.getTaskById(UUID.fromString(taskId));
+            if (!task.getUserId().equals(currentUser.getId()) && !task.getAuthor().equals(currentUser.getId())) {
+                throw new NoAccessRightsException("Current user not executor or author of this task");
+            }
+            taskList = taskService.getTaskExecutionList(task.getId());
+            if (taskList != null && !taskList.getType().equals(type)) {
+                throw new SokolException("Task type and process type not same");
+            }
+        } else {
+            taskList = taskService.getMainExecutionList(UUID.fromString(documentId), type);
+        }
+
         if (taskList != null) {
             ObjectNode listNode = mapper.valueToTree(taskList);
             UUID userId = taskList.getUserId();
@@ -158,7 +186,6 @@ public class TaskController {
             }
             listNode.put("created", Utils.formatDate(taskList.getCreated()));
 
-            User currentUser = userService.getCurrentUser();
             listNode.put("editable", currentUser.getId().equals(userId));
 
             listNode.get("tasks").forEach(t -> {
@@ -302,6 +329,10 @@ public class TaskController {
 
         if (task.getUserId().equals(currentUser.getId())) {
             taskData.put("editable", true);
+        }
+
+        if (taskService.getTaskExecutionList(task.getId()) != null) {
+            taskData.put("hasinternal", true);
         }
 
         subformCard.set("data", taskData);

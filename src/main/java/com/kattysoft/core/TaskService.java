@@ -22,7 +22,7 @@ public interface TaskService {
 
     String saveExecutionList(TasksList tasksList);
 
-    TasksList getExecutionList(UUID documentId, String type);
+    TasksList getExecutionList(UUID parentListId, String type);
 
     TasksList getMainExecutionList(UUID documentId, String type);
 
@@ -33,4 +33,6 @@ public interface TaskService {
     TasksList getExecutionListById(UUID id);
 
     void completeTask(Task task);
+
+    TasksList getTaskExecutionList(UUID taskId);
 }

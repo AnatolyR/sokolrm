@@ -35,6 +35,9 @@ public class TasksList {
     private UUID parentId;
 
     @Type(type = "pg-uuid")
+    private UUID parentTaskId;
+
+    @Type(type = "pg-uuid")
     private UUID documentId;
 
     @Type(type = "pg-uuid")
@@ -65,6 +68,14 @@ public class TasksList {
 
     public void setParentId(UUID parentId) {
         this.parentId = parentId;
+    }
+
+    public UUID getParentTaskId() {
+        return parentTaskId;
+    }
+
+    public void setParentTaskId(UUID parentTaskId) {
+        this.parentTaskId = parentTaskId;
     }
 
     public UUID getDocumentId() {
