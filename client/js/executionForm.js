@@ -285,7 +285,9 @@ $.widget('sokol.executionForm', {
             buttons.children('[name="save"]').show();
             buttons.children('[name="cancel"]').show();
         } else {
-            buttons.children('[name="edit"]').show();
+            if (this.options.data.editable) {
+                buttons.children('[name="edit"]').show();
+            }
         }
     },
 

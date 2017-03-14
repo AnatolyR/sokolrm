@@ -49,6 +49,9 @@ public class TaskController {
     @Autowired
     private TitleService titleService;
 
+    @Autowired
+    private AccessRightService accessRightService;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
@@ -66,17 +69,40 @@ public class TaskController {
         ObjectNode data = (ObjectNode) mapper.readTree(requestBody);
         UUID uuid = data.has("id") && !data.get("id").asText().isEmpty() && !data.get("id").isNull() ? UUID.fromString(data.get("id").asText()) : null;
         ObjectNode fields = (ObjectNode) data.get("fields");
+        String type = data.get("type").textValue();
+        String documentId = data.get("documentId").asText();
+
+        if (documentId == null || documentId.isEmpty()) {
+            throw new SokolException("Empty documentId");
+        }
+        Document document = documentService.getDocument(documentId);
+        if (!accessRightService.checkDocumentRights(document, "", AccessRightLevel.READ)) {
+            throw new NoAccessRightsException("Not access rights to read document");
+        }
+        if ("resolution".equals(type)) {
+            if (!accessRightService.checkDocumentRights(document, "*doresolution", AccessRightLevel.ALLOW)) {
+                throw new NoAccessRightsException("Not access rights to start execution document");
+            }
+        } else if ("approval".equals(type)) {
+            if (!accessRightService.checkDocumentRights(document, "*toapproval", AccessRightLevel.ALLOW)) {
+                throw new NoAccessRightsException("Not access rights to start approval document");
+            }
+        } else if ("acquaintance".equals(type)) {
+            if (!accessRightService.checkDocumentRights(document, "*toacquaintance", AccessRightLevel.ALLOW)) {
+                throw new NoAccessRightsException("Not access rights to start acquaintance document");
+            }
+        } else {
+            throw new SokolException("Wrong task list type");
+        }
 
         TasksList tasksList = new TasksList();
         tasksList.setId(uuid);
 
-        UUID documentId = UUID.fromString(data.get("documentId").asText());
-        tasksList.setDocumentId(documentId);
+        tasksList.setDocumentId(UUID.fromString(documentId));
 
         String comment = fields.get("comment").asText();
         tasksList.setComment(comment);
 
-        String type = data.get("type").textValue();
         if ("resolution".equals(type)) {
             tasksList.setType("execution");
         } else if ("approval".equals(type) || "acquaintance".equals(type)) {
@@ -111,12 +137,16 @@ public class TaskController {
         if (documentId == null || documentId.isEmpty()) {
             throw new SokolException("Empty documentId");
         }
+        Document document = documentService.getDocument(documentId);
+        if (!accessRightService.checkDocumentRights(document, "", AccessRightLevel.READ)) {
+            throw new NoAccessRightsException("Not access rights to read document");
+        }
 
         if (type == null || type.isEmpty() || !types.contains(type)) {
             throw new SokolException("Wrong executionlist type");
         }
 
-        TasksList taskList = taskService.getExecutionList(UUID.fromString(documentId), type);
+        TasksList taskList = taskService.getMainExecutionList(UUID.fromString(documentId), type);
         if (taskList != null) {
             ObjectNode listNode = mapper.valueToTree(taskList);
             UUID userId = taskList.getUserId();
@@ -127,6 +157,9 @@ public class TaskController {
                 listNode.put("userIdTitle", "[Пользователь не найден]");
             }
             listNode.put("created", Utils.formatDate(taskList.getCreated()));
+
+            User currentUser = userService.getCurrentUser();
+            listNode.put("editable", currentUser.getId().equals(userId));
 
             listNode.get("tasks").forEach(t -> {
                 if (t.has("userId") && !t.get("userId").isNull() &&!t.get("userId").asText().isEmpty()) {
@@ -202,8 +235,8 @@ public class TaskController {
         }
         Task task = taskService.getTaskById(UUID.fromString(id));
         User currentUser = userService.getCurrentUser();
-        if (!task.getUserId().equals(currentUser.getId())) {
-            throw new NoAccessRightsException("Current user not executor of this task");
+        if (!task.getUserId().equals(currentUser.getId()) && !task.getAuthor().equals(currentUser.getId())) {
+            throw new NoAccessRightsException("Current user not executor or author of this task");
         }
         UUID documentId = task.getDocumentId();
 
@@ -266,6 +299,11 @@ public class TaskController {
 
         taskData.set("executors", mapper.valueToTree(executors));
         taskData.set("executorsTitle", mapper.valueToTree(executorsTitle));
+
+        if (task.getUserId().equals(currentUser.getId())) {
+            taskData.put("editable", true);
+        }
+
         subformCard.set("data", taskData);
         subforms.add(subformCard);
         card.set("subforms", subforms);
@@ -287,6 +325,12 @@ public class TaskController {
 
         if (uuid == null) {
             throw new SokolException("Task id is null");
+        }
+
+        Task existTask = taskService.getTaskById(uuid);
+        User currentUser = userService.getCurrentUser();
+        if (!existTask.getUserId().equals(currentUser.getId())) {
+            throw new NoAccessRightsException("Current user not executor of this task");
         }
 
         ObjectNode fields = (ObjectNode) data.get("fields");
@@ -324,5 +368,9 @@ public class TaskController {
 
     public void setTitleService(TitleService titleService) {
         this.titleService = titleService;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

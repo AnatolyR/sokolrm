@@ -65,6 +65,11 @@ public class TaskServiceImpl implements TaskService {
             if (existList == null) {
                 throw new SokolException("TasksList not found");
             } else {
+                User currentUser = userService.getCurrentUser();
+                if (!currentUser.getId().equals(existList.getUserId())) {
+                    throw new NoAccessRightsException("Only process author can edit process");
+                }
+
                 BeanUtils.copyProperties(tasksList, existList, Utils.getNullPropertyNames(tasksList));
                 tasksList = existList;
             }
@@ -174,6 +179,18 @@ public class TaskServiceImpl implements TaskService {
     public TasksList getExecutionList(UUID documentId, String type) {
         User currentUser = userService.getCurrentUser();
         TasksList tasksList = tasksListRepository.findOneByDocumentIdAndUserIdAndType(documentId, currentUser.getId(), type);
+
+        if (tasksList != null) {
+            List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());
+            tasksList.setTasks(tasks);
+        }
+
+        return tasksList;
+    }
+
+    @Override
+    public TasksList getMainExecutionList(UUID documentId, String type) {
+        TasksList tasksList = tasksListRepository.findOneByDocumentIdAndParentIdAndType(documentId, null, type);
 
         if (tasksList != null) {
             List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());

@@ -1656,7 +1656,9 @@ $.widget('sokol.executionForm', {
             buttons.children('[name="save"]').show();
             buttons.children('[name="cancel"]').show();
         } else {
-            buttons.children('[name="edit"]').show();
+            if (this.options.data.editable) {
+                buttons.children('[name="edit"]').show();
+            }
         }
     },
 
@@ -1966,7 +1968,9 @@ $.widget('sokol.executionReportForm', {
         var buttons = $(this.element).find('[name="buttons"]');
         buttons.children().hide();
         var mode = this.options.mode;
-
+        if (!this.options.data.editable) {
+            return;
+        }
         if (mode == 'read') {
             buttons.children('[name="executionButton"]').show();
             buttons.children('[name="reportButton"]').show();
