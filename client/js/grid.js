@@ -342,6 +342,8 @@ $.widget("sokol.grid", {
                         td.appendTo(row);
                     } else if (column.editor == "user") {
                         this.createEditorUser(row, column, rowObj[column.idColumn], val);
+                    } else if (column.editor == "radio") {
+                        this.createEditorRadio(row, column, val);
                     } else if (column.editor == "date") {
                         this.createEditorDate(row, column, val);
                     } else {
@@ -361,6 +363,13 @@ $.widget("sokol.grid", {
 
                         var td = $('<td>' + (val ? val : '') + '</td>');
                         td.appendTo(row);
+                    } else if (column.render == 'boolean') {
+                        if (val) {
+                            var td = $('<td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>');
+                            td.appendTo(row);
+                        } else {
+                            row.append($('<td></td>'));
+                        }
                     } else if (column.render == 'expand') {
                         var td = $('<td></td>');
                         if (rowObj[column.dataColumn]) {
@@ -522,6 +531,8 @@ $.widget("sokol.grid", {
                     td.appendTo(row);
                 } else if (editor == "user") {
                     this.createEditorUser(row, column);
+                } else if (editor == "boolean") {
+                    this.createEditorBoolean(row, column);
                 } else if (editor == "date") {
                     this.createEditorDate(row, column);
                 } else {
@@ -530,6 +541,18 @@ $.widget("sokol.grid", {
             }
         }
         row.prependTo(tbody);
+    },
+
+    createEditorRadio: function (formNode, field, value) {
+        var dateNode = $('<td>' +
+            '<div class="radio">' +
+            '<label>' +
+            '<input name="' + field.id + '" type="radio" ' + (value ? 'checked="checked"' : '') + '>' +
+            '</label>' +
+            '</div>' +
+            //'<input name="' + field.id + '" type="checkbox" class="" ' + (value ? 'checked="checked"' : '') + '/>' +
+            '</td>');
+        dateNode.appendTo(formNode);
     },
 
     createEditorDate: function (formNode, field, value) {

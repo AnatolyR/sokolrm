@@ -51,6 +51,8 @@ public class TasksList {
 
     private String type;
 
+    private UUID mainExecutor;
+
     @Transient
     private List<Task> tasks;
 
@@ -124,6 +126,14 @@ public class TasksList {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public UUID getMainExecutor() {
+        return mainExecutor;
+    }
+
+    public void setMainExecutor(UUID mainExecutor) {
+        this.mainExecutor = mainExecutor;
     }
 
     public List<Task> getTasks() {

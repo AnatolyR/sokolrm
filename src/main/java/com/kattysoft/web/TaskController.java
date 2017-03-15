@@ -79,7 +79,7 @@ public class TaskController {
         if (!accessRightService.checkDocumentRights(document, "", AccessRightLevel.READ)) {
             throw new NoAccessRightsException("Not access rights to read document");
         }
-        if ("resolution".equals(type)) {
+        if ("execution".equals(type)) {
             if (!accessRightService.checkDocumentRights(document, "*doresolution", AccessRightLevel.ALLOW)) {
                 throw new NoAccessRightsException("Not access rights to start execution document");
             }
@@ -116,7 +116,7 @@ public class TaskController {
         String comment = fields.get("comment").asText();
         tasksList.setComment(comment);
 
-        if ("resolution".equals(type)) {
+        if ("execution".equals(type)) {
             tasksList.setType("execution");
         } else if ("approval".equals(type) || "acquaintance".equals(type)) {
             tasksList.setType(type);
@@ -133,6 +133,11 @@ public class TaskController {
 
             Date dueDate = Utils.parseDateShort(e.get("dueDate").asText());
             task.setDueDate(dueDate);
+
+            boolean mainExecutor = e.has("mainExecutor") && e.get("mainExecutor").booleanValue();
+            if (mainExecutor) {
+                tasksList.setMainExecutor(executorId);
+            }
 
             if (executorId != null && dueDate != null) {
                 tasksList.getTasks().add(task);
@@ -188,9 +193,14 @@ public class TaskController {
 
             listNode.put("editable", currentUser.getId().equals(userId));
 
+            String mainExecutor = taskList.getMainExecutor() != null ? taskList.getMainExecutor().toString() : null;
+
             listNode.get("tasks").forEach(t -> {
                 if (t.has("userId") && !t.get("userId").isNull() &&!t.get("userId").asText().isEmpty()) {
                     String taskUserId = t.get("userId").asText();
+                    if (mainExecutor != null && mainExecutor.equals(taskUserId)) {
+                        ((ObjectNode) t).put("mainExecutor", true);
+                    }
                     User taskUser = userService.getUserById(taskUserId);
                     ((ObjectNode) t).put("userTitle", taskUser.getTitle());
                 } else {

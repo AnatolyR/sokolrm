@@ -151,6 +151,17 @@ $.widget('sokol.executionForm', {
                 'filterable': false,
                 'deleteMethod': $.proxy(this.doDelete, this)
         };
+
+        if (type == 'execution') {
+            options.columns.splice(3, 0, {
+                'id': 'mainExecutor',
+                'title': 'Отв.',
+                'render': 'boolean',
+                'editor': 'radio'
+            });
+            options.columnsVisible.splice(2, 0, 'mainExecutor');
+        }
+
         options.data = (this.options.data && this.options.data.tasks) ? this.options.data.tasks : [];
         options.usePanel = false;
 
@@ -203,6 +214,9 @@ $.widget('sokol.executionForm', {
                 var input = $(inputs[j]);
                 var name = input.attr('name');
                 var value = input.val();
+                if (name == 'mainExecutor') {
+                    value = input.prop('checked');
+                }
                 if (name && value) {
                     rowData[name] = value;
                 }

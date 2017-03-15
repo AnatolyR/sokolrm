@@ -10,5 +10,6 @@ CREATE TABLE taskslists (
   comment text,
   created timestamp,
   stage varchar(255),
-  type varchar(255)
+  type varchar(255),
+  mainExecutor uuid
 );
