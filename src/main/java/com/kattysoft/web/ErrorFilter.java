@@ -50,6 +50,7 @@ public class ErrorFilter implements Filter {
             } else {
                 throw e;
             }
+            log.error("Error processing rest call", e);
             response.setContentType("application/json; charset=utf-8");
             response.getWriter().print("{\"error\": \"" + message.replaceAll("\"", "\\\"") + "\"}");
             ((HttpServletResponse) response).setStatus(status);

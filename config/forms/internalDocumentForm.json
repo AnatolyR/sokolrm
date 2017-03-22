@@ -1,4 +1,5 @@
 {
+  "title": "Основные реквизиты",
   "fields": [
     {
       "id": "title"
@@ -23,15 +24,6 @@
       "id": "executors"
     },
     {
-      "cols": 2,
-      "items": [
-        {
-          "id": "projectNumber",
-          "cols": 1
-        }
-      ]
-    },
-    {
       "cols": 4,
       "items": [
         {
@@ -42,9 +34,26 @@
           "id": "registrationDate"
         },
         {
-          "id": "pagesQuantity"
+          "id": "executionDate"
         }
       ]
+    },
+    {
+      "cols": 4,
+      "items": [
+        {
+          "id": "pagesQuantity"
+        },
+        {
+          "id": "itemQuantity"
+        },
+        {
+          "id": "appQuantity"
+        }
+      ]
+    },
+    {
+      "id": "comment"
     }
   ]
 }

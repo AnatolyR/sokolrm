@@ -51,9 +51,26 @@
           "id": "registrationDate"
         },
         {
-          "id": "pagesQuantity"
+          "id": "executionDate"
         }
       ]
+    },
+    {
+      "cols": 4,
+      "items": [
+        {
+          "id": "pagesQuantity"
+        },
+        {
+          "id": "itemQuantity"
+        },
+        {
+          "id": "appQuantity"
+        }
+      ]
+    },
+    {
+      "id": "comment"
     }
   ]
 }

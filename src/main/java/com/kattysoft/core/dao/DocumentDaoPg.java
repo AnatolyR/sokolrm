@@ -484,6 +484,12 @@ public class DocumentDaoPg implements DocumentDao {
                         } else {
                             prst.setNull(ix, Types.VARCHAR);
                         }
+                    } else if ("text".equals(columnType)) {
+                        if (value != null) {
+                            prst.setString(ix, (String) value);
+                        } else {
+                            prst.setNull(ix, Types.VARCHAR);
+                        }
                     } else {
                         throw new RuntimeException("Unknown column type '" + columnType + "' for '" + name + "'");
                     }

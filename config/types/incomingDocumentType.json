@@ -65,9 +65,29 @@
       "type": "date"
     },
     {
+      "id": "executionDate",
+      "title": "Дата исполнения",
+      "type": "date"
+    },
+    {
       "id": "pagesQuantity",
       "title": "Количество листов",
       "type": "number"
+    },
+    {
+      "id": "itemQuantity",
+      "title": "Количество экземпляров",
+      "type": "number"
+    },
+    {
+      "id": "appQuantity",
+      "title": "Количество приложений",
+      "type": "number"
+    },
+    {
+      "id": "comment",
+      "title": "Комментарий",
+      "type": "text"
     }
   ]
 }

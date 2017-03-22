@@ -89,6 +89,9 @@ public class DocumentCardController {
             public void accept(com.fasterxml.jackson.databind.JsonNode jsonNode) {
                 if (jsonNode.get("id") != null) {
                     com.fasterxml.jackson.databind.JsonNode fieldType = fieldTypes.get(jsonNode.get("id").asText());
+                    if (fieldType == null) {
+                        throw new SokolException("Field type '" + jsonNode.get("id").asText() + "' not found for '" + typeId + "'");
+                    }
                     ((com.fasterxml.jackson.databind.node.ObjectNode) jsonNode).setAll((com.fasterxml.jackson.databind.node.ObjectNode) fieldType);
                 } else if (jsonNode.get("items") != null) {
                     jsonNode.get("items").forEach(this);
@@ -177,6 +180,10 @@ public class DocumentCardController {
                             resultFields.put(name, value.asText());
                         }
                     } else if ("smallstring".equals(type)) {
+                        if (value.isTextual()) {
+                            resultFields.put(name, value.asText());
+                        }
+                    } else if ("text".equals(type)) {
                         if (value.isTextual()) {
                             resultFields.put(name, value.asText());
                         }

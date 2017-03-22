@@ -42,9 +42,25 @@
       "dictionary": "organizationPersons"
     },
     {
-      "id": "projectNumber",
-      "title": "Номер проекта",
-      "type": "smallstring"
+      "id": "executionDate",
+      "title": "Дата исполнения",
+      "type": "date"
+    },
+    {
+      "id": "itemQuantity",
+      "title": "Количество экземпляров",
+      "type": "number"
+    },
+    {
+      "id": "appQuantity",
+      "title": "Количество приложений",
+      "type": "number"
+    },
+    {
+      "id": "comment",
+      "title": "Комментарий",
+      "type": "text"
     }
+
   ]
 }

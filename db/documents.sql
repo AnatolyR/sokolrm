@@ -7,6 +7,7 @@ CREATE TABLE documents (
   title varchar(255),
   "documentKind" varchar(255),
   "registrationDate" timestamp,
+  "executionDate" timestamp,
   correspondent varchar(255),
   "correspondentTitle" varchar(255),
   "externalSigner" varchar(255),
@@ -15,6 +16,9 @@ CREATE TABLE documents (
   "externalDate" timestamp,
   "documentNumber" varchar(255),
   "pagesQuantity" integer,
+  "itemQuantity" integer,
+  "appQuantity" integer,
+  "comment" text,
   addressee varchar(255)[],
   "addresseeTitle" varchar(255)[],
   author varchar(255)

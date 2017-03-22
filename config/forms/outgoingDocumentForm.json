@@ -24,9 +24,6 @@
       "id": "executors"
     },
     {
-      "id": "projectNumber"
-    },
-    {
       "cols": 4,
       "items": [
         {
@@ -37,12 +34,26 @@
           "id": "registrationDate"
         },
         {
-          "id": "pagesQuantity"
+          "id": "executionDate"
         }
       ]
     },
     {
-      "delimeter": true
+      "cols": 4,
+      "items": [
+        {
+          "id": "pagesQuantity"
+        },
+        {
+          "id": "itemQuantity"
+        },
+        {
+          "id": "appQuantity"
+        }
+      ]
+    },
+    {
+      "id": "comment"
     }
   ]
 }
