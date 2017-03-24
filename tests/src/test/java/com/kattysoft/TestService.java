@@ -44,14 +44,16 @@ public class TestService {
     public static TestService getInstance() throws InterruptedException, AWTException, MalformedURLException {
         if (instance == null) {
             instance = new TestService();
-            instance.open();
+            instance.create();
             instance.login("test", "123");
             Thread.sleep(4000);
+        } else {
+            instance.open();
         }
         return instance;
     }
 
-    private void open() throws InterruptedException, AWTException, MalformedURLException {
+    private void create() throws InterruptedException, AWTException, MalformedURLException {
         System.setProperty("apple.awt.UIElement", "true");
         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
@@ -63,14 +65,18 @@ public class TestService {
         robot = new Robot();
         altTab();
 
-        driver.get("http://localhost:8080/sokol");
-        driver.navigate().refresh();
-        Thread.sleep(2000);
+        open();
 
 //        screen(robot, driver);
         //Thread.sleep(4000);
 
 //        click("Исходящий 1", null, false);
+    }
+
+    private void open() throws InterruptedException {
+        driver.get("http://localhost:8080/sokol");
+        driver.navigate().refresh();
+        Thread.sleep(2000);
     }
 
     public void login(String userData, String passwordData) {

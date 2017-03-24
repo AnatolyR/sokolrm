@@ -27,18 +27,21 @@ $.widget('sokol.executionForm', {
             } else {
                 title = 'Резолюция';
             }
+            this.element.addClass('sokolExecutionPanel');
         } else if (type == 'approval') {
             if (taskId) {
                 title = 'Внутреннее согласование';
             } else {
                 title = 'Согласование';
             }
+            this.element.addClass('sokolApprovalPanel');
         } else if (type == 'acquaintance') {
             if (taskId) {
                 title = 'Внутреннее ознакомление';
             } else {
                 title = 'Ознакомление';
             }
+            this.element.addClass('sokolAcquaintancePanel');
         }
         var panelTitle = $('<div class="panel-title">' + title + '</div>').appendTo(panelHeader);
 
