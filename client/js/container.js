@@ -65,6 +65,7 @@ $.widget('sokol.container', {
             mode: this.options.mode,
             data: data,
             form: form,
+            class: 'sokolMainAttributesPanel',
             dispatcher: this.options.dispatcher,
             containerType: this.options.containerType
         }, $('<div></div>').appendTo(this.element));

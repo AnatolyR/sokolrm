@@ -28,6 +28,9 @@ $.widget('sokol.form', {
 
     createBlock: function(container, title) {
         var panel = $('<div class="panel panel-default"></div>');
+        if (this.options.class) {
+            panel.addClass(this.options.class);
+        }
         panel.appendTo(container);
         var panelHeader = $('<div class="panel-heading"><div class="panel-title">' + title + '</div></div>');
         panelHeader.appendTo(panel);

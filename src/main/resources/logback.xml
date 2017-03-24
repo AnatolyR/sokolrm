@@ -11,6 +11,6 @@
         <appender-ref ref="STDOUT" />
     </root>
 
-    <logger name="com.kattysoft.core.impl.AccessRightServiceImpl" level="DEBUG" />
+    <logger name="com.kattysoft.core.impl.AccessRightServiceImpl" level="INFO" />
 
 </configuration>

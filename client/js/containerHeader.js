@@ -8,6 +8,7 @@ $.widget('sokol.containerHeader', {
         var data = this.options.data;
         var date = data.registrationDate ? moment(data.registrationDate, 'DD.MM.YYYY HH:mm').format("L") : '-';
         this.element.addClass('panel-body');
+        this.element.addClass('sokolHeaderPanel');
         $('<h3>' + (form.typeTitle ? form.typeTitle : '-') +
             ' № ' + (data.documentNumber ? data.documentNumber : '-') +
             ' от ' + date +

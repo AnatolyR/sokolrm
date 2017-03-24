@@ -943,6 +943,7 @@ $.widget('sokol.container', {
             mode: this.options.mode,
             data: data,
             form: form,
+            class: 'sokolMainAttributesPanel',
             dispatcher: this.options.dispatcher,
             containerType: this.options.containerType
         }, $('<div></div>').appendTo(this.element));
@@ -1172,6 +1173,7 @@ $.widget('sokol.containerHeader', {
         var data = this.options.data;
         var date = data.registrationDate ? moment(data.registrationDate, 'DD.MM.YYYY HH:mm').format("L") : '-';
         this.element.addClass('panel-body');
+        this.element.addClass('sokolHeaderPanel');
         $('<h3>' + (form.typeTitle ? form.typeTitle : '-') +
             ' № ' + (data.documentNumber ? data.documentNumber : '-') +
             ' от ' + date +
@@ -2180,6 +2182,9 @@ $.widget('sokol.form', {
 
     createBlock: function(container, title) {
         var panel = $('<div class="panel panel-default"></div>');
+        if (this.options.class) {
+            panel.addClass(this.options.class);
+        }
         panel.appendTo(container);
         var panelHeader = $('<div class="panel-heading"><div class="panel-title">' + title + '</div></div>');
         panelHeader.appendTo(panel);

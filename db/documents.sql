@@ -21,5 +21,9 @@ CREATE TABLE documents (
   "comment" text,
   addressee varchar(255)[],
   "addresseeTitle" varchar(255)[],
-  author varchar(255)
+  author varchar(255),
+  signer varchar(255),
+  "signerTitle" varchar(255),
+  executors varchar(255)[],
+  "executorsTitle" varchar(255)[]
 );

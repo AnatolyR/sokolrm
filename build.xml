@@ -1,0 +1,91 @@
+<project name="Sokol" basedir=".">
+    <tstamp>
+        <format property="datetime" pattern="yyyyMMdd-HHmm"  locale="en,UK" />
+    </tstamp>
+<!--
+-s schema only
+-c clean schema before create
+-O no owner
+-->
+
+    <target name="backup_schema">
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-s"/>
+            <arg value="-c"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/backup/schema_${datetime}.sql"/>
+        </exec>
+    </target>
+
+    <target name="dump_schema">
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-s"/>
+            <arg value="-c"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/dump/schema.sql"/>
+        </exec>
+    </target>
+
+    <target name="restore">
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="./db/dump/dump.sql"/>
+        </exec>
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="./db/dump/dump_files.sql"/>
+        </exec>
+    </target>
+
+    <target name="dump">
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-T"/>
+            <arg value="sokol.files"/>
+            <arg value="-c"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/dump/dump.sql"/>
+        </exec>
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.files"/>
+            <arg value="-c"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/dump/dump_files.sql"/>
+        </exec>
+    </target>
+
+    <target name="backup">
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-T"/>
+            <arg value="sokol.files"/>
+            <arg value="-c"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/backup/dump_${datetime}.sql"/>
+        </exec>
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.files"/>
+            <arg value="-c"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/backup/dump_files_${datetime}.sql"/>
+        </exec>
+    </target>
+</project>
