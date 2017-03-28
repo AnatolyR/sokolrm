@@ -15,6 +15,7 @@ import org.testng.annotations.*;
 
 import java.awt.*;
 import java.net.MalformedURLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -89,12 +90,16 @@ public class OpenDocumentIT {
 
     @BeforeClass
     public void before() throws InterruptedException, AWTException, MalformedURLException {
-        ts = TestService.getInstance();
+//        ts = TestService.getInstance();
     }
 
     @Test(dataProvider = "documents")
     public void openDocument(String documentTitle, String headerContent, String mainAttributesContent,
-                             String agreementContent, String attachesContent) throws InterruptedException {
+                             String agreementContent, String attachesContent) throws InterruptedException, MalformedURLException, AWTException {
+        ts = TestService.getInstance();
+        System.out.println("===================================");
+        System.out.println(Thread.currentThread().getId() + " openDocument " + new Date());
+        System.out.println("===================================");
         ts.click(documentTitle, null, false);
         Thread.sleep(2000);
 
@@ -126,5 +131,17 @@ public class OpenDocumentIT {
         WebElement attachesPanel = ts.elementByXpath("//*[contains(@class, 'sokolAttachesPanel')]");
         System.out.println("\nAttaches:\n" + attachesPanel.getText());
         assertThat(attachesPanel.getText(), equalTo(attachesContent));
+
+        ts.getDriver().close();
+        Thread.sleep(2000);
+        windowHandles = driver.getWindowHandles();
+        for (String windowHandle : windowHandles) {
+            driver.switchTo().window(windowHandle);
+            String currentUrl = driver.getCurrentUrl();
+            if (currentUrl.contains("#lists/documents")) {
+                break;
+            }
+        }
+        Thread.sleep(1000);
     }
 }

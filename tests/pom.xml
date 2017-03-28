@@ -95,6 +95,9 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>2.19.1</version>
                     <configuration>
+                        <suiteXmlFiles>
+                            <suiteXmlFile>testng.xml</suiteXmlFile>
+                        </suiteXmlFiles>
                         <includes>
                             <include>**/*IT.java</include>
                         </includes>
@@ -172,6 +175,20 @@
                             <target>
                                 <ant antfile="build.xml" dir="..">
                                     <target name="restore"/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>Run URL in system browser.</id>
+                        <phase>post-integration-test</phase>
+                        <configuration>
+                            <target>
+                                <ant antfile="build.xml" dir="..">
+                                    <target name="openReport"/>
                                 </ant>
                             </target>
                         </configuration>

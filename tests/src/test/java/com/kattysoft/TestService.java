@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -46,7 +47,7 @@ public class TestService {
             instance = new TestService();
             instance.create();
             instance.login("test", "123");
-            Thread.sleep(4000);
+            Thread.sleep(3000);
         } else {
             instance.open();
         }
@@ -74,9 +75,27 @@ public class TestService {
     }
 
     private void open() throws InterruptedException {
+//        Set<String> windowHandles = driver.getWindowHandles();
+//        boolean moreThanOneList
+//        for (String windowHandle : windowHandles) {
+//            driver.switchTo().window(windowHandle);
+//            String currentUrl = driver.getCurrentUrl();
+//            if (currentUrl.contains("#lists/documents")) {
+//                driver.close();
+//            }
+//        }
         driver.get("http://localhost:8080/sokol");
-        driver.navigate().refresh();
+//        driver.navigate().refresh();
         Thread.sleep(2000);
+        Set<String> windowHandles = driver.getWindowHandles();
+        for (String windowHandle : windowHandles) {
+            driver.switchTo().window(windowHandle);
+            String currentUrl = driver.getCurrentUrl();
+            if (currentUrl.contains("#lists/documents")) {
+                break;
+            }
+        }
+        Thread.sleep(1000);
     }
 
     public void login(String userData, String passwordData) {
@@ -90,7 +109,7 @@ public class TestService {
         submitButton.click();
     }
 
-    public void click(String text, String clazzWanted, boolean contains) {
+    public void click(String text, String clazzWanted, boolean contains) throws InterruptedException {
         text = text.trim();
         log.info("Click '${text}'");
         java.util.List<WebElement> elements = contains ?
@@ -100,6 +119,16 @@ public class TestService {
         for (WebElement element : elements) {
             if (element.isDisplayed()) {
                 logElement("Finding to click ", element);
+                if (clazzWanted == null) {
+                    clickable = element;
+                    break;
+                } else {
+                    List<String> clazz = element.getAttribute("class") != null ? Arrays.asList(element.getAttribute("class").split(" ")) : Collections.<String>emptyList();
+                    if (clazz.contains(clazzWanted)) {
+                        clickable = element;
+                        break;
+                    }
+                }
 //                String clazz = element.getAttribute("class");
 //                if (clazz.contains("dijitMenuItemLabel") && (clazzWanted == null || clazz.contains(clazzWanted))) {
 //                    clickable = getParent(element, "dijitMenuItem");
@@ -111,9 +140,28 @@ public class TestService {
 //                } else if (clazz.contains("dijitComboBoxHighlightMatch") && (clazzWanted == null || clazz.contains(clazzWanted))) {
 //                    clickable = getParent(element, "dijitMenuItem");
 //                }
-                clickable = element;
+                //clickable = element;
             }
         }
+//        if (clickable == null) {
+//            for (WebElement element : elements) {
+//                driver.executeScript("arguments[0].scrollIntoView(true);", element);
+//                Thread.sleep(500);
+//                driver.executeScript("window.scrollBy(0, -60);");
+//                Thread.sleep(500);
+//                logElement("Finding to click ", element);
+//                if (clazzWanted == null) {
+//                    clickable = element;
+//                    break;
+//                } else {
+//                    List<String> clazz = element.getAttribute("class") != null ? Arrays.asList(element.getAttribute("class").split(" ")) : Collections.<String>emptyList();
+//                    if (clazz.contains(clazzWanted)) {
+//                        clickable = element;
+//                        break;
+//                    }
+//                }
+//            }
+//        }
         logElement("Clickable ", clickable);
         if (clickable != null) {
             clickable.click();
@@ -156,12 +204,12 @@ public class TestService {
 
     private static void logElement(String message, WebElement element) {
         if (element == null) {
-            log.debug("element is null");
+            log.info("element is null");
         } else {
             String clazz = element.getAttribute("class");
             String id = element.getAttribute("id");
             String tag = element.getTagName();
-            log.debug(message + "\n<" + tag + " id=\"" + id + "\" class=\"" + clazz + "\">");
+            log.info(message + "\n<" + tag + " id=\"" + id + "\" class=\"" + clazz + "\">");
         }
     }
 

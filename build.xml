@@ -88,4 +88,10 @@
             <arg value="./db/backup/dump_files_${datetime}.sql"/>
         </exec>
     </target>
+
+    <target name="openReport">
+        <exec executable="open">
+            <arg value="/Users/anatolii/Documents/sokolsed/tests/target/failsafe-reports/emailable-report.html"/>
+        </exec>
+    </target>
 </project>

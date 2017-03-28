@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 
 import java.awt.*;
 import java.net.MalformedURLException;
-import java.util.*;
+import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -60,11 +60,15 @@ public class ListDocumentsIT {
 
     @BeforeClass
     public void before() throws InterruptedException, AWTException, MalformedURLException {
-        ts = TestService.getInstance();
+//        ts = TestService.getInstance();
     }
 
     @Test(dataProvider = "documents")
-    public void listDocuments(String listId, String listContent) throws InterruptedException {
+    public void listDocuments(String listId, String listContent) throws InterruptedException, MalformedURLException, AWTException {
+        ts = TestService.getInstance();
+        System.out.println("===================================");
+        System.out.println(Thread.currentThread().getId() + " listDocument " + new Date());
+        System.out.println("===================================");
 //        ts.click(documentTitle, null, false);
 //        Thread.sleep(2000);
 

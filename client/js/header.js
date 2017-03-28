@@ -54,11 +54,11 @@ $.widget('sokol.header', {
                         submenu.append($('<li role="separator" class="divider"></li>'));
                     } else {
                         if (subitem.link) {
-                            submenu.append($('<li><a href="' + subitem.link + '">' + subitem.title + '</a></li>'));
+                            submenu.append($('<li><a class="sokolHeaderMenuItem" href="' + subitem.link + '">' + subitem.title + '</a></li>'));
                         } else if (subitem.window) {
-                            submenu.append($('<li><a target="_blank" href="' + subitem.window + '">' + subitem.title + '</a></li>'));
+                            submenu.append($('<li><a class="sokolHeaderMenuItem" target="_blank" href="' + subitem.window + '">' + subitem.title + '</a></li>'));
                         } else if (subitem.open) {
-                            var openItem = $('<li><a href="">' + subitem.title + '</a></li>');
+                            var openItem = $('<li><a class="sokolHeaderMenuItem" href="">' + subitem.title + '</a></li>');
                             openItem.find('a').click(produceHandler(subitem.open));
                             submenu.append(openItem);
                         }
