@@ -14,6 +14,10 @@
       {
         "id": "documentGroups",
         "title": "Пространства"
+      },
+      {
+        "id": "registrationLists",
+        "title": "Журналы регистрации"
       }
     ]
   },

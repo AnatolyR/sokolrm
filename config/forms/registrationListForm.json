@@ -1,0 +1,36 @@
+{
+  "title": "Свойства",
+  "subtitle": "Журнал регистрации",
+  "fields": [
+    {
+      "id": "title",
+      "title": "Название",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "prefix",
+      "title": "Префикс",
+      "type": "smallstring",
+      "mandatory": true
+    },
+    {
+      "id": "suffix",
+      "title": "Суффикс",
+      "type": "smallstring"
+    },
+    {
+      "id": "count",
+      "title": "Счетчик",
+      "type": "number"
+    },
+    {
+      "id": "spaces",
+      "title": "Пространства",
+      "type": "dictionary",
+      "dictionary": "spaces",
+      "preload": true,
+      "multiple": true
+    }
+  ]
+}

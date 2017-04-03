@@ -78,7 +78,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public String saveGroup(Group group) {
         if (group.getId() == null) {
-            if (!accessRightService.checkRights("_system", "groups", null, AccessRightLevel.ADD)) {
+            if (!accessRightService.checkRights("_system", "groups", null, AccessRightLevel.CREATE)) {
                 throw new NoAccessRightsException("No access rights for add group");
             }
             UUID id = UUID.randomUUID();

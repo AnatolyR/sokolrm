@@ -29,6 +29,9 @@ public class Space {
 
     private String title;
 
+    @Type(type = "pg-uuid")
+    private UUID registrationListId;
+
     public Space() {
     }
 
@@ -50,5 +53,13 @@ public class Space {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public UUID getRegistrationListId() {
+        return registrationListId;
+    }
+
+    public void setRegistrationListId(UUID registrationListId) {
+        this.registrationListId = registrationListId;
     }
 }

@@ -1,0 +1,31 @@
+{
+  "checkAccessRightsForColumnLinks": true,
+  "gridConfig": {
+    "title": "Журналы регистрации",
+    "addableType": "registrationlist",
+    "sortable": false,
+    "columns": [
+      {
+        "id": "title",
+        "title": "Название",
+        "render": "link",
+        "linkType": "registrationlist"
+      },
+      {
+        "id": "prefix",
+        "title": "Префикс"
+      },
+      {
+        "id": "suffix",
+        "title": "Суфикс"
+      },
+      {
+        "id": "count",
+        "title": "Счетчик"
+      }
+    ],
+    "id": "registrationLists",
+    "url": "app/registrationLists",
+    "filterable": false
+  }
+}

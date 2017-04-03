@@ -110,4 +110,8 @@
 
     </bean>
 
+    <bean class="com.kattysoft.core.impl.RegistrationListServiceImpl">
+
+    </bean>
+
 </beans>

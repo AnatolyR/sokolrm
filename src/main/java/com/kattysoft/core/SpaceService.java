@@ -10,6 +10,7 @@ package com.kattysoft.core;
 import com.kattysoft.core.model.Space;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -25,4 +26,8 @@ public interface SpaceService {
     String addSpace(Space space);
 
     Space getSpace(String id);
+
+    List<Space> getSpacesByRegistrationListId(UUID registrationListId);
+
+    void saveSpace(Space space);
 }

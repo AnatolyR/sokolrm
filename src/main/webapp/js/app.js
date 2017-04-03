@@ -188,7 +188,7 @@ $.widget('sokol.accessRightsGrid', {
             var element = elementSelector.val();
             var subelement = subelementSelector.val();
             if ("_system" == space) {
-                if ("users" == element || "groups" == element) {
+                if ("users" == element || "groups" == element || "registrationLists" == element) {
                     addAr(["CREATE", "READ", "WRITE", "DELETE", "LIST"]);
                 } else if ("documentGroups" == element) {
                     addAr(["ADD", "DELETE", "LIST"]);
@@ -373,7 +373,7 @@ $.widget('sokol.admin', {
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
-        if (id == 'users' || id == 'groups') {
+        if (id == 'users' || id == 'groups' || id == 'registrationLists') {
             this.createPagedGrid(id);
             return;
         }
@@ -564,6 +564,11 @@ $.widget('sokol.app', {
             this.createForm('group', 'new/group', 'edit', 'Не удается создать карточку группы');
         } else if (id.startsWith('group/')) {
             this.createForm('group', id.substring(6), mode, 'Не удалось загрузить карточку группы');
+
+        } else if (id.startsWith('new/registrationlist')) {
+            this.createForm('registrationlist', 'new/registrationlist', 'edit', 'Не удается создать карточку журнала регистрации');
+        } else if (id.startsWith('registrationlist/')) {
+            this.createForm('registrationlist', id.substring(17), mode, 'Не удалось загрузить карточку журнала регистрации');
 
         } else if (id.startsWith('new/contragent')) {
             this.createForm('contragent', 'new/contragent', 'edit', 'Не удалось загрузить карточку контрагента');
@@ -926,7 +931,8 @@ $.widget('sokol.container', {
             this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
         } else {
             this.header = $.sokol.titleHeader({
-                title: data.title
+                title: data.title,
+                subtitle: this.options.form.subtitle
             }, $('<div></div>').appendTo(this.element));
         }
 
@@ -1087,6 +1093,10 @@ $.widget('sokol.container', {
             saveUrl = 'app/savecontragent';
             openType = 'contragent';
             message = 'Не удалось сохранить карточку контрагента. Обратитесь к администратору.';
+        } else if (this.options.containerType == 'registrationlist') {
+            saveUrl = 'app/saveRegistrationList';
+            openType = 'registrationlist';
+            message = 'Не удалось сохранить журнала регистрации. Обратитесь к администратору.';
         } else if (this.options.containerType == 'group') {
             saveUrl = 'app/saveGroup';
             openType = 'group';
@@ -2632,6 +2642,7 @@ $.widget('sokol.form', {
         }
 
         var valid = true;
+        var numberRegex = /^-?\d+$/
 
         for (var i = 0; i < this.fieldsInfo.length; i++) {
             var field = this.fieldsInfo[i];
@@ -2654,6 +2665,13 @@ $.widget('sokol.form', {
                     valid = false;
                 }
 
+            } else if(field.type == 'number') {
+                if (val.value && !val.value.match(numberRegex)) {
+                    fieldDiv.addClass("has-error");
+                    valid = false;
+                } else {
+                    fieldDiv.removeClass("has-error");
+                }
             } else if(field.validation) {
                 if (val.value.search(field.validation) < 0) {
                     fieldDiv.addClass("has-error");

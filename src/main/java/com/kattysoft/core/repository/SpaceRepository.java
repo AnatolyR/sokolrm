@@ -19,4 +19,6 @@ import java.util.UUID;
  */
 public interface SpaceRepository extends CrudRepository<Space, UUID> {
     List<Space> findByTitle(String title);
+
+    List<Space> findAllByRegistrationListId(UUID registrationListId);
 }

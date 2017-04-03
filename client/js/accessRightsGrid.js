@@ -188,7 +188,7 @@ $.widget('sokol.accessRightsGrid', {
             var element = elementSelector.val();
             var subelement = subelementSelector.val();
             if ("_system" == space) {
-                if ("users" == element || "groups" == element) {
+                if ("users" == element || "groups" == element || "registrationLists" == element) {
                     addAr(["CREATE", "READ", "WRITE", "DELETE", "LIST"]);
                 } else if ("documentGroups" == element) {
                     addAr(["ADD", "DELETE", "LIST"]);

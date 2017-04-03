@@ -59,6 +59,16 @@ public class SpaceServiceImpl implements SpaceService {
         return spaceRepository.findOne(UUID.fromString(id));
     }
 
+    @Override
+    public List<Space> getSpacesByRegistrationListId(UUID registrationListId) {
+        return spaceRepository.findAllByRegistrationListId(registrationListId);
+    }
+
+    @Override
+    public void saveSpace(Space space) {
+        spaceRepository.save(space);
+    }
+
     public void setSpaceRepository(SpaceRepository spaceRepository) {
         this.spaceRepository = spaceRepository;
     }

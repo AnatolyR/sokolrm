@@ -83,7 +83,7 @@ $.widget('sokol.admin', {
         setTimeout($.proxy(function() {
             this.sidebar.find('[name="category_' + id + '"]').addClass('active');
         }, this), 0);
-        if (id == 'users' || id == 'groups') {
+        if (id == 'users' || id == 'groups' || id == 'registrationLists') {
             this.createPagedGrid(id);
             return;
         }

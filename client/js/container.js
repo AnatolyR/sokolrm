@@ -47,7 +47,8 @@ $.widget('sokol.container', {
             this.header = $.sokol.containerHeader({data: data, form: form}, $('<div></div>').appendTo(this.element));
         } else {
             this.header = $.sokol.titleHeader({
-                title: data.title
+                title: data.title,
+                subtitle: this.options.form.subtitle
             }, $('<div></div>').appendTo(this.element));
         }
 
@@ -208,6 +209,10 @@ $.widget('sokol.container', {
             saveUrl = 'app/savecontragent';
             openType = 'contragent';
             message = 'Не удалось сохранить карточку контрагента. Обратитесь к администратору.';
+        } else if (this.options.containerType == 'registrationlist') {
+            saveUrl = 'app/saveRegistrationList';
+            openType = 'registrationlist';
+            message = 'Не удалось сохранить журнала регистрации. Обратитесь к администратору.';
         } else if (this.options.containerType == 'group') {
             saveUrl = 'app/saveGroup';
             openType = 'group';

@@ -474,6 +474,7 @@ $.widget('sokol.form', {
         }
 
         var valid = true;
+        var numberRegex = /^-?\d+$/
 
         for (var i = 0; i < this.fieldsInfo.length; i++) {
             var field = this.fieldsInfo[i];
@@ -496,6 +497,13 @@ $.widget('sokol.form', {
                     valid = false;
                 }
 
+            } else if(field.type == 'number') {
+                if (val.value && !val.value.match(numberRegex)) {
+                    fieldDiv.addClass("has-error");
+                    valid = false;
+                } else {
+                    fieldDiv.removeClass("has-error");
+                }
             } else if(field.validation) {
                 if (val.value.search(field.validation) < 0) {
                     fieldDiv.addClass("has-error");

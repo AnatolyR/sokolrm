@@ -123,9 +123,9 @@ public class GroupController {
     }
 
     @RequestMapping(value = "/groupcard")
-    public ObjectNode getUserCard(String id) {
+    public ObjectNode getCard(String id) {
         if (id == null || id.isEmpty()) {
-            throw new SokolException("Empty contragent id");
+            throw new SokolException("Empty group id");
         }
         Group group = id.equals("new/group") ? new Group() : groupService.getGroupById(id);
         if (group == null) {

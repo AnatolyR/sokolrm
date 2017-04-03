@@ -8,5 +8,6 @@ CREATE TABLE spaces (
   modifier varchar(255),
   modifyDate timestamp,
   deletor varchar(255),
-  deleteDate timestamp
+  deleteDate timestamp,
+  registrationlistid uuid
 );

@@ -19,6 +19,7 @@ ALTER TABLE ONLY sokol.users DROP CONSTRAINT users_pkey;
 ALTER TABLE ONLY sokol.taskslists DROP CONSTRAINT taskslists_pkey;
 ALTER TABLE ONLY sokol.tasks DROP CONSTRAINT tasks_pkey;
 ALTER TABLE ONLY sokol.spaces DROP CONSTRAINT spaces_pkey;
+ALTER TABLE ONLY sokol.registrationlists DROP CONSTRAINT registrationlists_pkey;
 ALTER TABLE ONLY sokol.table2 DROP CONSTRAINT pkey2;
 ALTER TABLE ONLY sokol.table1 DROP CONSTRAINT pkey;
 ALTER TABLE ONLY sokol.groups DROP CONSTRAINT groups_pkey;
@@ -34,6 +35,7 @@ DROP TABLE sokol.tasks;
 DROP TABLE sokol.table2;
 DROP TABLE sokol.table1;
 DROP TABLE sokol.spaces;
+DROP TABLE sokol.registrationlists;
 DROP TABLE sokol.groups;
 DROP TABLE sokol.favorites;
 DROP TABLE sokol.documents;
@@ -178,6 +180,19 @@ CREATE TABLE groups (
 
 
 --
+-- Name: registrationlists; Type: TABLE; Schema: sokol; Owner: -
+--
+
+CREATE TABLE registrationlists (
+    id uuid NOT NULL,
+    title character varying(255),
+    prefix character varying(255),
+    suffix character varying(255),
+    count integer
+);
+
+
+--
 -- Name: spaces; Type: TABLE; Schema: sokol; Owner: -
 --
 
@@ -189,7 +204,8 @@ CREATE TABLE spaces (
     modifier character varying(255),
     modifydate timestamp without time zone,
     deletor character varying(255),
-    deletedate timestamp without time zone
+    deletedate timestamp without time zone,
+    registrationlistid uuid
 );
 
 
@@ -318,6 +334,12 @@ c0925422-1f94-4540-9911-d12f228fc468	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space
 df59c89c-01a4-4151-b88a-796b0e28e311	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document		READ
 a40c51c6-bbba-4a0f-a9ef-8b9dbfac1ef4	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document	*toapproval	ALLOW
 21375c9b-524b-45bb-9cde-204ae29e8677	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document		READ
+f27a8f6e-e7b3-4785-8930-30d30bd13837	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	documentGroups		DELETE
+8b1cfd37-10ec-4a7e-a3ff-e5cb23949d94	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	documentGroups		LIST
+30a9878f-f71e-41c9-838b-057b190ab89c	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		LIST
+0e6b6fb9-1ec2-4391-b5d8-21f3e43eb785	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		READ
+4612b979-a8b8-401d-a8eb-306cda82f909	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		CREATE
+bf45a4a3-99a9-4a0a-a926-1f35647aea86	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		WRITE
 \.
 
 
@@ -467,12 +489,21 @@ bdc4e199-61e2-4cc6-81c8-0585d5e95b55	Делопроизводители	\N
 
 
 --
+-- Data for Name: registrationlists; Type: TABLE DATA; Schema: sokol; Owner: -
+--
+
+COPY registrationlists (id, title, prefix, suffix, count) FROM stdin;
+d48c9468-e328-4108-a08a-535931a25040	Входящие документы	ВХ-		2
+\.
+
+
+--
 -- Data for Name: spaces; Type: TABLE DATA; Schema: sokol; Owner: -
 --
 
-COPY spaces (id, title, creator, createdate, modifier, modifydate, deletor, deletedate) FROM stdin;
-39649da6-9fd9-4a3b-a356-2c1c99d9619a	Test 1	\N	\N	\N	\N	\N	\N
-20a4ffbc-c0e0-437c-addc-eca2cc8372eb	Test Space 3	\N	\N	\N	\N	\N	\N
+COPY spaces (id, title, creator, createdate, modifier, modifydate, deletor, deletedate, registrationlistid) FROM stdin;
+39649da6-9fd9-4a3b-a356-2c1c99d9619a	Test 1	\N	\N	\N	\N	\N	\N	d48c9468-e328-4108-a08a-535931a25040
+20a4ffbc-c0e0-437c-addc-eca2cc8372eb	Test Space 3	\N	\N	\N	\N	\N	\N	d48c9468-e328-4108-a08a-535931a25040
 \.
 
 
@@ -660,6 +691,14 @@ ALTER TABLE ONLY table1
 
 ALTER TABLE ONLY table2
     ADD CONSTRAINT pkey2 PRIMARY KEY (id);
+
+
+--
+-- Name: registrationlists_pkey; Type: CONSTRAINT; Schema: sokol; Owner: -
+--
+
+ALTER TABLE ONLY registrationlists
+    ADD CONSTRAINT registrationlists_pkey PRIMARY KEY (id);
 
 
 --

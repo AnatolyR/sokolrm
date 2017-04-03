@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Contragent;
 import com.kattysoft.core.model.DictionaryValue;
+import com.kattysoft.core.model.Space;
 import com.kattysoft.core.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,9 @@ public class DictionaryController {
     @Autowired
     private ConfigService configService;
 
+    @Autowired
+    private SpaceService spaceService;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "/dictionary", produces = "application/json; charset=utf-8")
@@ -56,6 +60,16 @@ public class DictionaryController {
                 ObjectNode node = mapper.createObjectNode();
                 node.put("id", u.getId().toString());
                 node.put("title", u.getTitle());
+                return node;
+            }).collect(Collectors.toList());
+            String json = mapper.writeValueAsString(nodes);
+            return json;
+        } else if ("spaces".equals(id)) {
+            List<Space> spaces = spaceService.getSpaces();
+            List<ObjectNode> nodes = spaces.stream().filter(s -> s.getRegistrationListId() == null).map(s -> {
+                ObjectNode node = mapper.createObjectNode();
+                node.put("id", s.getId().toString());
+                node.put("title", s.getTitle());
                 return node;
             }).collect(Collectors.toList());
             String json = mapper.writeValueAsString(nodes);
@@ -140,5 +154,9 @@ public class DictionaryController {
 
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
+    }
+
+    public void setSpaceService(SpaceService spaceService) {
+        this.spaceService = spaceService;
     }
 }
