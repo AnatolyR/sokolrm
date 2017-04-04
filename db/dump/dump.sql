@@ -154,7 +154,8 @@ CREATE TABLE documents (
     signer character varying(255),
     "signerTitle" character varying(255),
     "executorsTitle" character varying(255)[],
-    executors character varying(255)[]
+    executors character varying(255)[],
+    archivecase character varying(255)
 );
 
 
@@ -340,6 +341,7 @@ f27a8f6e-e7b3-4785-8930-30d30bd13837	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_syste
 0e6b6fb9-1ec2-4391-b5d8-21f3e43eb785	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		READ
 4612b979-a8b8-401d-a8eb-306cda82f909	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		CREATE
 bf45a4a3-99a9-4a0a-a926-1f35647aea86	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		WRITE
+4f44e0d2-e1f7-45db-a2f4-16e1f25956a3	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		DELETE
 \.
 
 
@@ -426,40 +428,40 @@ c97dd759-17bc-4f7d-b888-1f59726f7ac1	executionReportStatus	\N	укукуотуе
 -- Data for Name: documents; Type: TABLE DATA; Schema: sokol; Owner: -
 --
 
-COPY documents (id, type, status, title, "documentKind", "registrationDate", correspondent, "correspondentTitle", "externalSigner", "externalExecutor", "externalNumber", "externalDate", "documentNumber", "pagesQuantity", addressee, "addresseeTitle", author, space, "itemQuantity", "appQuantity", "executionDate", comment, signer, "signerTitle", "executorsTitle", executors) FROM stdin;
-10984d8e-8e18-4384-95bd-8743d1f98676	incomingDocument	\N			2016-04-13 22:03:25.815		ООО 3	\N	\N	\N	\N	\N	\N	{}	{"Кузьмин С. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-04b77f61-f92c-4e44-9559-c76261ce3d1e	incomingDocument	\N	jksdf lsdhjf jksd gfjg		2016-04-13 22:44:37.929		ООО 5	\N	\N	\N	\N	\N	\N	{}	{"Быков П. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-b0cf186d-ae9c-44e0-93db-d4d2a72fc88b	test	\N	Test document 2	Тестовый	2016-04-09 15:43:34.545	correspondent 1	ООО 1	\N	\N	\N	\N	\N	\N	{}	{"Леонов С. Р."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-d0e38e2e-18bd-48fd-91ec-5e102519cd06	incomingDocument	\N	Test document 1rtyr2355777	Письмо	2016-04-23 23:32:49.359	65208064-e1ef-4bf5-be7b-39a3839668d3	КВАЛИТЕТ, строительная экспертиза	\N	\N	\N	\N	\N	\N	{bbb3bfbf-66af-41b8-8a6d-24f6e527386a,be547579-8664-4221-8dde-029ef242b517,137e29ed-acb2-4f06-b6f6-74ed1b332caa}	{"Середин Т. И.","Власов Л. И.","Козлов Я. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-ed15fe1e-870a-4c01-92e1-39738e678edd	incomingDocument	draft	Проверка новых полей	Акт	\N	\N	\N				\N		1	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-01 16:10:00		\N	\N	\N	\N
-20a8fac1-cebd-455a-8eb6-ce34e59c3631	incomingDocument	\N	1235678+	Приглашение	2016-11-12 21:51:00	3704a2c0-015f-4c3f-b5ec-01556fc4a204	АРХИТЕКТУРА, ООО, проектная организация	pppppp	eeeee	212143234234	2016-12-30 21:55:00	sd23235	3	{4f4181fc-6953-4fd0-8684-37e435e3cce1,e879c49c-4fdf-43a1-8507-7091f2dea03d}	{"Волкова А. Г.","Волков Б. П."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-698a2c4b-ac01-4b68-a5a4-cb4cd20ed751	incomingDocument	review	2222222		\N	\N	\N				\N		\N	{9bb42bab-8965-49d2-b134-cec0d1505cc3}	{"Ивашова А. Е."}	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N
-13e615aa-3ac7-4fc5-8484-a7bf72bf222f	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-60c520e0-2005-454b-9a11-16647c818124	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-d45bf780-1983-4e2e-b352-9b21a687bb1a	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-79c868d6-27f5-4859-a16c-0db368576964	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-19435abb-7e0b-478f-b265-bc7fd78a689f	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-6863ac65-d40d-4dc1-98c4-61a087556e43	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-165df595-d6c4-4914-bcf2-ee786e9884a6	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-1cb5f042-7381-4846-b93e-40f0b05d254e	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-b1bfc6fa-1bc9-496c-a2fa-2515db27d284	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-bed13521-d500-4e92-82f9-63dfafccb968	incomingDocument	Черновик	11111111	Указ	\N	\N	\N				\N		\N	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-72c8d4e3-3a74-4d56-8c74-4ae9dccb4590	incomingDocument	Черновик	111222333	Указ	\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-1cf6a554-0c32-4450-8c10-822a7d8fadb0	incomingDocument	Черновик	sdfdsfdf		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-0ea7d868-d99c-4812-939f-314563f42fc2	incomingDocument	Черновик	565667777		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-534c9631-a7c2-4145-bde5-13389f42d106	incomingDocument	Черновик	График платежей	Справка	2017-02-25 14:55:00	8ce9ecce-c2d1-4ab4-b72a-48c6b711a241	ВТБ 24				\N		5	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-001afe34-7912-4571-83a4-9ae0e7e9b8dc	incomingDocument	registered	Проверка Зарегистрирован		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-de32b8fe-7c34-4417-87f7-844be0c4663f	incomingDocument	review	Проверка Рассмотрение		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-f9e65b52-8594-4865-b5e3-f234d62c1a48	incomingDocument	tocase	Супер тест 1		\N	\N	\N				\N		\N	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-57b5cfa7-9dfb-40a4-8044-8f3fb6a71a83	incomingDocument	execution	6tu7	567	2016-04-13 22:45:00	\N	\N				\N	1122	\N	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
-49bb9b47-2ea1-4f63-9ceb-e89c0a42d19d	outgoingDocument	approval	Исходящий 2		\N	4a2bec91-3bff-48bf-a052-19a150dde393	УралСиб, ЗАО Страховая группа	\N	\N	\N	\N		\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N
-04743fe6-f08f-4963-96db-07c32e57b5c1	incomingDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N
-d0004a5c-b3d9-4934-bed8-05ad15cc037c	outgoingDocument	approval	Исходящий 1	Указ	2017-03-22 17:25:00	55c3554b-99cc-4857-a964-7a2731a6ddfe	ИСКУССТВО СТИЛЯ, имидж-агентство	\N	\N	\N	\N	ИСХ-100500	1	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-03-23 17:25:00	Olololo THIS IS COMMMENT!!!!!	580f62b3-7b96-4109-a321-dc7d24109a1a	Поляков И. В.	{"Луков Б. П.","Захаров Н. В."}	{5ca6d548-afa3-4c26-a72e-f0f19100e701,a2cfff23-4070-4063-9e94-c3956e824122}
-c5e712ba-3a0a-459d-8377-35b840e0360a	outgoingDocument	draft	Все поля	Указ	2017-03-21 17:33:00	\N	\N	\N	\N	\N	\N	ИСХ-012	1	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-02 17:32:00	comment	\N	\N	\N	\N
-1eb9b85a-ddcb-4e79-b669-7711e0523752	internalDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N
-49479cff-f719-4a7f-a7e5-0718746631b4	outgoingDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N
-6ca8ee0e-a78e-4162-b4ca-33d980e8dd32	internalDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N
-f3267d38-b674-4964-9003-1109edeaf1d7	internalDocument	draft	Все поля		2017-03-21 17:45:00	\N	\N	\N	\N	\N	\N	ВН-110	1	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-01 17:45:00	Коммент	\N	\N	\N	\N
+COPY documents (id, type, status, title, "documentKind", "registrationDate", correspondent, "correspondentTitle", "externalSigner", "externalExecutor", "externalNumber", "externalDate", "documentNumber", "pagesQuantity", addressee, "addresseeTitle", author, space, "itemQuantity", "appQuantity", "executionDate", comment, signer, "signerTitle", "executorsTitle", executors, archivecase) FROM stdin;
+10984d8e-8e18-4384-95bd-8743d1f98676	incomingDocument	\N			2016-04-13 22:03:25.815		ООО 3	\N	\N	\N	\N	\N	\N	{}	{"Кузьмин С. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+04b77f61-f92c-4e44-9559-c76261ce3d1e	incomingDocument	\N	jksdf lsdhjf jksd gfjg		2016-04-13 22:44:37.929		ООО 5	\N	\N	\N	\N	\N	\N	{}	{"Быков П. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+b0cf186d-ae9c-44e0-93db-d4d2a72fc88b	test	\N	Test document 2	Тестовый	2016-04-09 15:43:34.545	correspondent 1	ООО 1	\N	\N	\N	\N	\N	\N	{}	{"Леонов С. Р."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+d0e38e2e-18bd-48fd-91ec-5e102519cd06	incomingDocument	\N	Test document 1rtyr2355777	Письмо	2016-04-23 23:32:49.359	65208064-e1ef-4bf5-be7b-39a3839668d3	КВАЛИТЕТ, строительная экспертиза	\N	\N	\N	\N	\N	\N	{bbb3bfbf-66af-41b8-8a6d-24f6e527386a,be547579-8664-4221-8dde-029ef242b517,137e29ed-acb2-4f06-b6f6-74ed1b332caa}	{"Середин Т. И.","Власов Л. И.","Козлов Я. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+ed15fe1e-870a-4c01-92e1-39738e678edd	incomingDocument	draft	Проверка новых полей	Акт	\N	\N	\N				\N		1	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-01 16:10:00		\N	\N	\N	\N	\N
+20a8fac1-cebd-455a-8eb6-ce34e59c3631	incomingDocument	\N	1235678+	Приглашение	2016-11-12 21:51:00	3704a2c0-015f-4c3f-b5ec-01556fc4a204	АРХИТЕКТУРА, ООО, проектная организация	pppppp	eeeee	212143234234	2016-12-30 21:55:00	sd23235	3	{4f4181fc-6953-4fd0-8684-37e435e3cce1,e879c49c-4fdf-43a1-8507-7091f2dea03d}	{"Волкова А. Г.","Волков Б. П."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+13e615aa-3ac7-4fc5-8484-a7bf72bf222f	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+60c520e0-2005-454b-9a11-16647c818124	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+d45bf780-1983-4e2e-b352-9b21a687bb1a	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+79c868d6-27f5-4859-a16c-0db368576964	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+19435abb-7e0b-478f-b265-bc7fd78a689f	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+6863ac65-d40d-4dc1-98c4-61a087556e43	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+165df595-d6c4-4914-bcf2-ee786e9884a6	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+1cb5f042-7381-4846-b93e-40f0b05d254e	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+b1bfc6fa-1bc9-496c-a2fa-2515db27d284	incomingDocument	Черновик	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+bed13521-d500-4e92-82f9-63dfafccb968	incomingDocument	Черновик	11111111	Указ	\N	\N	\N				\N		\N	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+72c8d4e3-3a74-4d56-8c74-4ae9dccb4590	incomingDocument	Черновик	111222333	Указ	\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+1cf6a554-0c32-4450-8c10-822a7d8fadb0	incomingDocument	Черновик	sdfdsfdf		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+0ea7d868-d99c-4812-939f-314563f42fc2	incomingDocument	Черновик	565667777		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+534c9631-a7c2-4145-bde5-13389f42d106	incomingDocument	Черновик	График платежей	Справка	2017-02-25 14:55:00	8ce9ecce-c2d1-4ab4-b72a-48c6b711a241	ВТБ 24				\N		5	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+001afe34-7912-4571-83a4-9ae0e7e9b8dc	incomingDocument	registered	Проверка Зарегистрирован		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+de32b8fe-7c34-4417-87f7-844be0c4663f	incomingDocument	review	Проверка Рассмотрение		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+f9e65b52-8594-4865-b5e3-f234d62c1a48	incomingDocument	tocase	Супер тест 1		\N	\N	\N				\N		\N	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+57b5cfa7-9dfb-40a4-8044-8f3fb6a71a83	incomingDocument	execution	6tu7	567	2016-04-13 22:45:00	\N	\N				\N	1122	\N	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+49bb9b47-2ea1-4f63-9ceb-e89c0a42d19d	outgoingDocument	approval	Исходящий 2		\N	4a2bec91-3bff-48bf-a052-19a150dde393	УралСиб, ЗАО Страховая группа	\N	\N	\N	\N		\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+04743fe6-f08f-4963-96db-07c32e57b5c1	incomingDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+d0004a5c-b3d9-4934-bed8-05ad15cc037c	outgoingDocument	approval	Исходящий 1	Указ	2017-03-22 17:25:00	55c3554b-99cc-4857-a964-7a2731a6ddfe	ИСКУССТВО СТИЛЯ, имидж-агентство	\N	\N	\N	\N	ИСХ-100500	1	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-03-23 17:25:00	Olololo THIS IS COMMMENT!!!!!	580f62b3-7b96-4109-a321-dc7d24109a1a	Поляков И. В.	{"Луков Б. П.","Захаров Н. В."}	{5ca6d548-afa3-4c26-a72e-f0f19100e701,a2cfff23-4070-4063-9e94-c3956e824122}	\N
+c5e712ba-3a0a-459d-8377-35b840e0360a	outgoingDocument	draft	Все поля	Указ	2017-03-21 17:33:00	\N	\N	\N	\N	\N	\N	ИСХ-012	1	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-02 17:32:00	comment	\N	\N	\N	\N	\N
+1eb9b85a-ddcb-4e79-b669-7711e0523752	internalDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+49479cff-f719-4a7f-a7e5-0718746631b4	outgoingDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+6ca8ee0e-a78e-4162-b4ca-33d980e8dd32	internalDocument	draft	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+f3267d38-b674-4964-9003-1109edeaf1d7	internalDocument	draft	Все поля		2017-03-21 17:45:00	\N	\N	\N	\N	\N	\N	ВН-110	1	\N	\N	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-01 17:45:00	Коммент	\N	\N	\N	\N	\N
+698a2c4b-ac01-4b68-a5a4-cb4cd20ed751	incomingDocument	review	2222222		\N	\N	\N				\N		\N	{9bb42bab-8965-49d2-b134-cec0d1505cc3}	{"Ивашова А. Е."}	722b151c-f9d7-4222-b541-cfc554695510	20a4ffbc-c0e0-437c-addc-eca2cc8372eb	\N	\N	\N		\N	\N	\N	\N	123
 \.
 
 
@@ -502,8 +504,8 @@ d48c9468-e328-4108-a08a-535931a25040	Входящие документы	ВХ-		
 --
 
 COPY spaces (id, title, creator, createdate, modifier, modifydate, deletor, deletedate, registrationlistid) FROM stdin;
+20a4ffbc-c0e0-437c-addc-eca2cc8372eb	Test Space 3	\N	\N	\N	\N	\N	\N	\N
 39649da6-9fd9-4a3b-a356-2c1c99d9619a	Test 1	\N	\N	\N	\N	\N	\N	d48c9468-e328-4108-a08a-535931a25040
-20a4ffbc-c0e0-437c-addc-eca2cc8372eb	Test Space 3	\N	\N	\N	\N	\N	\N	d48c9468-e328-4108-a08a-535931a25040
 \.
 
 

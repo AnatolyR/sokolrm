@@ -24,4 +24,6 @@ public interface RegistrationListService {
     RegistrationList getListById(String id);
 
     String saveList(RegistrationList list);
+
+    void deleteList(String id);
 }

@@ -42,6 +42,7 @@
                    required>
         </div>
         <p style="display: none;" id="errorMessage" class="text-danger">Неверное имя пользователя или пароль</p>
+        <p style="display: none;" id="systemErrorMessage" class="text-danger">Ошибка на сервере. Обратитесь к администратору.</p>
         <!--<div class="checkbox">-->
             <!--<label>-->
                 <!--<input type="checkbox" value="remember-me"> Запомнить-->
@@ -60,12 +61,15 @@ $("#submitButton").click(function(e) {
     $.post("login", data, function(data) {
         if (data == "true") {
             $("#errorMessage").hide();
+            $("#systemErrorMessage").hide();
             $("input").parent().removeClass("has-error");
             window.location.href = window.location.href.replace("login", "");
         } else {
             $("input").parent().addClass("has-error");
             $("#errorMessage").show();
         }
+    }).fail(function(e) {
+        $("#systemErrorMessage").show();
     });
 });
 </script>

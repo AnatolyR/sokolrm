@@ -9,8 +9,10 @@
  */
 package com.kattysoft.web;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.model.Space;
 import com.kattysoft.core.model.User;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -49,6 +51,9 @@ public class DocumentCardController {
 
     @Autowired
     private TitleService titleService;
+
+    @Autowired
+    private SpaceService spaceService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -122,6 +127,13 @@ public class DocumentCardController {
         String statusId = document.getStatus();
         String statusTitle = titleService.getTitle("status", statusId);
         document.getFields().put("status", statusTitle);
+
+        String spaceId = document.getSpace();
+        if (spaceId != null) {
+            Space space = spaceService.getSpace(spaceId);
+            String spaceTitle = space != null ? space.getTitle() : "[Не найдено]";
+            document.getFields().put("spaceTitle", spaceTitle);
+        }
     }
 
     private void addActions(com.fasterxml.jackson.databind.JsonNode formConfig, com.fasterxml.jackson.databind.JsonNode typeConfig, Document document) {
@@ -291,5 +303,9 @@ public class DocumentCardController {
 
     public void setTitleService(TitleService titleService) {
         this.titleService = titleService;
+    }
+
+    public void setSpaceService(SpaceService spaceService) {
+        this.spaceService = spaceService;
     }
 }

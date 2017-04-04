@@ -1147,6 +1147,10 @@ $.widget('sokol.container', {
             deleteUrl = 'app/deletecontragent';
             errorMessage = 'Не удалось удалить карточку контрагента. Обратитесь к администратору.';
             message = 'Карточка контрагента удалена';
+        } else if (this.options.containerType == 'registrationlist') {
+            deleteUrl = 'app/deleteRegistrationList';
+            errorMessage = 'Не удалось удалить карточку журнала регистрации. Обратитесь к администратору.';
+            message = 'Карточка журнала регистрации удалена';
         } else if (this.options.containerType == 'group') {
             deleteUrl = 'app/deleteGroup';
             errorMessage = 'Не удалось удалить карточку группы. Обратитесь к администратору.';

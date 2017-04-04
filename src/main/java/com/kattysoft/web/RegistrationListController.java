@@ -110,6 +110,15 @@ public class RegistrationListController {
         });
     }
 
+    @RequestMapping(value = "/deleteRegistrationList")
+    public String deleteRegistrationList(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new SokolException("Registration list id is empty");
+        }
+        registrationListService.deleteList(id);
+        return "true";
+    }
+
     @RequestMapping(value = "/registrationlistcard")
     public ObjectNode getCard(String id) {
         if (id == null || id.isEmpty()) {

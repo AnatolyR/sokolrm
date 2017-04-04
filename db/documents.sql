@@ -25,5 +25,6 @@ CREATE TABLE documents (
   signer varchar(255),
   "signerTitle" varchar(255),
   executors varchar(255)[],
-  "executorsTitle" varchar(255)[]
+  "executorsTitle" varchar(255)[],
+  archivecase varchar(255)
 );

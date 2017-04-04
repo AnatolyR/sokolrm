@@ -28,7 +28,7 @@
       "id": "spaces",
       "title": "Пространства",
       "type": "dictionary",
-      "dictionary": "spaces",
+      "dictionary": "freespaces",
       "preload": true,
       "multiple": true
     }

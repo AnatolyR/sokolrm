@@ -11,6 +11,8 @@ package com.kattysoft.web;
 
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -25,6 +27,7 @@ import java.io.IOException;
  * Date: 30.04.2016
  */
 public class LoginFilter implements Filter {
+    private static final Logger log = LoggerFactory.getLogger(LoginFilter.class);
     private UserService userService;
 
     @Override
@@ -49,14 +52,18 @@ public class LoginFilter implements Filter {
         String path = (servletPath != null ? servletPath : "") + (pathInfo != null ? pathInfo : "");
 
         if ("post".equalsIgnoreCase(req.getMethod()) && path.endsWith("login")) {
-            String login = req.getParameter("user");
-            String password = req.getParameter("password");
-            User user = authenticate(login, password);
-            if (user != null) {
-                req.getSession().setAttribute("user", user);
-                res.getWriter().write("true");
-            } else {
-                res.getWriter().write("false");
+            try {
+                String login = req.getParameter("user");
+                String password = req.getParameter("password");
+                User user = authenticate(login, password);
+                if (user != null) {
+                    req.getSession().setAttribute("user", user);
+                    res.getWriter().write("true");
+                } else {
+                    res.getWriter().write("false");
+                }
+            } catch (Exception e) {
+                res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } else if (path.equals("/login")) {
             req.getRequestDispatcher("login.html").forward(req, res);

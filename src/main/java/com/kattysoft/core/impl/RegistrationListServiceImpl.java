@@ -112,7 +112,7 @@ public class RegistrationListServiceImpl implements RegistrationListService {
         UUID listId = list.getId();
 
         List<UUID> existSpaces = spaceService.getSpacesByRegistrationListId(listId).stream().map(Space::getId).collect(Collectors.toList());
-        List<UUID> spacesToAdd = spaces == null ? Collections.emptyList() : spaces.stream().filter(s -> ! existSpaces.contains(s)).collect(Collectors.toList());
+        List<UUID> spacesToAdd = spaces == null ? Collections.emptyList() : spaces.stream().filter(s -> !existSpaces.contains(s)).collect(Collectors.toList());
         List<UUID> spacesToDelete = existSpaces.stream().filter(s -> !(spaces != null && spaces.contains(s))).collect(Collectors.toList());
 
         spacesToAdd.forEach(s -> {
@@ -127,6 +127,15 @@ public class RegistrationListServiceImpl implements RegistrationListService {
         });
 
         return listId.toString();
+    }
+
+    @Override
+    public void deleteList(String id) {
+        if (!accessRightService.checkRights("_system", "registrationLists", null, AccessRightLevel.DELETE)) {
+            throw new NoAccessRightsException("No access rights for delete registrationLists");
+        }
+        UUID uuid = UUID.fromString(id);
+        registrationListRepository.delete(uuid);
     }
 
     public void setRegistrationListRepository(RegistrationListRepository registrationListRepository) {

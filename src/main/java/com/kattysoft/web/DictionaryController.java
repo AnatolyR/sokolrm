@@ -64,9 +64,19 @@ public class DictionaryController {
             }).collect(Collectors.toList());
             String json = mapper.writeValueAsString(nodes);
             return json;
-        } else if ("spaces".equals(id)) {
+        } else if ("freespaces".equals(id)) {
             List<Space> spaces = spaceService.getSpaces();
             List<ObjectNode> nodes = spaces.stream().filter(s -> s.getRegistrationListId() == null).map(s -> {
+                ObjectNode node = mapper.createObjectNode();
+                node.put("id", s.getId().toString());
+                node.put("title", s.getTitle());
+                return node;
+            }).collect(Collectors.toList());
+            String json = mapper.writeValueAsString(nodes);
+            return json;
+        } else if ("spaces".equals(id)) {
+            List<Space> spaces = spaceService.getSpaces();
+            List<ObjectNode> nodes = spaces.stream().map(s -> {
                 ObjectNode node = mapper.createObjectNode();
                 node.put("id", s.getId().toString());
                 node.put("title", s.getTitle());

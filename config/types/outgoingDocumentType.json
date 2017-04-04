@@ -67,6 +67,19 @@
       "id": "comment",
       "title": "Комментарий",
       "type": "text"
+    },
+    {
+      "id": "space",
+      "title": "Пространство",
+      "type": "dictionary",
+      "dictionary": "spaces",
+      "preload": true,
+      "multiple": false
+    },
+    {
+      "id": "archivecase",
+      "title": "Дело",
+      "type": "string"
     }
   ]
 }

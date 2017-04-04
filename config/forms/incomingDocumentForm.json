@@ -71,6 +71,17 @@
     },
     {
       "id": "comment"
+    },
+    {
+      "cols": 2,
+      "items": [
+        {
+          "id": "space"
+        },
+        {
+          "id": "archivecase"
+        }
+      ]
     }
   ]
 }
