@@ -28,6 +28,10 @@ $.widget('sokol.formButtons', {
             cancelButton.appendTo(buttons);
         }
 
+        if (this.options.dispatcher.options.data.status == 'Черновик') {
+            this.addTemplatesButton(buttons);
+        }
+
         var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
         deleteButton.click($.proxy(function() {
             this.options.dispatcher.deleteDocument();
@@ -53,6 +57,50 @@ $.widget('sokol.formButtons', {
         }, this));
 
         this.manageButtons();
+    },
+
+    addTemplatesButton: function(buttons) {
+        var fromTemplatesButton = $('<div name="templates" class="btn-group">' +
+            '<button type="button" class="btn btn-info dropdown-toggle controlElementLeftMargin" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+            'Из шаблона <span class="caret"></span>' +
+            '</button>' +
+            '<ul class="dropdown-menu">' +
+            '</ul>' +
+            '</div>');
+        var fromTemplateUl = fromTemplatesButton.find('ul');
+
+        var type = this.options.dispatcher.options.data.type;
+        $.getJSON('app/documentTemplates', {type: type}, $.proxy(function(res) {
+            var data = res.data;
+            data.forEach($.proxy(function(t) {
+                var aTemplate = $('<a href="#">' + t.title + '</a>');
+                aTemplate.click($.proxy(function(e) {
+                    e.preventDefault();
+                    this.updateCardFromTemplate(t.id);
+                }, this));
+                var liTemplate = $('<li></li>').appendTo(fromTemplateUl);
+                aTemplate.appendTo(liTemplate);
+            }, this));
+
+            var toTemplate = $('<a href="#">Сохранить как шаблон</a>');
+            toTemplate.click($.proxy(function(e) {
+                e.preventDefault();
+                this.saveAsTemplate();
+            }, this));
+            $('<li role="separator" class="divider"></li>').appendTo(fromTemplateUl);
+            var liToTemplate = $('<li></li>').appendTo(fromTemplateUl);
+            toTemplate.appendTo(liToTemplate);
+        }, this));
+
+        fromTemplatesButton.appendTo(buttons);
+    },
+
+    saveAsTemplate: function() {
+        this.options.dispatcher.saveAsTemplate();
+    },
+
+    updateCardFromTemplate: function(templateDocumentId) {
+        this.options.dispatcher.updateCardFromTemplate(templateDocumentId);
     },
 
     doAction: function(action) {
@@ -87,6 +135,11 @@ $.widget('sokol.formButtons', {
                 buttons.children('[name="cancel"]').show();
             }
             buttons.children('[name="save"]').show();
+
+            if (this.options.dispatcher.options.data.status == 'Черновик') {
+                buttons.children('[name="templates"]').show();
+                buttons.children('[name="saveAsTemplate"]').show();
+            }
         }
     },
 

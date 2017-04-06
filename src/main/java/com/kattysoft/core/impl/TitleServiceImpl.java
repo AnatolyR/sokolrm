@@ -45,6 +45,7 @@ public class TitleServiceImpl implements TitleService {
 
         Map<String, String> status = new HashMap<>();
         status.put("draft", "Черновик");
+        status.put("template", "Шаблон");
         status.put("registered", "Зарегистрирован");
         status.put("review", "Рассмотрение");
         status.put("execution", "Исполнение");

@@ -184,6 +184,23 @@ $.widget('sokol.container', {
         }
     },
 
+    updateCardFromTemplate: function(templateDocumentId) {
+        $.getJSON('app/card', {id: templateDocumentId},
+            $.proxy(function (data) {
+                this.options.data = data.data;
+                this.form.options.data = data.data;
+                this.form.setMode('edit');
+            }, this)
+        ).fail($.proxy(function(e) {
+                this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить шаблон "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+            }, this));
+    },
+
+    saveAsTemplate: function() {
+        this.options.template = true;
+        this.saveForm();
+    },
+
     saveForm: function() {
         if (!this.form.validateForm()) {
             return;
@@ -196,6 +213,10 @@ $.widget('sokol.container', {
             if (child.getData) {
                 data[child.formId] = child.getData();
             }
+        }
+
+        if (this.options.template) {
+            data.template = true;
         }
 
         var saveUrl;

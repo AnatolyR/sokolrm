@@ -167,6 +167,7 @@ public class DocumentCardController {
             ObjectNode data = (ObjectNode) mapper.readTree(requestBody);
 
             String typeId = data.get("type").asText();
+            boolean template = data.has("template");
             JsonNode typeConfig = configService.getConfig("types/" + typeId + "Type");
             Map<String, JsonNode> fieldsInfo = new HashMap<>();
             typeConfig.get("fields").forEach(jsonNode -> fieldsInfo.put(jsonNode.get("id").asText(), jsonNode));
@@ -174,7 +175,10 @@ public class DocumentCardController {
             String id = data.get("id").asText();
             Document document = new Document();
             document.setId(id);
-            document.setType(typeId);
+//            document.setType(typeId);
+            if (template) {
+                document.setStatus("template");
+            }
 
             JsonNode fields = data.get("fields");
             Iterator<String> fieldsNames = fields.getFieldNames();

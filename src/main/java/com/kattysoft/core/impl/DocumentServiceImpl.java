@@ -57,8 +57,16 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public String saveDocument(Document document) {
         //todo проверка прав на поля
-        if (document.getId() != null && documentDao.getDocument(document.getId(), null) == null) {
+        Document existDocument = documentDao.getDocument(document.getId(), null);
+        if (document.getId() != null && existDocument == null) {
             throw new SokolException("Document not found");
+        }
+        if ("template".equals(document.getStatus())) {
+            if ("draft".equals(existDocument.getStatus())) {
+                document.getFields().put("status", "template");
+            } else {
+                throw new SokolException("Only draft document can be saved as template");
+            }
         }
 
         fillTitleFields(document);
