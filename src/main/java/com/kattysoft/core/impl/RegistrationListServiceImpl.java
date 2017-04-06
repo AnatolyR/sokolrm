@@ -10,6 +10,7 @@
 package com.kattysoft.core.impl;
 
 import com.kattysoft.core.*;
+import com.kattysoft.core.dao.RegistrationListDao;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.RegistrationList;
 import com.kattysoft.core.model.Space;
@@ -40,6 +41,9 @@ public class RegistrationListServiceImpl implements RegistrationListService {
 
     @Autowired
     private SpaceService spaceService;
+
+    @Autowired
+    private RegistrationListDao registrationListDao;
 
     @Override
     public Page<RegistrationList> getLists(Specification specification) {
@@ -138,6 +142,25 @@ public class RegistrationListServiceImpl implements RegistrationListService {
         registrationListRepository.delete(uuid);
     }
 
+    @Override
+    public String produceNextNumber(String spaceId) {
+        Space space = spaceService.getSpace(spaceId);
+        if (space == null || space.getRegistrationListId() == null) {
+            return null;
+        }
+        UUID listId = space.getRegistrationListId();
+        RegistrationList list = registrationListRepository.findOne(listId);
+        if (list != null) {
+            Integer count = registrationListDao.produceNextNumber(listId);
+            if (count == null) {
+                throw new SokolException("Can not generate registration list number");
+            }
+            return list.getPrefix() + count + (list.getSuffix() != null ? list.getSuffix() : "");
+        } else {
+            return null;
+        }
+    }
+
     public void setRegistrationListRepository(RegistrationListRepository registrationListRepository) {
         this.registrationListRepository = registrationListRepository;
     }
@@ -148,5 +171,9 @@ public class RegistrationListServiceImpl implements RegistrationListService {
 
     public void setSpaceService(SpaceService spaceService) {
         this.spaceService = spaceService;
+    }
+
+    public void setRegistrationListDao(RegistrationListDao registrationListDao) {
+        this.registrationListDao = registrationListDao;
     }
 }

@@ -26,4 +26,6 @@ public interface RegistrationListService {
     String saveList(RegistrationList list);
 
     void deleteList(String id);
+
+    String produceNextNumber(String space);
 }

@@ -10,10 +10,7 @@
 package com.kattysoft.core.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.kattysoft.core.ActionService;
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.DocumentService;
-import com.kattysoft.core.SokolException;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,28 +28,51 @@ public class ActionServiceImpl implements ActionService {
     @Autowired
     private ConfigService configService;
 
+    @Autowired
+    private RegistrationListService registrationListService;
+
     @Override
     public void doAction(String documentId, String actionId) {
         Document document = documentService.getDocument(documentId);
         if (document == null) {
             throw new SokolException("Document not found");
         }
+        if (actionId == null) {
+            throw new SokolException("Action is empty");
+        }
         String typeId = document.getType();
         JsonNode type = configService.getConfig2("types/" + typeId + "Type");
         String flowId = type.get("flow").textValue();
         JsonNode flow = configService.getConfig2("flows/" + flowId);
         String status = document.getStatus();
+        String space = document.getSpace();
         JsonNode state = StreamSupport.stream(flow.get("states").spliterator(), false).filter(s -> status.equals(s.get("id").textValue())).findFirst().orElse(null);
         JsonNode action = StreamSupport.stream(state.get("actions").spliterator(), false).filter(a -> actionId.equals(a.get("id").textValue())).findFirst().orElse(null);
         String endState = action.has("state") ? action.get("state").textValue() : null;
         if (endState != null) {
-            Document holder = new Document();
-            holder.setId(documentId);
-            holder.getFields().put("status", endState);
-            documentService.saveDocument(holder);
+            if (actionId.equals("doregistration")) {
+                registrDocument(documentId, endState, space);
+            } else {
+                Document holder = new Document();
+                holder.setId(documentId);
+                holder.getFields().put("status", endState);
+                documentService.saveDocument(holder);
+            }
         } else {
             throw new SokolException("No end state");
         }
+    }
+
+    private void registrDocument(String documentId, String endState, String space) {
+        String documentNumber = registrationListService.produceNextNumber(space);
+
+        Document holder = new Document();
+        holder.setId(documentId);
+        holder.getFields().put("status", endState);
+        if (documentNumber != null) {
+            holder.getFields().put("documentNumber", documentNumber);
+        }
+        documentService.saveDocument(holder);
     }
 
     public void setDocumentService(DocumentService documentService) {
@@ -61,5 +81,9 @@ public class ActionServiceImpl implements ActionService {
 
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
+    }
+
+    public void setRegistrationListService(RegistrationListService registrationListService) {
+        this.registrationListService = registrationListService;
     }
 }

@@ -56,6 +56,10 @@
         <property name="dataSource" ref="pgDb" />
     </bean>
 
+    <bean id="registrationListDao" class="com.kattysoft.core.dao.RegistrationListDaoPg">
+        <property name="dataSource" ref="pgDb" />
+    </bean>
+
     <bean class="com.kattysoft.core.impl.DocumentServiceImpl">
         <property name="documentDao" ref="documentDao" />
     </bean>

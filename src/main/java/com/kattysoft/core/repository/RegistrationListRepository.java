@@ -21,7 +21,11 @@ import java.util.UUID;
  * Date: 29.03.2017
  */
 public interface RegistrationListRepository extends CrudRepository<RegistrationList, UUID>, JpaSpecificationExecutor<RegistrationList> {
+//    @org.springframework.transaction.annotation.Transactional
 //    @Modifying(clearAutomatically = true)
-//    @Query("update RegistrationList list set list.count =:isRead where feedEntry.id =:entryId")
-//    void markEntryAsRead(@Param("entryId") Long rssFeedEntryId, @Param("isRead") boolean isRead);
+//    @Query(value = "UPDATE registrationlists r SET r.count = LAST_INSERT_ID(r.count + 1) WHERE r.id = ?1", nativeQuery = true)
+//    int updateCounterByName(UUID listId);
+//
+//    @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
+//    int getLastInsertId();
 }

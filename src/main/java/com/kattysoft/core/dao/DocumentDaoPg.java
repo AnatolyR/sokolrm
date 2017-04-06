@@ -9,7 +9,6 @@
  */
 package com.kattysoft.core.dao;
 
-import com.kattysoft.core.Utils;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.*;
 import org.apache.commons.dbutils.DbUtils;
