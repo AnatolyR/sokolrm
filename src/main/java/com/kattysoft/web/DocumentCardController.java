@@ -9,7 +9,6 @@
  */
 package com.kattysoft.web;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.model.Space;
