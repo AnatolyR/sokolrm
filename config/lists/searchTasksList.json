@@ -1,0 +1,50 @@
+{
+  "condition": "t.userId = '${currentUser}'::uuid",
+  "join": "right join tasks t on d.id = t.documentId",
+  "gridConfig": {
+    "id": "searchTasks",
+    "url": "app/documents",
+    "title": "Входящие задачи",
+    "columnsVisible": [
+      "t.type",
+      "t.author",
+      "d.documentNumber",
+      "d.title",
+      "t.status"
+    ],
+    "columns": [
+      {
+        "id": "t.id",
+        "type": "hidden"
+      },
+      {
+        "id": "t.type",
+        "title": "Тип",
+        "render": "executionType"
+      },
+      {
+        "id": "t.author",
+        "title": "Автор",
+        "render": "user"
+      },
+      {
+        "id": "d.documentNumber",
+        "title": "Номер документа",
+        "render": "link",
+        "linkType": "document"
+      },
+      {
+        "id": "d.title",
+        "title": "Заголовок документа",
+        "render": "link",
+        "linkType": "task",
+        "idColumn": "t.id"
+      },
+      {
+        "id": "t.status",
+        "title": "Статус",
+        "render": "executionStatus"
+      }
+    ]
+  }
+}

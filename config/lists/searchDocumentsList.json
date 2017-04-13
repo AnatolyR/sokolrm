@@ -1,0 +1,70 @@
+{
+  "condition": "status IS DISTINCT FROM 'Черновик'",
+  "gridConfig": {
+    "title": "Документы",
+    "columnsVisible": [
+      "id",
+      "title",
+      "textheadline",
+      "documentNumber",
+      "type",
+      "status",
+      "registrationDate"
+    ],
+    "columns": [
+      {
+        "id": "id",
+        "type": "hidden"
+      },
+      {
+        "id": "documentNumber",
+        "title": "Номер"
+      },
+      {
+        "id": "type",
+        "title": "Тип",
+        "render": "doctype"
+      },
+      {
+        "id": "status",
+        "title": "Статус",
+        "render": "status"
+      },
+      {
+        "id": "title",
+        "title": "Заголовок",
+        "render": "link",
+        "linkType": "document"
+      },
+      {
+        "id": "textheadline",
+        "title": "Текст"
+      },
+      {
+        "id": "registrationDate",
+        "title": "Дата регистрации",
+        "render": "datetime"
+      },
+      {
+        "id": "pagesQuantity",
+        "title": "Кол. стр."
+      },
+      {
+        "id": "addressee",
+        "title": "Адресаты (ИД)"
+      },
+      {
+        "id": "addresseeTitle",
+        "title": "Адресаты"
+      },
+      {
+        "id": "correspondent",
+        "title": "Корреспондент (ИД)"
+      },
+      {
+        "id": "correspondentTitle",
+        "title": "Корреспондент"
+      }
+    ]
+  }
+}

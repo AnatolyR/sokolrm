@@ -153,12 +153,20 @@ public class DocumentDaoPg implements DocumentDao {
                 }
             }).collect(Collectors.toList()));
 
+            List<Object> paramsValues = new ArrayList<>();
+            if (spec.getSearchText() != null && !spec.getSearchText().isEmpty()) {
+                columns.add("ts_headline('russian', searchtext, to_tsquery('russian', ?), 'StartSel = <mark>, StopSel = </mark>') as textheadline");
+                paramsValues.add(spec.getSearchText());
+                fieldsNames.add("textheadline");
+                columnTypes.put("textheadline", "text");
+            }
+
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT");
             sql.append(" ");
             sql.append(String.join(", ", columns));
             sql.append(" FROM documents d ");
-            List<Object> paramsValues = new ArrayList<>();
+
             if (spec.getJoin() != null) {
                 sql.append(spec.getJoin());
                 sql.append(" ");
@@ -166,6 +174,12 @@ public class DocumentDaoPg implements DocumentDao {
             if (spec.getCondition() != null) {
                 Condition condition = spec.getCondition();
                 String conditionSql = conditionToSql(condition, paramsValues, columnTypes);
+
+                if (spec.getSearchText() != null && !spec.getSearchText().isEmpty()) {
+                    conditionSql += " AND to_tsvector('russian', searchtext) @@ to_tsquery('russian', ?)";
+                    paramsValues.add(spec.getSearchText());
+                }
+
                 sql.append("WHERE ");
                 sql.append(conditionSql);
             }
@@ -200,7 +214,11 @@ public class DocumentDaoPg implements DocumentDao {
             PreparedStatement preparedStatement = connection.prepareStatement(sqlStr);
             int i = 1;
             for (Object paramsValue : paramsValues) {
-                preparedStatement.setObject(i++, paramsValue);
+                if (paramsValue instanceof String) {
+                    preparedStatement.setString(i++, (String) paramsValue);
+                } else {
+                    preparedStatement.setObject(i++, paramsValue);
+                }
             }
             resultSet = preparedStatement.executeQuery();
 
@@ -384,6 +402,12 @@ public class DocumentDaoPg implements DocumentDao {
             if (spec.getCondition() != null) {
                 Condition condition = spec.getCondition();
                 String conditionSql = conditionToSql(condition, paramsValues, columnTypes);
+
+                if (spec.getSearchText() != null && !spec.getSearchText().isEmpty()) {
+                    conditionSql += " AND to_tsvector('russian', searchtext) @@ to_tsquery('russian', ?)";
+                    paramsValues.add(spec.getSearchText());
+                }
+
                 sql.append("WHERE ");
                 sql.append(conditionSql);
             }
@@ -423,26 +447,31 @@ public class DocumentDaoPg implements DocumentDao {
             List<String> fieldsNames = new ArrayList<>();
             List<String> fieldsValuesPlaceholder = new ArrayList<>();
 
-            if (!update) {
-                fieldsNames.add("type");
-                fieldsValuesPlaceholder.add("?");
-            }
-
             fields.forEach((name, value) -> {
                 String columnType = columnTypes.get(name);
 
                 if (columnType != null) {
-                    fieldsNames.add("\"" + name + "\"");
+                    fieldsNames.add(name);
                     fieldsValuesPlaceholder.add("?");
                 }
             });
+
+            if (fieldsNames.contains("title")) {
+                fieldsNames.add("searchtext");
+                fieldsValuesPlaceholder.add("?");
+                columnTypes.put("searchtext", "text");
+                String searchtext = (String) fields.get("title");
+                fields.put("searchtext", searchtext);
+            }
+
             String sql;
+            List<String> fieldsNamesQuoted = fieldsNames.stream().map(n -> "\"" + n + "\"").collect(Collectors.toList());
             if (update) {
-                sql = "UPDATE documents SET (" + String.join(", ", fieldsNames) + ") = (" + String.join(", ", fieldsValuesPlaceholder) + ") WHERE id = ?::uuid;";
+                sql = "UPDATE documents SET (" + String.join(", ", fieldsNamesQuoted) + ") = (" + String.join(", ", fieldsValuesPlaceholder) + ") WHERE id = ?::uuid;";
             } else {
                 String id = UUID.randomUUID().toString();
                 document.setId(id);
-                sql = "INSERT INTO documents (" + String.join(", ", fieldsNames) + ", id) VALUES (" + String.join(", ", fieldsValuesPlaceholder) + ", ?::uuid);";
+                sql = "INSERT INTO documents (type, " + String.join(", ", fieldsNamesQuoted) + ", id) VALUES (?, " + String.join(", ", fieldsValuesPlaceholder) + ", ?::uuid);";
             }
 
             prst = connection.prepareStatement(sql);
@@ -453,7 +482,7 @@ public class DocumentDaoPg implements DocumentDao {
                 prst.setString(ix++, document.getType());
             }
 
-            for (String name : fields.keySet()) {
+            for (String name : fieldsNames) {
                 Object value = fields.get(name);
                 String columnType = columnTypes.get(name);
                 if (columnType != null) {

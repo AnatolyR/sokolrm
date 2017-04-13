@@ -31,6 +31,11 @@ body {
     background-color: #428bca;
 }
 
+.nav-sidebar > .active > a > .badge {
+    color: #337ab7;
+    background-color: #fff;
+}
+
 .controlElementLeftMargin {
     margin-left: 5px !important;
 }
@@ -52,3 +57,9 @@ body {
 .execution-report-form-buttons {
     border-top: 1px solid #ddd;
 }
+
+.nav-sidebar > li > div {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+

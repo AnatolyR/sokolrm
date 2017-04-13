@@ -1,0 +1,17 @@
+{
+  "title": "Значения справочников",
+  "gridConfig": {
+    "url": "app/dictionaryvalues",
+    "title": "Значения справочников",
+    "columns": [
+      {
+        "id": "title",
+        "title": "Значение"
+      },
+      {
+        "id": "dictionary",
+        "title": "Справочник"
+      }
+    ]
+  }
+}

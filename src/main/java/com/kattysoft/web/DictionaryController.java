@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -116,6 +117,18 @@ public class DictionaryController {
         ((ObjectNode) config).set("data", data);
 
         return config.toString();
+    }
+
+    @RequestMapping(value = "/dictionaryvalues", produces = "application/json; charset=utf-8")
+    public ObjectNode getDictionaryValues(String searchText) {
+        List<ObjectNode> userNodes = new ArrayList<>();
+
+        ObjectNode page = mapper.createObjectNode();
+        page.putArray("data").addAll(userNodes);
+        page.put("offset", 0);
+        page.put("total", 0);
+
+        return page;
     }
 
     @RequestMapping("deleteDictionaryValues")

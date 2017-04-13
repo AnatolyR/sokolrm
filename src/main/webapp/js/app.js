@@ -585,9 +585,10 @@ $.widget('sokol.app', {
             this.container = $('<div>Раздел Отчеты в разработке</div>').appendTo('body');
             this.container.destroy = this.container.remove;
 
+        } else if (id.startsWith('search/')) {
+            this.container = $.sokol.search({id: id.substring(7), dispatcher: this}, $("<div></div>").appendTo("body"));
         } else if (id == 'search') {
-            this.container = $('<div>Раздел Поиск в разработке</div>').appendTo('body');
-            this.container.destroy = this.container.remove;
+            this.container = $.sokol.search({id: null, dispatcher: this}, $("<div></div>").appendTo("body"));
 
         } else if (id == 'archive') {
             this.container = $('<div>Раздел Архив в разработке</div>').appendTo('body');
@@ -2947,7 +2948,7 @@ $.widget("sokol.grid", {
 
         this.renderTablePanel();
         this.reload();
-        if (!this.options.data) {
+        if (!this.options.data && !this.options.noControls) {
             var bottomBar = this.createButtonsBar(central);
             this.createPagination(bottomBar);
         }
@@ -2968,22 +2969,24 @@ $.widget("sokol.grid", {
             this.topBar = topBar;
         }
 
-        if (!this.options.data) {
+        if (!this.options.data && !this.options.noControls) {
             var pagination = this.createPagination(topBar);
         } else {
-            $('<span style="margin-right: 10px;">Найдено: <span name="gridItemsCount">' + this.options.data.length + '</span></span>').appendTo(topBar);
+            $('<span style="margin-right: 10px;">Найдено: <span name="gridItemsCount"></span></span>').appendTo(topBar);
         }
-        if (this.options.columnsVisible) {
-            this.createColumnsSelector(topBar);
-        }
-        if (this.options.deletable) {
-            this.createDeleteButton(topBar);
-        }
-        if (this.options.filterable) {
-            this.createFilterButton(topBar);
-        }
-        if (this.options.addable) {
-            this.createAddButton(topBar);
+        if (!this.options.noControls) {
+            if (this.options.columnsVisible) {
+                this.createColumnsSelector(topBar);
+            }
+            if (this.options.deletable) {
+                this.createDeleteButton(topBar);
+            }
+            if (this.options.filterable) {
+                this.createFilterButton(topBar);
+            }
+            if (this.options.addable) {
+                this.createAddButton(topBar);
+            }
         }
     },
 
@@ -3033,11 +3036,16 @@ $.widget("sokol.grid", {
                 offset: this.options.offset,
                 conditions: (this.filter && this.filter.conditions) ? JSON.stringify(this.filter.conditions) : null,
                 sort: this.sortColumn,
-                sortAsc: this.sortAsc
+                sortAsc: this.sortAsc,
+                searchtext: this.options.searchtext
             }, $.proxy(function (data) {
                 this.options.data = data.data;
                 this.options.total = data.total;
                 this.refresh();
+
+                if (this.options.dataLoadedCallback) {
+                    this.options.dataLoadedCallback(this);
+                }
 
             }, this)).fail(function() {
                 $.notify({message: 'Не удалось загрузить данные. Обратитесь к администратору.'}, {type: 'danger', delay: 0, timer: 0});
@@ -3770,6 +3778,293 @@ $.widget('sokol.smodal', {
             this.options.confirmAction(this.options.data);
         }, this));
         modal.modal();
+    }
+});
+$.widget('sokol.search', {
+    options: {
+
+    },
+
+    _create: function () {
+        var row = $('<div class="row"></div>').appendTo(this.element);
+        var sidebar = $('<div class="col-sm-3 col-md-2 sidebar"></div>').appendTo(row);
+        var main = $('<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2"></div>').appendTo(row);
+        this.main = main;
+        this.sidebar = sidebar;
+        var currentNode = null;
+
+        var produceHandler = $.proxy(function produceHandler(item) {
+            return $.proxy(function handleCategoryClick(e) {
+                e.preventDefault();
+                this.createGrid(item.id);
+            }, this)
+        }, this);
+        $.getJSON('app/config', {id: 'navigation/search'}, $.proxy(function(data) {
+            this.data = data;
+            data.items.forEach($.proxy(function (item) {
+                if (item.type == 'header') {
+                    if (item.title) {
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        currentNode = header;
+                        header.find("a").click(produceHandler(item));
+                    } else {
+                        var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                        currentNode = block;
+                    }
+                } else {
+                    if (!currentNode) {
+                        currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+                    }
+                    var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
+                    //if (item.disabled) {
+                    //    category.addClass('disabled');
+                        //category.find('a').click(function handleCategoryClick(e) {
+                        //    e.preventDefault();
+                        //});
+                    //} else {
+                    //    category.find('a').click(produceHandler(item));
+                    //}
+                    category.find('a').click(produceHandler(item));
+                    if (item.id == 'all') {
+                        category.addClass('active');
+                    } else {
+                        //category.addClass('disabled');
+                    }
+                }
+            }, this));
+            //if (this.options.id) {
+            //    setTimeout($.proxy(function () {
+            //        this.sidebar.find('[name="category_' + this.options.id + '"]').addClass('active');
+            //    }, this), 0);
+            //}
+            //if (this.options.id == 'all') {
+            //    this.createAllGrid();
+            //}
+        }, this));
+
+        this.text = $('<form style="margin-top: 10px; margin-bottom: 10px;">' +
+            '<div class="form-group">' +
+            '<label>Поисковый запрос:</label>' +
+            '<input name="searchtext" class="form-control">' +
+            '</div>' +
+            '<button type="button" class="btn btn-default">Найти</button>' +
+            '</form>').appendTo(this.main);
+        this.text.find("button").click($.proxy(function() {
+            if (!this.options.id || this.options.id == 'all') {
+                this.createGrid('all');
+            } else {
+                if (this.grid) {
+                    var searchtext = this.text.find('input[name="searchtext"]').val();
+                    this.grid.options.searchtext = searchtext;
+                    this.grid.reload();
+
+                    var category = this.sidebar.find('li');
+                    var a = category.find('a');
+                    a.find('span').remove();
+                }
+            }
+        }, this));
+        //if (this.options.id) {
+        //    this.createGrid(this.options.id);
+        //}
+
+    },
+
+
+    //_createWithCheckboxes: function () {
+    //    var row = $('<div class="row"></div>').appendTo(this.element);
+    //    var sidebar = $('<div class="col-sm-3 col-md-2 sidebar"></div>').appendTo(row);
+    //    var main = $('<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2"></div>').appendTo(row);
+    //    this.main = main;
+    //    this.sidebar = sidebar;
+    //    var currentNode = null;
+    //
+    //    var produceHandler = $.proxy(function produceHandler(item) {
+    //        return $.proxy(function handleCategoryClick(e) {
+    //            e.preventDefault();
+    //            this.createGrid(item.id);
+    //        }, this)
+    //    }, this);
+    //    $.getJSON('app/config', {id: 'navigation/search'}, $.proxy(function(data) {
+    //        var categoryAll = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;"><div class="checkbox">' +
+    //            '<label>' +
+    //            '<input type="checkbox" value="" checked="true">' +
+    //            'Все' +
+    //            '</label>' +
+    //            '</div></li></ul>').appendTo(sidebar);
+    //        categoryAll.find("input").click(function() {
+    //            var checked = categoryAll.find('input').prop('checked');
+    //            var inputs = sidebar.find('input.categoryCheckBox');
+    //            inputs.prop('checked', checked ? 'checked' : '');
+    //        });
+    //        data.items.forEach($.proxy(function (item) {
+    //            if (item.type == 'header') {
+    //                if (item.title) {
+    //                    var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+    //                    currentNode = header;
+    //                    header.find("a").click(produceHandler(item));
+    //                } else {
+    //                    var block = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+    //                    currentNode = block;
+    //                }
+    //            } else {
+    //                if (!currentNode) {
+    //                    currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
+    //                }
+    //                var category = $('<li><div class="checkbox">' +
+    //                    '<label>' +
+    //                    '<input type="checkbox" class="categoryCheckBox" value="" checked="true">' +
+    //                     item.title +
+    //                '</label>' +
+    //                '</div></li>').appendTo(currentNode);
+    //                //var category = $('<li name="category_' + item.id + '"><span>' + item.title + '</span></li>').appendTo(currentNode);
+    //                category.find("input").click(function() {
+    //                    var checked = $(this).prop('checked');
+    //                    categoryAll.find('input').prop('checked', '');
+    //                });
+    //            }
+    //        }, this));
+    //        if (this.options.id && this.options.id.startsWith("dictionaries/")) {
+    //            setTimeout($.proxy(function () {
+    //                this.sidebar.find('[name="category_' + this.options.id.substring(13) + '"]').addClass('active');
+    //            }, this), 0);
+    //        }
+    //    }, this));
+    //    if (this.options.id) {
+    //        if (this.options.id.startsWith("search/")) {
+    //            this.createGrid(this.options.id.substring(7));
+    //        } else {
+    //            this.text = $('<form style="margin-top: 10px;">' +
+    //                '<div class="form-group">' +
+    //                '<label>Поисковый запрос:</label>' +
+    //                '<input class="form-control">' +
+    //                '</div>' +
+    //                '<button class="btn btn-default">Найти</button>' +
+    //                '</form>').appendTo(this.main);
+    //        }
+    //    }
+    //},
+
+    createGrid: function(id) {
+        if (this.grid) {
+            this.grid.destroy();
+        }
+        if (this.grids) {
+            this.grids.forEach(function(g) {
+                g.destroy();
+            });
+        }
+        if (this.info) {
+            this.info.remove();
+        }
+
+
+        this.sidebar.find('li').removeClass('active');
+        this.options.id = id;
+
+        setTimeout($.proxy(function() {
+            var category = this.sidebar.find('[name="category_' + id + '"]');
+            category.addClass('active');
+
+            category.removeClass('disabled');
+            //category.find('a').click($.proxy(function handleCategoryClick(e) {
+            //    e.preventDefault();
+            //    this.createGrid(id);
+            //}, this));
+        }, this), 0);
+
+        //if (this.options.dispatcher) {
+        //    this.options.dispatcher.updateHash('search/' + id);
+        //}
+
+        if (id == 'all') {
+            this.createAllGrid();
+            return;
+        }
+
+        var searchId = 'search' + id.substring(0, 1).toUpperCase() + id.substring(1);
+        var fullId = 'lists/' + searchId + 'List';
+
+        $.getJSON('app/config', {id: fullId},
+            $.proxy(function (data) {
+                var options = {
+                    title: data.title,
+                    columnsVisible: data.columnsVisible,
+                    columns: data.columns,
+                    url: data.url ? data.url : 'app/documents',
+                    id: searchId,
+                    filterable: true,
+                    sortable: true
+                };
+                var searchtext = this.text.find('input[name="searchtext"]').val();
+                options.searchtext = searchtext;
+                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+
+            }, this)
+        ).fail(function failLoadList() {
+                $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+            });
+    },
+
+    addGrid: function(id, el) {
+        var searchId = 'search' + id.substring(0, 1).toUpperCase() + id.substring(1);
+        var fullId = 'lists/' + searchId + 'List';
+        this.grids = [];
+        $.getJSON('app/config', {id: fullId},
+            $.proxy(function (data) {
+                var options = {
+                    title: data.title,
+                    columnsVisible: data.columnsVisible,
+                    columns: data.columns,
+                    url: data.url ? data.url : 'app/documents',
+                    id: searchId,
+                    filterable: true,
+                    sortable: true,
+                    pageSize: 5,
+                    noControls: true
+                };
+                var searchtext = this.text.find('input[name="searchtext"]').val();
+                options.searchtext = searchtext;
+                options.dataLoadedCallback = $.proxy(function(grid) {
+                    var category = this.sidebar.find('[name="category_' + id + '"]');
+                    var a = category.find('a');
+                    a.find('span').remove();
+                    //a.unbind();
+                    a.html(a.html() + ' <span class="badge">' + grid.options.total + '</span>');
+
+                    //if (grid.options.total > 0) {
+                    //    category.removeClass('disabled');
+                    //    a.click($.proxy(function handleCategoryClick(e) {
+                    //        e.preventDefault();
+                    //        this.createGrid(id);
+                    //    }, this));
+                    //} else {
+                    //    //category.addClass('disabled');
+                    //}
+                }, this);
+                var grid = $.sokol.grid(options, el);
+                this.grids.push(grid);
+            }, this)
+        ).fail(function failLoadList() {
+                $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
+            });
+    },
+
+    createAllGrid: function() {
+        var searchtext = this.text.find('input[name="searchtext"]').val();
+        if (searchtext) {
+            if (this.data.items) {
+                this.data.items.forEach($.proxy(function (item) {
+                    if (item.id && item.id != 'all') {
+                        this.addGrid(item.id, $("<div></div>").appendTo(this.main));
+                    }
+                }, this));
+            }
+        }
+    },
+
+    _destroy: function() {
+        this.element.detach();
     }
 });
 $.widget('sokol.titleHeader', {

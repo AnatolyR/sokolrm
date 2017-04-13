@@ -1,0 +1,35 @@
+{
+  "items": [
+    {
+      "id": "all",
+      "title": "Все"
+    },
+    {
+      "type": "header"
+    },
+    {
+      "id": "documents",
+      "title": "Документы"
+    },
+    {
+      "id": "tasks",
+      "title": "Задачи"
+    },
+    {
+      "id": "users",
+      "title": "Сотрудники"
+    },
+    {
+      "id": "contragents",
+      "title": "Контрагенты"
+    },
+    {
+      "id": "dictionaries",
+      "title": "Справочники"
+    },
+    {
+      "id": "files",
+      "title": "Вложения"
+    }
+  ]
+}

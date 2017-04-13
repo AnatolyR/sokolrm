@@ -1,0 +1,35 @@
+{
+  "gridConfig": {
+    "title": "Внешние организации",
+    "addableType": "contragent",
+    "filterable": true,
+    "columnsVisible": [
+      "title",
+      "fullName",
+      "address",
+      "phone"
+    ],
+    "columns": [
+      {
+        "id": "title",
+        "title": "Наименование",
+        "render": "link",
+        "linkType": "contragent"
+      },
+      {
+        "id": "fullName",
+        "title": "Полное наименование"
+      },
+      {
+        "id": "address",
+        "title": "Адрес"
+      },
+      {
+        "id": "phone",
+        "title": "Телефон"
+      }
+    ],
+    "id": "contragents",
+    "url": "app/contragents"
+  }
+}

@@ -96,9 +96,10 @@ $.widget('sokol.app', {
             this.container = $('<div>Раздел Отчеты в разработке</div>').appendTo('body');
             this.container.destroy = this.container.remove;
 
+        //} else if (id.startsWith('search/')) {
+        //    this.container = $.sokol.search({id: id.substring(7), dispatcher: this}, $("<div></div>").appendTo("body"));
         } else if (id == 'search') {
-            this.container = $('<div>Раздел Поиск в разработке</div>').appendTo('body');
-            this.container.destroy = this.container.remove;
+            this.container = $.sokol.search({id: null, dispatcher: this}, $("<div></div>").appendTo("body"));
 
         } else if (id == 'archive') {
             this.container = $('<div>Раздел Архив в разработке</div>').appendTo('body');

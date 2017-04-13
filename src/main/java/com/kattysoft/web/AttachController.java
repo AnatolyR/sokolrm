@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,20 @@ public class AttachController {
         attachService.deleteAttach(id);
         return "true";
     }
+
+    @RequestMapping(value = "/searchfiles", produces = "application/json; charset=utf-8")
+    public ObjectNode getDictionaryValues(String searchText) {
+        List<ObjectNode> userNodes = new ArrayList<>();
+
+        ObjectNode page = mapper.createObjectNode();
+        page.putArray("data").addAll(userNodes);
+        page.put("offset", 0);
+        page.put("total", 0);
+
+        return page;
+    }
+
+
     public void setAttachService(AttachService attachService) {
         this.attachService = attachService;
     }

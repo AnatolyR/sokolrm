@@ -57,7 +57,7 @@ public class DocumentListController {
     }
 
     @RequestMapping(value = "/documents")
-    public Object listDocuments(String listId, Integer offset, Integer size, String conditions, String sort, String sortAsc) throws IOException {
+    public Object listDocuments(String listId, Integer offset, Integer size, String conditions, String sort, String sortAsc, String searchtext) throws IOException {
         if (offset == null) {
             offset = 0;
         }
@@ -117,10 +117,17 @@ public class DocumentListController {
             spec.setSort(Collections.singletonList(sortObject));
         }
 
+        if (searchtext != null && !searchtext.isEmpty()) {
+            spec.setSearchText(searchtext);
+        }
+
         spec.setOffset(offset);
         spec.setSize(size);
         List<String> fields = StreamSupport.stream(config.get("gridConfig").get("columns").spliterator(), false)
             .map(node -> node.get("id").asText()).collect(Collectors.toList());
+        if (fields.contains("textheadline")) {
+            fields.remove("textheadline");
+        }
         spec.setFields(fields);
 
         final Map<String, String> typeTitleCash = new HashMap<>();

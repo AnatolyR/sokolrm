@@ -47,7 +47,7 @@ $.widget("sokol.grid", {
 
         this.renderTablePanel();
         this.reload();
-        if (!this.options.data) {
+        if (!this.options.data && !this.options.noControls) {
             var bottomBar = this.createButtonsBar(central);
             this.createPagination(bottomBar);
         }
@@ -68,22 +68,24 @@ $.widget("sokol.grid", {
             this.topBar = topBar;
         }
 
-        if (!this.options.data) {
+        if (!this.options.data && !this.options.noControls) {
             var pagination = this.createPagination(topBar);
         } else {
-            $('<span style="margin-right: 10px;">Найдено: <span name="gridItemsCount">' + this.options.data.length + '</span></span>').appendTo(topBar);
+            $('<span style="margin-right: 10px;">Найдено: <span name="gridItemsCount">' + ((this.options.data && this.options.data.length) ? this.options.data.length : '') + '</span></span>').appendTo(topBar);
         }
-        if (this.options.columnsVisible) {
-            this.createColumnsSelector(topBar);
-        }
-        if (this.options.deletable) {
-            this.createDeleteButton(topBar);
-        }
-        if (this.options.filterable) {
-            this.createFilterButton(topBar);
-        }
-        if (this.options.addable) {
-            this.createAddButton(topBar);
+        if (!this.options.noControls) {
+            if (this.options.columnsVisible) {
+                this.createColumnsSelector(topBar);
+            }
+            if (this.options.deletable) {
+                this.createDeleteButton(topBar);
+            }
+            if (this.options.filterable) {
+                this.createFilterButton(topBar);
+            }
+            if (this.options.addable) {
+                this.createAddButton(topBar);
+            }
         }
     },
 
@@ -133,11 +135,16 @@ $.widget("sokol.grid", {
                 offset: this.options.offset,
                 conditions: (this.filter && this.filter.conditions) ? JSON.stringify(this.filter.conditions) : null,
                 sort: this.sortColumn,
-                sortAsc: this.sortAsc
+                sortAsc: this.sortAsc,
+                searchtext: this.options.searchtext
             }, $.proxy(function (data) {
                 this.options.data = data.data;
                 this.options.total = data.total;
                 this.refresh();
+
+                if (this.options.dataLoadedCallback) {
+                    this.options.dataLoadedCallback(this);
+                }
 
             }, this)).fail(function() {
                 $.notify({message: 'Не удалось загрузить данные. Обратитесь к администратору.'}, {type: 'danger', delay: 0, timer: 0});

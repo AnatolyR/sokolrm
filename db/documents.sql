@@ -1,3 +1,4 @@
+DROP INDEX IF EXISTS documents_stidx;
 DROP TABLE IF EXISTS documents;
 CREATE TABLE documents (
   id uuid CONSTRAINT documents_pkey PRIMARY KEY,
@@ -26,5 +27,7 @@ CREATE TABLE documents (
   "signerTitle" varchar(255),
   executors varchar(255)[],
   "executorsTitle" varchar(255)[],
-  archivecase varchar(255)
+  archivecase varchar(255),
+  searchtext text
 );
+CREATE INDEX documents_stidx ON documents USING gin (to_tsvector('russian'::regconfig, searchtext));

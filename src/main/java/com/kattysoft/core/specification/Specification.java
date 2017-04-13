@@ -32,6 +32,7 @@ public class Specification {
     private Integer size = 20; //default page size
     private Integer offset;
     private String join;
+    private String searchText;
 
     public List<String> getFields() {
         if (fields == null) {
@@ -82,5 +83,13 @@ public class Specification {
 
     public void setJoin(String join) {
         this.join = join;
+    }
+
+    public String getSearchText() {
+        return searchText;
+    }
+
+    public void setSearchText(String searchText) {
+        this.searchText = searchText;
     }
 }

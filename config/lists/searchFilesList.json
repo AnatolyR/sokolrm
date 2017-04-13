@@ -1,0 +1,17 @@
+{
+  "title": "Вложения",
+  "gridConfig": {
+    "url": "app/searchfiles",
+    "title": "Вложения",
+    "columns": [
+      {
+        "id": "title",
+        "title": "Вложение"
+      },
+      {
+        "id": "object",
+        "title": "Объект"
+      }
+    ]
+  }
+}
