@@ -92,9 +92,10 @@ $.widget('sokol.app', {
             var type = id.substring(4);
             this.createDocument(type);
 
+        } else if (id.startsWith('reports/')) {
+            this.container = $.sokol.reports({id: id.substring(8), dispatcher: this}, $("<div></div>").appendTo("body"));
         } else if (id == 'reports') {
-            this.container = $('<div>Раздел Отчеты в разработке</div>').appendTo('body');
-            this.container.destroy = this.container.remove;
+            this.container = $.sokol.reports({id: null, dispatcher: this}, $("<div></div>").appendTo("body"));
 
         //} else if (id.startsWith('search/')) {
         //    this.container = $.sokol.search({id: id.substring(7), dispatcher: this}, $("<div></div>").appendTo("body"));

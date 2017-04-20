@@ -9,6 +9,8 @@
  */
 package com.kattysoft.web;
 
+import com.kattysoft.core.UserService;
+import com.kattysoft.core.model.User;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -32,6 +34,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,11 +46,14 @@ public class UploadServlet extends HttpServlet {
 
     private DataSource dataSource;
 
+    private UserService userService;
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
         dataSource = (DataSource) applicationContext.getBean("pgDb");
+        userService = applicationContext.getBean(UserService.class);
     }
 
     @Override
@@ -59,6 +65,8 @@ public class UploadServlet extends HttpServlet {
         factory.setRepository(repository);
 
         ServletFileUpload upload = new ServletFileUpload(factory);
+
+        User user = userService.getCurrentUser();
 
         Connection conn = null;
         PreparedStatement ps = null;
@@ -72,12 +80,15 @@ public class UploadServlet extends HttpServlet {
                 String objectId = req.getParameter("objectId");
                 InputStream inputStream = item.getInputStream();
                 conn = dataSource.getConnection();
-                ps = conn.prepareStatement("INSERT INTO files (id, objectId, title, size, content) VALUES (?::uuid, ?::uuid, ?, ?, ?)");
+                ps = conn.prepareStatement("INSERT INTO files (id, objectId, title, size, content, author, authorTitle, created) VALUES (?::uuid, ?::uuid, ?, ?, ?, ?::uuid, ?, ?)");
                 ps.setString(1, id);
                 ps.setString(2, objectId);
                 ps.setString(3, fileName);
                 ps.setInt(4, (int) item.getSize());
                 ps.setBinaryStream(5, inputStream, (int) item.getSize());
+                ps.setString(6, user.getId().toString());
+                ps.setString(7, user.getTitle());
+                ps.setTimestamp(8, new java.sql.Timestamp(new Date().getTime()));
                 ps.executeUpdate();
             }
         } catch (FileUploadException | SQLException e) {
@@ -102,9 +113,10 @@ public class UploadServlet extends HttpServlet {
             rs = ps.executeQuery();
             if (rs.next()) {
                 String fileName = rs.getString("title");
+                Integer size = rs.getInt("size");
                 InputStream inputStream = rs.getBinaryStream("content");
                 resp.setContentType("application/octet-stream");
-                resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+                resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"; size=" + size);
                 IOUtils.copy(inputStream, resp.getOutputStream());
                 resp.flushBuffer();
                 inputStream.close();

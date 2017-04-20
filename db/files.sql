@@ -4,5 +4,8 @@ CREATE TABLE files (
   objectId uuid,
   title varchar(255),
   size integer,
-  content bytea
+  content bytea,
+  author uuid,
+  authorTitle varchar(255),
+  created timestamp
 );

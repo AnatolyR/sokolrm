@@ -10,10 +10,13 @@
 package com.kattysoft.core.impl;
 
 import com.kattysoft.core.AttachService;
+import com.kattysoft.core.dao.AttachesDao;
 import com.kattysoft.core.model.Attach;
+import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.AttachRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,10 +29,13 @@ public class AttachServiceImpl implements AttachService {
     @Autowired
     private AttachRepository attachRepository;
 
+    @Autowired
+    private AttachesDao attachesDao;
+
     @Override
     public List<Attach> getAttachesForObject(String objectId) {
         UUID uuid = UUID.fromString(objectId);
-        List<Attach> attaches = attachRepository.findAllByObjectId(uuid);
+        List<Attach> attaches = attachRepository.findAllByObjectIdOrderByCreatedDesc(uuid);
         return attaches;
     }
 
@@ -38,7 +44,21 @@ public class AttachServiceImpl implements AttachService {
         attachRepository.delete(uuid);
     }
 
+    @Override
+    public byte[] getContent(String id) {
+        return attachesDao.getContent(id);
+    }
+
+    @Override
+    public void addContent(String reportObjectId, String name, User user, Date date, byte[] bytes) {
+        attachesDao.addContent(reportObjectId, name, user, date, bytes);
+    }
+
     public void setAttachRepository(AttachRepository attachRepository) {
         this.attachRepository = attachRepository;
+    }
+
+    public void setAttachesDao(AttachesDao attachesDao) {
+        this.attachesDao = attachesDao;
     }
 }

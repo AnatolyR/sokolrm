@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +35,12 @@ public class AttachController {
     private AttachService attachService;
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+    public AttachController() {
+        mapper.setDateFormat(dateFormat);
+    }
 
     @RequestMapping(value = "/attaches")
     public List<ObjectNode> getAttaches(String id) {

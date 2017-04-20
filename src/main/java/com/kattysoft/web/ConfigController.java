@@ -9,10 +9,7 @@
  */
 package com.kattysoft.web;
 
-import com.kattysoft.core.AccessRightLevel;
-import com.kattysoft.core.AccessRightService;
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.UserService;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.User;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -37,6 +34,9 @@ public class ConfigController {
 
     @RequestMapping(value = "/config", produces = "application/json; charset=utf-8")
     public String getConfig(String id) {
+        if (id == null || id.split("/").length > 2 || !id.replace("/", "").matches("^[a-zA-Z]+$")) {
+            throw new SokolException("Empty or wrong config id");
+        }
         JsonNode config = configService.getConfig(id);
         if (id.startsWith("lists/")) {
             config = config.get("gridConfig");

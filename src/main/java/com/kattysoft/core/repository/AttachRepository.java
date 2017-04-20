@@ -18,5 +18,5 @@ import java.util.UUID;
  * Date: 18.01.2017
  */
 public interface AttachRepository extends CrudRepository<Attach, UUID> {
-    List<Attach> findAllByObjectId(UUID objectId);
+    List<Attach> findAllByObjectIdOrderByCreatedDesc(UUID objectId);
 }

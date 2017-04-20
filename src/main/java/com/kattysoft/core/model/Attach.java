@@ -14,6 +14,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -32,6 +33,13 @@ public class Attach {
     private String title;
 
     private Integer size;
+
+    @Type(type = "pg-uuid")
+    private UUID author;
+
+    private String authorTitle;
+
+    private Date created;
 
     public UUID getId() {
         return id;
@@ -63,5 +71,29 @@ public class Attach {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    public UUID getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(UUID author) {
+        this.author = author;
+    }
+
+    public String getAuthorTitle() {
+        return authorTitle;
+    }
+
+    public void setAuthorTitle(String authorTitle) {
+        this.authorTitle = authorTitle;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }

@@ -36,6 +36,7 @@ $.widget('sokol.form', {
         panelHeader.appendTo(panel);
         var panelBody = $('<div class="panel-body"></div>');
         panelBody.appendTo(panel);
+        this.body = panelBody;
         return panelBody;
     },
 

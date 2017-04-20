@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
+<!-- 2017-04-17T23:18:24 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ListOfOutDocuments" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="701" leftMargin="85" rightMargin="56" topMargin="56" bottomMargin="56" uuid="b7e803cf-b58b-4a76-8353-e9145cf5e2a3">
+	<style name="TimesBolt12" fontName="DejaVu Sans" fontSize="12" isBold="true"/>
+	<style name="Times10" fontName="DejaVu Sans" fontSize="10"/>
+	<style name="TimesBolt13" fontName="DejaVu Sans" fontSize="13" isBold="true"/>
+	<style name="Times12" fontName="DejaVu Sans" fontSize="12"/>
+	<style name="TimesBolt11" fontName="DejaVu Sans" fontSize="11" isBold="true"/>
+	<style name="TimesBolt10" fontName="DejaVu Sans" fontSize="10" isBold="true"/>
+	<style name="Times8" fontName="DejaVu Sans" fontSize="8"/>
+	<parameter name="Logotype" class="java.lang.String">
+		<defaultValueExpression><![CDATA["/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCABKASQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKo3us6Xp0qxX2pWdrIy7gk86oSOmcE9ODS2WsaZqUjR2Oo2d06jcywTq5A9SAarldr2FzK9rl2iiipGFFFFABRRUF3e2lhB595dQ20OceZNIEXPpk0JXDYnorOtdf0a9uFt7TVrCed87Y4rlGY4GTgA56Vo02mtxJp7BRRRSGFFZcfiXQppUii1vTXkdgqot0hLE9ABnk1qU3FrdCTT2CiiikMKKKKACiisuTxNoMUjRya3pqOpKsrXcYII6gjNNRb2Qm0tzUopkM0VxCk0EiSxOAyOjBlYHoQR1FPpDCiiigAooooAKKKKACmSSpCu6Rgo7e/sPU0w3cG9EWQOzkhdg3dPcdPxrmNa8aeHrNQ51W1kZhtBhfzSPwXOKqMJSdkiZSS3Nq41y2gO1UkdiMrgYBPpzyPyqS1vLi7U7YUi9CWL/AKcV5vJ470GJvPM81wd2NkURyB6/NgfrXb+FLu+1XTo9TuYltLadSbe1AJbbx87sQMk4yoAAwed2RjadCUI8zVjGNZSny9TZ+yQtzKgmf+9IAT/9b8KKnornOgqapqVvpGl3OoXbbYLeMu3IBOOgGSBknAA7kivANY0nV9U0R/Gl2Q6Xl2yuqgnYvRWHJwgIKYOMYXrmu5+IV1qHibxHbeDtIJOwCW7JJCgkZG84+6oweMglgMZAp58J/ENtH/sltc0o2PkC38or/wAswNuM+Vnp3zmvSw9qMVJtJvv2PPr3qycUm0u3cqfCTxT97w5dv6yWfy/VnQnP/Ahx/e56Cuy8XaN4h1iOCLRtaSwh3ATKFZXYd2DjnjjCgDOTk9BXhup6ZqfhDxCkMxWO8tnSaKVBlGxyrLuHIyPTqCK9Yf4pW1voOl6g+mXM/wBoKpcvEAscLjIdQcn5uNwQ4ypBJFViKMvaKrS1uKhVXI6dXSwkfw+8E6FZwxa1PE88nImu7swbyAM7VDAYz25Iz1NYHi3wv4LOjSXOgatp1vd26tJ5QvhIJwBkqAWJ3ccY6ng9cj0C503wz45s7a7lEWowQ58to5mXYWCkghSCDjbweR7VyXjHw14H8NaFPK9gEvZY2W0jFxKzNJjg4L/dB5JPH4kA50a0nNc0pc3boXVpJRfLGNu/U5zwH8QbzS9Qi07Vbl7jTp3VBJNJk256AhmPCdMjoByO4OX8TP8AkoOqf9sv/RSVR8JeGLrxRrUdrFG/2VGVrqYHAjTPPOD8xwQBjr7AkXviZ/yUHVP+2X/opK7oxhHEe7vbX70cblN0Pe2vp+J3Wi/DPw9q3hjTrqVbqO4uLeOR5IpuckAnAII/SvNddtf+EX8WXdrpWoyn7LJtjuIn2uuV5XKnqMlT06HgdK9P0TwKNV8K2DTeItcWG4tULWy3X7oAqPlCkYx7VZtfhF4bt7hJZJL+5Rc5ilmUK3HfaoPvwe1csMTGnKXPJvysdE8PKcVyRt5nPeIviRqUXhTTLSFJLfVLy0ElxcnAKrkqCoGMM+3dnAwGGM5BFX4feELfxaLvWtdlmu1WbygjTNukYLklz16MuMHsc8dV+KvhWWzv49asbVV09okim8vpE6/Kvy9FXaFAxxkdsjOt8HdYsl0y70h5lS8a5M0aOwHmKUA+XnJI2En2I98U2o4Zzo6XEk5YhQq62Oj1f4beHNTs3jhsksrgRCOKeDI2EdCVzhvcnkjuOCPJtE8W694M1JrIytJb20xjnsZH3JlSQwU87Tkk5XqcE56V7/f39rpljNe3s6w20K7nkboB/U9gByTxXzVMLrxN4lnaytXa4v7l5I4FOSCzFsZ44HcnAwM8VOCbqRkqmsfMrFpQlF09JeR6z4x+J0ejm2g0aOG6mngS4MspOxEYZUFQQ24jnBxgEdc8VvCZ8eeJdNXUZfEkdnaSFhEfscUjvg4JxgYGQR1zx0xzWT45+HV9BDaX2lrJfeVbQ29xHGhLkooQOqjOQQBkDOOvIzi34I+IGl6Do0Gg6zDc2k9rJIjSGMso+YthgPmDZJGMHp+S5IewvRV310uw55e2tWdl9yPNtCiln8Q6ZDBN5E0l3EscuwN5bFwA2D1wecV6d4vu/HfhOGG8XXlvrJiFeQWUSFG7BlweD659uOM+ZaBcw2XiPS7u4fZBBdxSSNgnaquCTgc9BXoHjnx3D4nshoHh+G6uDNKDI4i/1qr8wVFwWPODnAI29wa6q8ZOrH3brrdHPRlFU5a2fSzOr8B+PF8VrLaXcKw6lCpkIiB8uRMgZGc4IyAQT7juBz3jL7V468ZL4Z0ydVg0+F5ZnLZTzcd8NyASqdMqWfgis/wzpt94B0fUfE+qxC3nkt/s9layYLSO+GBYZGANoyM7sBuBgZ7H4Z6JJp3h1tSu2Z77VWFzK7tuYpyUycnJOS2eD8+D0rjmoUZSqw9F69fuOqDnVjGnP1fp/wAE8h8Ma5deEvEsd00boEYw3cLJ8xTI3rg4wwxkdOQM8Zr33XNft9F8Nz60F+1QRxq8YiYYk3EBcN0wSw5549a8r+LHhddO1FNdtVAt719sygABJcZyMddwBJ46gknkVF4bvZvE/gXUfCXmI2oRbZ9PWR9u9QwZkBxjIwcZP8fYLka1oQrxjW6df68jOlOVGUqX3GRFfa38Q/Ettp15qJRbiQsqc+VEFDMSqDqQuQM8nue9eu23w58LW9i1qdLSUOqh5ZXYyMV7hs/KT324B+leMeENRh8OeNLK71NZYY7eR45hsO6MlWQ5XrwTyOvB4zxX0bFLHPCk0MiyRSKGR0OVYHkEEdRUY6U6bjGGkfIvBxjNNz1fmeG+MtDuPh/r9vfaHfS28F3uMSq53R7SpKN/eTJXGc56HOMnpPDUGlfEy2a5123kbVLCNIJJIpCiyISxVsDgEndke3bOBjfF7W7LUdVstPtZfNlsPME7Lyqs235c+o28+mcdQQOk+EWh3enaPd6jdI0a35Qwoy4JRQcP9DuOPYZ6EVdSTWGVSWku/X+rEQiniHCOsfw/q5wfxF8P6f4c8Q29np0bpC9qspDuWO4u46n2UV13grwBoGt+EbHUb2CZribzN5WYqDiRlHH0ArE+Mf8AyN1p/wBeCf8AoySvQ/hn/wAk+0v/ALa/+jXpVqs1hoyT1/4cKVODxEotaf8ADG9pGk2mh6ZFp9irLbxbioZtx5JJ5+pNXqa8iRKWkdUUZJLHA4Gf5CuD1T4htJdvZeHrRdQnRyDOSRCuOPUb8jdzkDOMbq86MJ1G397f6s7p1I00l9yWrfokdxLOqwtKHjWJV3GZ2+RRgnPuOnpx3rldY8f+HdMEqfbTeTqR8kC7wecjaeE4z1znj1FcDrCahdsZta1V7iQZwifdXgD5RgBenOBzXMJFGt0GjTe2flLnOKJVcJS+KTk+y2+9nZhsszPFNOMFTh3k9bei/U2vF/iO8166McLS29iq7TCz48w5BywUkcEDAyeme9cn9ikdvvLj616vD8J5p7eOSfV/JmZQXj+zbth7jO/nFdBpXw30PTmSSdZb2VQpPnNhNw6kKOx9CTUwxuLUbJJI7pYXKKUm7yk/z/BI4rwH4BXUpo9S1BN1lG+5EdeJiD0x3XI5zwenrj2WkACgAAADgAUtDnUnrUldnm1PZuTdKCiu3+b3YUUUVJBl6f4d0nS9Ru9Qs7NY7u7YtNMWZmYk7jjJOATyQMDgegrUrLk8SaFDK8UutabHIjFWRrpAVI6gjPBpv/CU+Hv+g9pf/gZH/jWjjOWrTIUoR0VhmteFNE8QzRTapYLPLEpVXDsjY64JUjI+vTJ9TTNO8H+H9Kt7q3tNMiEF1s86OVmlV9pJXIckcEmoNW8YaHZfYI5J57gXsqi3ayVnD4fGQycMAwAKgknONpzilsvEtnaz3unazqdlBd2c3lhpp1QzRlVdHIOBnDYOOMg4wCALtW5ba27f15kXpc19LmRe/CfwxdMhhS7swowVgnyG9zvDfpS2Xwn8MWrOZo7u8DDAE8+Av02Bf1rov+Ep8Pf9B7S//AyP/Gr1nf2eowmaxu4LqJW2l4JA6g9cZB68j86brV0tWxKjRb0SEsdOstLt/s9haQ20OclIUCgnAGTjqcAc+1Y+p+BvDmsahLf3+nedcy43v58i5wABwGA6AV0NFYqcou6epq4Ras1oQ2dpBYWcNpbJsghQRxrknCgYAyeamrgdQ8W+IobK41uzttJm0ZLswQxh3ae5USeXlCvy5YgkccD179cmuaZLqS6fHewvdMXARTnLJ99c9NwyCVzkDnGKudKa1ZMakXoi9JGksbRyIrxuCrKwyGB6giuU1P4a+F9S8xvsBtJZMfvLVym3GOi8oOn939a3U1zTJNRXT472F7pi6hFbOWTG9c9NwyCVzkDnGKSPX9JluJYU1CAtFGZXO7ChASGO7oQCDnB474og6kNY3QSVOekrM5eL4U+HxcRS3VxqV6sa7BFcXA27QMAfKoIA7AEV1GkaFpeg25g0yyitkb7xUZZ+SRuY8tjJxk8ZqyL+zZrZRdwFrpS1uBIMzADJKc/MMEHjtVCbUbj+0rRILnS/sN2iNDI8582QjJbYo4cFduCGGMk/MMCnKpVqaSYowpw1ijXorPTXNLl1IafHewvdMXARTnLJ99c9Ny5BK5yAc4xUyalYyNbCO8t3N0CbfbID5oAySuOoA9Ky5WuhpzLucdZfCfQrC/t7yK71IyW8qyqGkTBKkEZ+TpxXd1XF/Zs1sou4C10pa3AkGZgBklOfmGCDx2qCPW9Ml1EafHewtdEsoQHOWX7yg9Cy9SucgEEjBrSc6lTWWpEI04aR0INb8NaT4iEA1W1NwINxjHmumM4z90jPQda1qKz01zTJdSGnx3sT3TF1CKcgsn3kz03DIJXOQOcYqPekrdEV7qd+5LqemWesafLYX8PnW0uN6biucEEcgg9QKxrDwF4a0y+hvbLT3huYW3JItzLkH/vrkdiDwRxWtFrOlz3gs4tSs5LollEKTqXyM5G3OcjBz9Keuq6c9vBcLf2rQXEgihkEylZHJI2qc4JyCMD0NUpVIrlTaRLjTk7uzKmseGNF1/adT0+Kd1xiTlHwM8blIOOTxnFcy/wm0L9+sN7qsEE7ZeCOddmAcgYKkkDtkk11setabLqAsY7yN7gll2qcjev3k3dN4HJXO7HOMU6PV9MmvDZxajaPdAspgWdS+V+8Nuc5GDmqjUrQVk2KVOlN3aRkaT4D8N6NNFcW2mo9xGoAmnYyHIwd2CcBsjOQBjtiukquL+zZrZRdwFrpS1uBIMzADJKc/MMEHjtTF1XTnt4Lhb+1aC4kEUMgmUrI5JAVTnBOQRgehqJOc3eV2VFQirR0M7WfCGheILxLvVLHz50jEat5zrhQScYVgOpNW7e203w1oqwQKLaxtwSqlyQuSSeWPqT1P6VZfULKNY2e7gVZJvIQtIAGkyRsHPLZBGOuQa53U9P03WpZb3WtVt202xlMf2aO4CRRvnafNfIJflePl25xzkkjlUceXVo0pwpc3NJpd+/9etl5nK6ndal4+1A2dikg0pGG4jKiXnILE/dTjIHUkZPICr1uk+Dbawt1SV8kY+SIbV9x+P4V0cFvDawrDbxRxRL91I1CqO/AFSVk05fG/l0/rzN/bRhdUVy33fV+r/RGWnhzRkVgdNt5NxyfOTzP/Qs4qN/CugvdW9yNLt45rdxJG0K+XhgQQSFxnkd81sUUckexHt6v8z+9hRRRVGQUUUUAFFFFAGBr/gzRPEcb/bLRY7hyCbqABZeMfxYOeBjnPFcfqnwhgmBNhPFCxdVT76hEydzNkv5j4wMDyx39q9PoraGIqw0izGdCnPVo81ksfENrp954csLUala27Iv2mJxC8UxxLvBaQHcGKPt+YEsfmUfIKLeBdU8XzwaxqVxFG0s8qXlsv7toyjGPKsA4bGxRjA4UckksfWKKtYqS1irPv+ZLw0Xu9Dg9N+FWiWzW0l6BcywE5EYZEmGMDerM3IOT8pUe1dtbWtvZW629pBFBAmdscSBVXJycAcdSamorKdWdT4nc1hThD4VYKoa218miXp0yJpL4xMsCqVBDkYB+YgcE559O9X6KhOzuU1dWMC18LWOk6TGum2OnjVLe28uG7e2VWMgTAdiBnk8n6msTT9G117DSLWGzTS00q0ZlE5jcT3jRsgbCFsKpZmJPJLfd7jtriUwW8kojeQopbYgyzY7AetYVp400i5lMcjy2zZCjz0wCT7jIGPfFN4pQdpvV9yoYOdRc1OLsuxRtbDUl8B/2bb6S9lqdpZBIHkaLBmKFXeNkc7WOW+Y7eX+tLqdleXvhv+zdP0Ke0OyOxjM08IdLdiBJ8wZ8LsUDPzNnB2nFdVDPFcRLLBKksbdHRgwP4ipKtVne9vMydG3uv0OH1TQ9YN7quoW8El1frp/2a1lLRxbpZSd7xnJMaou0KpI/i5JZmaC08GalbajDdh0N9a6bIltc+aTFFMy7I4kQ5IjjUHlsli+Tk9O/oqliJpWJ9hG9zjbXTb5fBUNhb6EbXVbS0W3t5ZHiXZJIuySVHRmK4yWJwC31NUpPDWsWVnr9nYxS3QaygsNOlvJoyfKORKF2hdgAI4PUoDz0rv6KSryXT+v6/Ng6MX1OAXwdqNrePfIFlvbXSpY7SZJSoSdl2RxRIThURQeWPJkycnONbQPD/kXNpcXEd+qadCYLKO9e3LR7gAxAhX0VRksSctwOp6miiVeclZjjRindFe/e6j066exjWW7WFzBG5+VpMHaDyOCcdxXG29j4leSO8nhvJJ7GyleBLmS3VZLxxtyEiIG0Avy7Z+fjuT3VFTCpyq1ipQ5ne559YaLrun2Spa216V0/T3jso52tV/0p8KJERDtAUbiS7MfnOMnOZj4W1G0/skxQQ3T6XaSSxq6oYjMqbYolyQR8xLs+BuYAnGFCd3RVvES7Ij2ETgba38VveafLc2l9I9tA8gNxJaiIXjrsyVjw3lAM5zksc9OOS48MavHbajbWqNK409NPt5bifKTmZ911Oy5JVsnPUn5f4uBXeSSxwxtJK6oijLMxwAPc1nnXbJ3aO0aS9lXblbVN4GTgZb7o79SOlS8Vyvoi44VzWl2c1e+HNStdSbULK2iuLm00x47OWMKjC4c7QERm2rFGg4U/3z95iTTW8PX+j6paLYXF9dW9jYyvZLd3SGOS62FI49nynAQuc8deowc9Yv2+4PziO0jIPCnzJORx22qR/wADB/U2UhjjZmVfnbqxOSRknGTzgEnA6DPFCxE30B4eEeuvkcFZ+Cruzbw+11Cl4NODTOkUmxYmRcqkakjLPId7MxAJTsMLUkHhTUrnS9Jg1RY5ZHvBdXqMiPHGMtK+RwGd3wmQCFUlRxuL97RVPETf9ev+ZCoQQUUUVgbBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFY2seGdP1gmSRDFcf89o+CeMDPr29+OtbNFTOEZq0lcunVnSlzQdmeeT+Dda06bzdNuBKc7Q0UnlPgjnOTjHbqar/234o0hE+0/aBCjbf9IhyGPoWIyfzr0uiuV4NLWnJo9FZpKStWgpfLU8+t/iBerITc2dvImOBGWQ5+pz/KrkXxDiMgE2mukfdkmDEfgQP511txYWd2ytc2kEzKMAyRhsfnXH+N7CztLG2a2tIIWLkExxhSfyrnqTrUr+/e3kdlClhcRb93a/my9/wn+lf8+95/3wv/AMVR/wAJ/pX/AD73v/fC/wDxVec0Vh9erHX/AGRhuz+89G/4T/Sv+fe8/wC+F/8AiqP+E/0r/n3vP++F/wDiq85r0bwpplhc6DFJPZW0shY5Z4lY/mRWlPF1pu1/wMq2W4alHms38yKf4gWSpm3s7iR/SQqg/MZpkHja8vEf7JoU0xXqY3LhT2zha6q3sLO0Ja2tIISwwTHGFz+VWK7IRrTXNz/gjy6s8NSfIqV33cmcnFfeMbyNQun2tusgwJXGCnuQWJ/T8KnTRvEF1Gq6hrxjAcEraoFJH+8ApHfsR0610tFaKgvtSb+f+Rg8Y/sQjH5f53MWDwtpkc3nzpJez5yZbpzITxjBHQ8eorYREijWONVRFACqowAB2Ap1FaxhGPwowqVZ1PjdwoooqjMKKKKACiiigAooooAKKKKACiiigAooooA//9k="]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from documents]]>
+	</queryString>
+	<field name="documentNumber" class="java.lang.String"/>
+	<field name="correspondentTitle" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="110" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<textField>
+				<reportElement style="TimesBolt13" x="0" y="67" width="701" height="33" uuid="1239754f-edd7-4868-8a8b-e88ecf307865"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Список документов на " + new SimpleDateFormat("dd.MM.yyyy").format(new Date())]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement x="0" y="0" width="699" height="45" uuid="e55c01b2-3800-44c8-9c84-7576c7bd6cb7">
+					<property name="local_mesure_unitwidth" value="mm"/>
+					<property name="local_mesure_unity" value="mm"/>
+					<property name="local_mesure_unitheight" value="mm"/>
+				</reportElement>
+				<box padding="0" leftPadding="0">
+					<topPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+					<leftPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+					<rightPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+				</box>
+				<staticText>
+					<reportElement style="TimesBolt11" x="103" y="1" width="520" height="22" uuid="46edfe8b-3b51-40b5-9a3e-450e8ff93bd8">
+						<property name="local_mesure_unitwidth" value="mm"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="local_mesure_unitheight" value="mm"/>
+					</reportElement>
+					<box leftPadding="0" rightPadding="0">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font fontName="DejaVu Sans" size="11" isBold="true"/>
+						<paragraph lineSpacing="Single" lineSpacingSize="1.0" firstLineIndent="0" leftIndent="0" spacingBefore="0" tabStopWidth="0"/>
+					</textElement>
+					<text><![CDATA[СИСТЕМА ЭЛЕКТРОННОГО ДОКУМЕНТООБОРОТА
+]]></text>
+				</staticText>
+				<textField>
+					<reportElement style="Times8" x="623" y="0" width="75" height="32" uuid="8301f419-a4a7-48ce-8e1e-1221f5fc816a">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="local_mesure_unitwidth" value="mm"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Сформировано\n"+new SimpleDateFormat("dd.MM.yyyy").format(new Date()) + "\n" +
+"Время " + new SimpleDateFormat("HH:mm").format(new Date())]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report">
+					<reportElement style="Times8" x="666" y="33" width="33" height="10" uuid="170ff8b4-d33e-45e0-ae8e-3363badf8873">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="local_mesure_unity" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" из " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Times8" x="629" y="33" width="36" height="10" uuid="b2b846ab-0b62-4b80-8ea8-1d2248680cd8">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="local_mesure_unity" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Стр. " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement style="Times10" x="103" y="23" width="520" height="21" uuid="df479bdb-da24-485c-978d-79553df49d19">
+						<property name="local_mesure_unitheight" value="mm"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="local_mesure_unitwidth" value="mm"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="2.0" lineStyle="Double" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans" size="10.5" isBold="true"/>
+						<paragraph lineSpacing="Single" lineSpacingSize="1.0" firstLineIndent="0" leftIndent="0" tabStopWidth="0"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1" y="1" width="100" height="42" forecolor="#EB750E" uuid="8ac4cd52-358e-4970-8a65-09ef14aa9b85"/>
+					<box>
+						<pen lineColor="#DE7A1D"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font fontName="DejaVu Sans" size="15" isItalic="true"/>
+					</textElement>
+					<text><![CDATA[Сокол СЭД]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="49" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<textField>
+				<reportElement style="TimesBolt12" mode="Opaque" x="419" y="0" width="282" height="49" backcolor="#EDEDED" uuid="e9bd7b91-479b-42d8-a7bf-9e635a5577a7"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="false"/>
+					<paragraph spacingBefore="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Комментарий"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="TimesBolt12" mode="Opaque" x="229" y="0" width="190" height="49" backcolor="#EDEDED" uuid="2394a881-e8c2-4658-83e6-50a2f48c2a43">
+					<property name="local_mesure_unity" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="false"/>
+					<paragraph spacingBefore="5"/>
+				</textElement>
+				<text><![CDATA[Заголовок документа]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="TimesBolt12" mode="Opaque" x="130" y="0" width="99" height="49" backcolor="#EDEDED" uuid="d86da6c4-37e0-4800-af9b-09f4ed7f9da8">
+					<property name="local_mesure_unitheight" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="false"/>
+					<paragraph spacingBefore="5"/>
+				</textElement>
+				<text><![CDATA[Корреспондент]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="TimesBolt12" mode="Opaque" x="30" y="0" width="101" height="49" backcolor="#EDEDED" uuid="380d1220-a60d-4dd9-b637-ea29386820ec"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="false"/>
+					<paragraph spacingBefore="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Номер"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="TimesBolt12" mode="Opaque" x="1" y="0" width="29" height="49" backcolor="#EDEDED" uuid="83ad5fb6-282d-4e6c-bcde-b4214d21746f"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="false"/>
+					<paragraph spacingBefore="5"/>
+				</textElement>
+				<text><![CDATA[№ п/п]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Prevent">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Times12" stretchType="RelativeToBandHeight" mode="Transparent" x="419" y="0" width="282" height="20" uuid="7d8b22b2-54e6-44e0-bc9b-41197e50b7eb">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<paragraph leftIndent="5" spacingBefore="5" spacingAfter="5"/>
+				</textElement>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Times12" stretchType="RelativeToBandHeight" mode="Transparent" x="229" y="0" width="190" height="20" uuid="90b6f16f-a5e7-4010-af0f-dbb40558cb50"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<paragraph leftIndent="5" spacingBefore="5" spacingAfter="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Times12" stretchType="RelativeToBandHeight" mode="Transparent" x="131" y="0" width="98" height="20" uuid="e2b2ea4e-5d4e-4f00-a8a8-2cb9f7004372"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<paragraph leftIndent="5" spacingBefore="5" spacingAfter="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{correspondentTitle}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Times12" stretchType="RelativeToBandHeight" mode="Transparent" x="30" y="0" width="101" height="20" uuid="20b9be6e-c0b7-483d-9141-7083e343185b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<paragraph leftIndent="5" spacingBefore="5" spacingAfter="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{documentNumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Times12" stretchType="RelativeToBandHeight" mode="Transparent" x="1" y="0" width="29" height="20" uuid="8d5b442e-042f-4cd7-953d-1a26a255c9a8">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<paragraph leftIndent="5" spacingBefore="5" spacingAfter="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<noData>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement style="Times10" x="0" y="0" width="701" height="22" uuid="c0c38a30-1ed1-4c81-a45d-14854a3b3738"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Входящих документов не найдено.]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

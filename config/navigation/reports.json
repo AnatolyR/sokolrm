@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "id": "allDocuments",
+      "title": "Зарегистрированные документы"
+    },
+    {
+      "id": "incomingDocuments",
+      "title": "Входящие документы"
+    }
+  ]
+}

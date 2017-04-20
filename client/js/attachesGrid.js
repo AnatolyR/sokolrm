@@ -41,11 +41,11 @@ $.widget('sokol.attachesGrid', {
                 title: "Размер"
             },
             {
-                id: "creationDate",
+                id: "created",
                 title: "Дата добавления"
             },
             {
-                id: "creator",
+                id: "authorTitle",
                 title: "Кто добавил"
             }
         ];

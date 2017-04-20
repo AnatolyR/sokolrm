@@ -8,7 +8,9 @@
 package com.kattysoft.core;
 
 import com.kattysoft.core.model.Attach;
+import com.kattysoft.core.model.User;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,4 +21,8 @@ public interface AttachService {
     List<Attach> getAttachesForObject(String objectId);
 
     void deleteAttach(String id);
+
+    byte[] getContent(String id);
+
+    void addContent(String objectId, String name, User user, Date date, byte[] bytes);
 }
