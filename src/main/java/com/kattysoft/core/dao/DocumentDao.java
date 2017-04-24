@@ -23,6 +23,10 @@ public interface DocumentDao {
 
     String saveDocument(Document document);
 
+    void saveHistory(String documentId, String history);
+
+    String getHistory(String documentId);
+
     boolean deleteDocument(String documentId);
 
     Integer getTotalCount(Specification specification);

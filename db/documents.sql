@@ -28,6 +28,7 @@ CREATE TABLE documents (
   executors varchar(255)[],
   "executorsTitle" varchar(255)[],
   archivecase varchar(255),
-  searchtext text
+  searchtext text,
+  history jsonb
 );
 CREATE INDEX documents_stidx ON documents USING gin (to_tsvector('russian'::regconfig, searchtext));

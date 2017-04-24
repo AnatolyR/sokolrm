@@ -12,6 +12,7 @@ package com.kattysoft.core.dao;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.*;
 import org.apache.commons.dbutils.DbUtils;
+import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,10 +71,10 @@ public class DocumentDaoPg implements DocumentDao {
                         Timestamp timestamp = resultSet.getTimestamp(columnLabel);
                         fields.put(columnLabel, timestamp != null ? new Date(timestamp.getTime()) : null);
                     } else if ("int4".equals(columnTypeName)) {
-                        fields.put(columnLabel, resultSet.getInt(columnLabel));
+                        fields.put(columnLabel, resultSet.getObject(columnLabel));
                     } else if ("_varchar".equals(columnTypeName)) {
                         Array array = resultSet.getArray(columnLabel);
-                        fields.put(columnLabel, array != null ? array.getArray() : new java.util.ArrayList());
+                        fields.put(columnLabel, array != null ? Arrays.asList((String[]) array.getArray()) : new java.util.ArrayList());
                     } else {
                         fields.put(columnLabel, resultSet.getString(columnLabel));
                     }
@@ -537,6 +538,52 @@ public class DocumentDaoPg implements DocumentDao {
         } finally {
             DbUtils.closeQuietly(prst);
             DbUtils.closeQuietly(connection);
+        }
+    }
+
+    public void saveHistory(String documentId, String history) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dataSource.getConnection();
+            preparedStatement = connection.prepareStatement("UPDATE documents SET history = ?::json WHERE id = ?::uuid");
+            preparedStatement.setString(2, documentId);
+
+            PGobject jsonObject = new PGobject();
+            jsonObject.setType("json");
+            jsonObject.setValue(history);
+            preparedStatement.setObject(1, jsonObject);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DbUtils.closeQuietly(preparedStatement);
+            DbUtils.closeQuietly(connection);
+        }
+    }
+
+    @Override
+    public String getHistory(String documentId) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSource.getConnection();
+            preparedStatement = connection.prepareStatement("SELECT history FROM documents WHERE id = ?::UUID");
+            preparedStatement.setString(1, documentId);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("history");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DbUtils.closeQuietly(connection);
+            DbUtils.closeQuietly(resultSet);
+            DbUtils.closeQuietly(preparedStatement);
         }
     }
 

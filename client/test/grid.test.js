@@ -269,7 +269,7 @@ modules["grid"] = (function() {
         });
         steps.push({
             step: function changePageSize() {
-                $(".selectpicker[name='pageSize']").first().parent().find("ul li:nth-child(2) a").trigger("click");
+                $(".selectpicker[name='pageSize']").first().parent().find("ul li:nth-child(3) a").trigger("click");
             },
             wait: 500
         });

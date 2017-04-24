@@ -16,7 +16,8 @@ $.widget("sokol.grid", {
         deleteMethod: null,
         addable: false,
         addMethod: null,
-        usePanel: true
+        usePanel: true,
+        bottomPagination: true
     },
 
     _create: function () {
@@ -47,7 +48,7 @@ $.widget("sokol.grid", {
 
         this.renderTablePanel();
         this.reload();
-        if (!this.options.data && !this.options.noControls) {
+        if (!this.options.data && !this.options.noControls && this.options.bottomPagination) {
             var bottomBar = this.createButtonsBar(central);
             this.createPagination(bottomBar);
         }
@@ -169,7 +170,7 @@ $.widget("sokol.grid", {
             '<button name="next" class="btn btn-default" href = "#">Следующая ' +
             '<span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></button>&nbsp;' +
             '<span style="margin-left: 10px;">Отображать ' +
-            '<select name="pageSize" class="selectpicker"><option>20</option><option>50</option><option>100</option></select>&nbsp;' +
+            '<select name="pageSize" class="selectpicker"><option>5</option><option>20</option><option>50</option><option>100</option></select>&nbsp;' +
             '</span>&nbsp;'
         ).appendTo(div);
 
@@ -390,6 +391,36 @@ $.widget("sokol.grid", {
                                     } else {
                                         var expandData = rowObj[column.dataColumn];
                                         expandTr = $('<tr data-name="reportComment"><td colspan="100">' + (expandData ? expandData : '') + '</td></tr>');
+                                        expandTr.insertAfter(row);
+                                    }
+                                };
+                            })(row, column));
+                        } else {
+                            var s = $('<span>' + (val ? val : '') + '</span>').appendTo(td);
+                        }
+
+                        td.appendTo(row);
+                    } else if (column.render == 'history') {
+                        var td = $('<td></td>');
+                        if (rowObj[column.dataColumn]) {
+                            var a = $('<a href="#">' + (val ? val : '') + '</a>').appendTo(td);
+                            a.click((function(row, column) {
+                                return function(e) {
+                                    e.preventDefault();
+                                    var expandTr = $(row).next();
+                                    if (expandTr.attr("data-name") == "reportComment") {
+                                        expandTr.remove();
+                                    } else {
+                                        var historyItemsFields = rowObj[column.dataColumn];
+                                        var expandData = $('<table class="table table-striped table-condensed noTopBorderTable"></table>');
+                                        var expandDataBody = $('<tbody></tbody>').appendTo(expandData);
+                                        $('<thead><tr><th>Поле</th><th>Старое значение</th><th>Новое значение</th></tr></thead>').appendTo(expandData);
+                                        for (var i = 0; i < historyItemsFields.length; i++) {
+                                            var f = historyItemsFields[i];
+                                            $('<tr><td>' + f.field + '</td><td>' + f.oldValue + '</td><td>' + f.newValue + '</td></tr>').appendTo(expandDataBody);
+                                        }
+                                        expandTr = $('<tr data-name="reportComment"><td colspan="100"></td></tr>');
+                                        expandTr.find("td").append(expandData);
                                         expandTr.insertAfter(row);
                                     }
                                 };

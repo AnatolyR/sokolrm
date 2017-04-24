@@ -260,6 +260,31 @@ public class DocumentDaoPgIT extends AbstractTestNGSpringContextTests {
         assertThat(totalCount, equalTo(5));
     }
 
+    @Test
+    @Sql("file:db/documents.sql")
+    @Sql("testDocuments.sql")
+    public void testUpdateHistory() throws SQLException, ParseException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSource.getConnection();
+
+            documentDao.saveHistory("d0e38e2e-18bd-48fd-91ec-5e102519cd06", "{\"test\" : \"good\"}");
+
+            preparedStatement = connection.prepareStatement("SELECT history FROM documents WHERE id = ?::UUID");
+            preparedStatement.setString(1, "d0e38e2e-18bd-48fd-91ec-5e102519cd06");
+            resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            assertThat(resultSet.getString("history"), equalTo("{\"test\": \"good\"}"));
+
+        } finally {
+            DbUtils.closeQuietly(connection);
+            DbUtils.closeQuietly(resultSet);
+            DbUtils.closeQuietly(preparedStatement);
+        }
+    }
+
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }

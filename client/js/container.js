@@ -74,6 +74,10 @@ $.widget('sokol.container', {
         if (this.options.containerType == 'document') {
             this.createExecutionListIfExist('approval');
             this.createExecutionListIfExist('execution');
+
+            if (this.options.mode == 'read') {
+                this.history = $.sokol.history({id: data.id}, $('<div></div>').appendTo(this.element));
+            }
         }
 
         if (this.options.subforms) {

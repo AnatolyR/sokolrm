@@ -7,6 +7,7 @@
  */
 package com.kattysoft.core;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.Specification;
 
@@ -26,4 +27,6 @@ public interface DocumentService {
     String saveDocument(Document document);
 
     boolean deleteDocument(String documentId);
+
+    ArrayNode getHistory(String documentId);
 }

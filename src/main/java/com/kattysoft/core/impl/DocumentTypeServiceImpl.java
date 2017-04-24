@@ -33,34 +33,40 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
         documentTypes.forEach(jsonNode -> {
             String typeName = jsonNode.asText();
-            JsonNode typeNode = configService.getConfig2("types/" + typeName + "Type");
-            String typeTitle = typeNode.get("title").asText();
-            List<DocumentType.FieldType> fieldsTypes = new ArrayList<DocumentType.FieldType>();
-            typeNode.get("fields").forEach(fieldNode -> {
-                String fieldId = fieldNode.get("id").asText();
-                String fieldTitle = fieldNode.has("title") ? fieldNode.get("title").asText() : null;
-                if (fieldTitle != null) {
-                    DocumentType.FieldType fieldType = new DocumentType.FieldType();
-                    fieldType.setId(fieldId);
-                    fieldType.setTitle(fieldTitle);
-                    fieldsTypes.add(fieldType);
-                }
-            });
-            DocumentType documentType = new DocumentType();
-            documentType.setId(typeName);
-            documentType.setTitle(typeTitle);
-            String flowId = typeNode.has("flow") ? typeNode.get("flow").textValue() : null;
-            documentType.setFlow(flowId);
-            documentType.setFieldsTypes(fieldsTypes);
-
-            if (typeNode.has("actions")) {
-                typeNode.get("actions").forEach(a -> documentType.getActions().add(a.asText()));
-            }
+            DocumentType documentType = getDocumentType(typeName);
 
             types.add(documentType);
         });
 
         return types;
+    }
+
+    @Override
+    public DocumentType getDocumentType(String typeName) {
+        JsonNode typeNode = configService.getConfig2("types/" + typeName + "Type");
+        String typeTitle = typeNode.get("title").asText();
+        List<DocumentType.FieldType> fieldsTypes = new ArrayList<DocumentType.FieldType>();
+        typeNode.get("fields").forEach(fieldNode -> {
+            String fieldId = fieldNode.get("id").asText();
+            String fieldTitle = fieldNode.has("title") ? fieldNode.get("title").asText() : null;
+            if (fieldTitle != null) {
+                DocumentType.FieldType fieldType = new DocumentType.FieldType();
+                fieldType.setId(fieldId);
+                fieldType.setTitle(fieldTitle);
+                fieldsTypes.add(fieldType);
+            }
+        });
+        DocumentType documentType = new DocumentType();
+        documentType.setId(typeName);
+        documentType.setTitle(typeTitle);
+        String flowId = typeNode.has("flow") ? typeNode.get("flow").textValue() : null;
+        documentType.setFlow(flowId);
+        documentType.setFieldsTypes(fieldsTypes);
+
+        if (typeNode.has("actions")) {
+            typeNode.get("actions").forEach(a -> documentType.getActions().add(a.asText()));
+        }
+        return documentType;
     }
 
     public void setConfigService(ConfigService configService) {

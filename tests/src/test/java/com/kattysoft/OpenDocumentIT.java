@@ -61,7 +61,9 @@ public class OpenDocumentIT {
                     "Количество приложений:\n" +
                     "3\n" +
                     "Комментарий:\n" +
-                    "Olololo THIS IS COMMMENT!!!!!",
+                    "Olololo THIS IS COMMMENT!!!!!\n" +
+                    "Пространство:\n" +
+                    "Дело:",
                 "Согласование\n" +
                     "Автор:\n" +
                     "Ивашов В. Н.\n" +

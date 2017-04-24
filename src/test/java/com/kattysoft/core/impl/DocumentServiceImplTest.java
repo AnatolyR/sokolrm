@@ -4,6 +4,7 @@ import com.kattysoft.core.DocumentService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.dao.DocumentDao;
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.model.User;
 import com.kattysoft.core.specification.Specification;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,6 +43,11 @@ public class DocumentServiceImplTest {
         documentService = new DocumentServiceImpl();
         MockitoAnnotations.initMocks(this);
         ((DocumentServiceImpl) documentService).setConfigService(configService);
+
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setTitle("Test User");
+        when(userService.getCurrentUser()).thenReturn(user);
     }
 
     @Test

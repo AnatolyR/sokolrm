@@ -960,6 +960,10 @@ $.widget('sokol.container', {
         if (this.options.containerType == 'document') {
             this.createExecutionListIfExist('approval');
             this.createExecutionListIfExist('execution');
+
+            if (this.options.mode == 'read') {
+                this.history = $.sokol.history({id: data.id}, $('<div></div>').appendTo(this.element));
+            }
         }
 
         if (this.options.subforms) {
@@ -2620,7 +2624,7 @@ $.widget('sokol.form', {
         this.fieldsInfo.push(field);
         this.fieldsInfoMap[id] = field;
 
-        if (!value) {
+        if (!value && value !== 0) {
             value = "";
         }
         if (type == "string" || type == "smallstring") {
@@ -2919,7 +2923,8 @@ $.widget("sokol.grid", {
         deleteMethod: null,
         addable: false,
         addMethod: null,
-        usePanel: true
+        usePanel: true,
+        bottomPagination: true
     },
 
     _create: function () {
@@ -2950,7 +2955,7 @@ $.widget("sokol.grid", {
 
         this.renderTablePanel();
         this.reload();
-        if (!this.options.data && !this.options.noControls) {
+        if (!this.options.data && !this.options.noControls && this.options.bottomPagination) {
             var bottomBar = this.createButtonsBar(central);
             this.createPagination(bottomBar);
         }
@@ -3072,7 +3077,7 @@ $.widget("sokol.grid", {
             '<button name="next" class="btn btn-default" href = "#">Следующая ' +
             '<span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></button>&nbsp;' +
             '<span style="margin-left: 10px;">Отображать ' +
-            '<select name="pageSize" class="selectpicker"><option>20</option><option>50</option><option>100</option></select>&nbsp;' +
+            '<select name="pageSize" class="selectpicker"><option>5</option><option>20</option><option>50</option><option>100</option></select>&nbsp;' +
             '</span>&nbsp;'
         ).appendTo(div);
 
@@ -3293,6 +3298,36 @@ $.widget("sokol.grid", {
                                     } else {
                                         var expandData = rowObj[column.dataColumn];
                                         expandTr = $('<tr data-name="reportComment"><td colspan="100">' + (expandData ? expandData : '') + '</td></tr>');
+                                        expandTr.insertAfter(row);
+                                    }
+                                };
+                            })(row, column));
+                        } else {
+                            var s = $('<span>' + (val ? val : '') + '</span>').appendTo(td);
+                        }
+
+                        td.appendTo(row);
+                    } else if (column.render == 'history') {
+                        var td = $('<td></td>');
+                        if (rowObj[column.dataColumn]) {
+                            var a = $('<a href="#">' + (val ? val : '') + '</a>').appendTo(td);
+                            a.click((function(row, column) {
+                                return function(e) {
+                                    e.preventDefault();
+                                    var expandTr = $(row).next();
+                                    if (expandTr.attr("data-name") == "reportComment") {
+                                        expandTr.remove();
+                                    } else {
+                                        var historyItemsFields = rowObj[column.dataColumn];
+                                        var expandData = $('<table class="table table-striped table-condensed noTopBorderTable"></table>');
+                                        var expandDataBody = $('<tbody></tbody>').appendTo(expandData);
+                                        $('<thead><tr><th>Поле</th><th>Старое значение</th><th>Новое значение</th></tr></thead>').appendTo(expandData);
+                                        for (var i = 0; i < historyItemsFields.length; i++) {
+                                            var f = historyItemsFields[i];
+                                            $('<tr><td>' + f.field + '</td><td>' + f.oldValue + '</td><td>' + f.newValue + '</td></tr>').appendTo(expandDataBody);
+                                        }
+                                        expandTr = $('<tr data-name="reportComment"><td colspan="100"></td></tr>');
+                                        expandTr.find("td").append(expandData);
                                         expandTr.insertAfter(row);
                                     }
                                 };
@@ -3664,6 +3699,74 @@ $.widget('sokol.header', {
         this._super(options);
     }
 });
+$.widget('sokol.history', {
+    options: {
+
+    },
+
+    _create: function () {
+        this.createHeader();
+        this.createHistoryList();
+    },
+
+    createHeader: function() {
+        this.element.addClass('panel panel-default');
+
+        var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
+
+        var panelTitle = $('<div class="panel-title">История изменений</div>').appendTo(panelHeader);
+
+        var panelBody = $('<div class="panel-body"></div>');
+        panelBody.appendTo(this.element);
+        this.panelBody = panelBody;
+    },
+
+    _destroy: function() {
+        this.element.detach();
+    },
+
+    createHistoryList: function(listData, objectId) {
+        var columns = [
+            {
+                id: 'date',
+                title: 'Дата изменения',
+                render: 'datetime'
+            },
+            {
+                id: 'userTitle',
+                title: 'Пользователь'
+            },
+            {
+                id: 'type',
+                title: 'Тип',
+                render: 'history',
+                dataColumn: 'fields'
+            }
+            //,
+            //{
+            //    id: 'fields',
+            //    title: 'Информация',
+            //    render: 'history'
+            //    //dataColumn: 'fullInfo'
+            //}
+        ];
+
+        var options = {
+            title: 'История изменений',
+            //columnsVisible: ['date', 'userTitle', 'type', 'fields'],
+            columns: columns,
+            url: 'app/history',
+            id: this.options.id,
+            //filterable: true,
+            sortable: false,
+            pageSize: 5,
+            usePanel: false,
+            bottomPagination: false
+        };
+
+        this.grid = $.sokol.grid(options, $("<div></div>").insertAfter(this.panelBody));
+    }
+});
 $.widget('sokol.list', {
     options: {
 
@@ -3835,11 +3938,11 @@ $.widget('sokol.reports', {
         }, this)).fail(function (jqXHR, textStatus, errorThrown) {
             $.notify({message: 'Не удалось получить данные. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
-        if (this.options.id) {
-            this.createReportForm(id);
-        } else {
+        //if (this.options.id) {
+        //    this.createReportForm(id);
+        //} else {
             this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите отчет</div></div>').appendTo(this.main);
-        }
+        //}
 
     },
 
@@ -3919,140 +4022,6 @@ $.widget('sokol.reports', {
         }, this)).fail($.proxy(function() {
             $.notify({message: 'Не удалось выполнить действие.'},{type: 'danger', delay: 0, timer: 0});
         }, this));
-    },
-
-    createPagedGrid: function(id) {
-        if (this.options.dispatcher) {
-            this.options.dispatcher.updateHash('admin/' + id);
-        }
-        $.getJSON('app/config', {id: 'dictionaries/' + id}, $.proxy(function(response) {
-            var options = response.gridConfig;
-            options.addable = 'link';
-            this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-            document.title = options.title;
-        }, this));
-    },
-
-    createGrid: function(id) {
-        this.options.id = "admin/" + id;
-        if (this.grid) {
-            this.grid.destroy();
-        }
-        if (this.info) {
-            this.info.remove();
-        }
-        this.sidebar.find('li').removeClass('active');
-        setTimeout($.proxy(function() {
-            this.sidebar.find('[name="category_' + id + '"]').addClass('active');
-        }, this), 0);
-        if (id == 'users' || id == 'groups' || id == 'registrationLists') {
-            this.createPagedGrid(id);
-            return;
-        }
-        if (this.options.dispatcher) {
-            this.options.dispatcher.updateHash('admin/' + id);
-        }
-        $.getJSON('app/spaces', {id: id},
-            $.proxy(function (data) {
-                var preparedData = [];
-                data.data.forEach(function(item) {
-                    preparedData.push({
-                        id: item.id,
-                        title: item.title
-                    });
-                });
-                var options = {
-                    title: data.title,
-                    columnsVisible: data.gridConfig.columnsVisible,
-                    columns: data.gridConfig.columns,
-                    data: preparedData,
-                    id: id,
-                    selectable: true,
-                    deletable: true,
-                    deleteMethod: $.proxy(this.doDeleteWithConfirm, this),
-                    addable: true,
-                    addMethod: $.proxy(this.doAdd, this)
-                };
-                this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
-                document.title = data.title;
-            }, this)
-        ).fail(function failLoadList() {
-                $.notify({message: 'Не удалось загрузить список "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
-            });
-    },
-
-    doDelete: function(data) {
-        var ids = data.map(function(e) {return e.id});
-        $.post('app/deleteSpaces',
-            {ids: ids},
-            $.proxy(function(response){
-                if (response === 'true') {
-                    $.notify({
-                        message: 'Элементы удалены'
-                    },{
-                        type: 'success',
-                        delay: 1000,
-                        timer: 1000
-                    });
-                    if (this.options.id.startsWith("admin/")) {
-                        this.createGrid(this.options.id.substring(6));
-                    }
-                } else {
-                    $.notify({message: 'Не удалось удалить эелементы'},{type: 'danger', delay: 0, timer: 0});
-                }
-            }, this)
-        );
-    },
-
-    doDeleteWithConfirm: function(grid, objects) {
-        var titles = objects.map(function(e) {return e.title});
-
-        $.sokol.smodal({
-            title: 'Подтверждение удаления',
-            body: titles.join(', '),
-            confirmButtonTitle: 'Удалить',
-            confirmAction: $.proxy(this.doDelete, this),
-            data: objects
-        });
-    },
-
-    doAdd: function(data, callback) {
-        var obj = {};
-
-        data.forEach(function(e) {
-            obj[e.id] = e.value;
-        });
-
-        if (!obj['title'] || obj['title'].length === 0 || !obj['title'].trim()) {
-            $.notify({message: 'Название пространства не может быть пустым.'},{type: 'warning', delay: 1000, timer: 1000});
-            return;
-        }
-        var id = this.options.id.substring(6);
-        $.post('app/addSpace',
-            {
-                data: JSON.stringify(obj)
-            },
-            $.proxy(function(response){
-                if (response) {
-                    $.notify({
-                        message: 'Элемент добавлен'
-                    },{
-                        type: 'success',
-                        delay: 1000,
-                        timer: 1000
-                    });
-                    callback(response);
-                } else {
-                    $.notify({message: 'Не удалось добавить эелемент'},{type: 'danger', delay: 0, timer: 0});
-                }
-            }, this)
-        ).fail(function(e) {
-                if (e.responseJSON && e.responseJSON.error) {
-                    $.notify({message: 'Пространство с таким названием уже существует.'},{type: 'warning', delay: 1000, timer: 1000});
-                } else {
-                    $.notify({message: 'Не удалось добавить эелемент. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
-                }
-            });
     },
 
     _destroy: function() {

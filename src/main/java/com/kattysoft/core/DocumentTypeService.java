@@ -17,4 +17,6 @@ import java.util.List;
  */
 public interface DocumentTypeService {
     List<DocumentType> getDocumentTypes();
+
+    DocumentType getDocumentType(String typeId);
 }

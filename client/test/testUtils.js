@@ -1,6 +1,7 @@
 var assertEquals = function(expected, real, message) {
     var splice = function(inp, idx, rem, str) {
-        return inp.slice(0, idx) + str + inp.slice(idx + Math.abs(rem));
+        var cinp = inp + '';
+        return cinp.slice(0, idx) + str + cinp.slice(idx + Math.abs(rem));
     };
 
     if (expected !== real) {

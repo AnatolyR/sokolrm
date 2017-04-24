@@ -12,6 +12,7 @@ package com.kattysoft;
 import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -56,9 +57,24 @@ public class TestService {
 
     private void create() throws InterruptedException, AWTException, MalformedURLException {
         System.setProperty("apple.awt.UIElement", "true");
-        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
-        driver = new RemoteWebDriver(new URL("http://127.0.0.1:9515/"), capabilities);
+        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("user-data-dir=" + profilePath);
+//        options.addArguments("--start-maximized");
+        options.addArguments("disable-infobars");
+        options.addArguments("enable-automation");
+
+        Map<String, Object> prefs = new LinkedHashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+        options.setExperimentalOption("prefs", prefs);
+
+        DesiredCapabilities capability = DesiredCapabilities.chrome();
+
+        capability.setBrowserName("chrome");
+        capability.setCapability(ChromeOptions.CAPABILITY, options);
+
+        driver = new RemoteWebDriver(new URL("http://127.0.0.1:9515/"), capability);
         driver.manage().window().setPosition(new Point(100, 100));
         driver.manage().window().setSize(new Dimension(1400, 900));
         Thread.sleep(1000);

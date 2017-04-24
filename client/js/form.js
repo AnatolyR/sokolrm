@@ -425,7 +425,7 @@ $.widget('sokol.form', {
         this.fieldsInfo.push(field);
         this.fieldsInfoMap[id] = field;
 
-        if (!value) {
+        if (!value && value !== 0) {
             value = "";
         }
         if (type == "string" || type == "smallstring") {

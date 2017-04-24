@@ -11,6 +11,7 @@ package com.kattysoft.web;
 
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.model.DocumentType;
 import com.kattysoft.core.model.Space;
 import com.kattysoft.core.model.User;
 import org.apache.commons.io.IOUtils;
@@ -54,6 +55,9 @@ public class DocumentCardController {
     @Autowired
     private SpaceService spaceService;
 
+    @Autowired
+    private DocumentTypeService documentTypeService;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     private com.fasterxml.jackson.databind.ObjectMapper mapper2 = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -67,6 +71,13 @@ public class DocumentCardController {
 
     @RequestMapping(value = "/createdocument")
     public String createDocument(String type) {
+        if (type == null || type.isEmpty() || !type.matches("^[a-zA-Z]+$")) {
+            throw new SokolException("Wrong document type");
+        }
+        DocumentType documentType = documentTypeService.getDocumentType(type);
+        if (documentType == null) {
+            throw new SokolException("Document type not found");
+        }
         Document document = new Document();
         document.setType(type);
         document.getFields().put("status", "draft");
@@ -310,5 +321,9 @@ public class DocumentCardController {
 
     public void setSpaceService(SpaceService spaceService) {
         this.spaceService = spaceService;
+    }
+
+    public void setDocumentTypeService(DocumentTypeService documentTypeService) {
+        this.documentTypeService = documentTypeService;
     }
 }
