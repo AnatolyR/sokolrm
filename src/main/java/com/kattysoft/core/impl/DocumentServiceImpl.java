@@ -15,7 +15,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.*;
 import com.kattysoft.core.dao.DocumentDao;
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.model.DocumentLink;
 import com.kattysoft.core.model.User;
+import com.kattysoft.core.repository.DocumentLinkRepository;
 import com.kattysoft.core.specification.Specification;
 import org.codehaus.jackson.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Autowired
     private TitleService titleService;
+
+    @Autowired
+    private DocumentLinkRepository documentLinkRepository;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -227,6 +232,37 @@ public class DocumentServiceImpl implements DocumentService {
         return history;
     }
 
+    @Override
+    public UUID addDocumentLink(String docId, String documentNumber, String type) {
+
+        UUID documentId = UUID.fromString(docId);
+        UUID linkId = null;
+        if (Utils.isUUID(documentNumber)) {
+            linkId = UUID.fromString(documentNumber);
+        } else {
+            //todo search by documentNumber
+        }
+        if (linkId != null) {
+            DocumentLink link = new DocumentLink();
+            UUID id = UUID.randomUUID();
+            link.setId(id);
+            link.setDocId(documentId);
+            link.setLinkId(linkId);
+            link.setLinkType(type);
+
+            documentLinkRepository.save(link);
+            return id;
+        } else {
+            throw new SokolException("Document to link not found");
+        }
+    }
+
+    @Override
+    public void deleteDocumentLinks(List<String> ids) {
+        List<DocumentLink> values = ids.stream().map(id -> new DocumentLink(UUID.fromString(id))).collect(Collectors.toList());
+        documentLinkRepository.delete(values);
+    }
+
     public void setDocumentDao(DocumentDao documentDao) {
         this.documentDao = documentDao;
     }
@@ -245,5 +281,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     public void setTitleService(TitleService titleService) {
         this.titleService = titleService;
+    }
+
+    public DocumentLinkRepository getDocumentLinkRepository() {
+        return documentLinkRepository;
+    }
+
+    public void setDocumentLinkRepository(DocumentLinkRepository documentLinkRepository) {
+        this.documentLinkRepository = documentLinkRepository;
     }
 }

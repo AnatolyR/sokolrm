@@ -94,8 +94,20 @@ public class DictionaryController {
             }).collect(Collectors.toList());
             String json = mapper.writeValueAsString(nodes);
             return json;
+        } else {
+            List<DictionaryValue> values = dictionaryService.getValuesForDictionaryId(id);
+
+            ArrayNode data = mapper.createArrayNode();
+
+            values.forEach(v -> {
+                ObjectNode item = mapper.createObjectNode();
+                item.put("id", v.getTitle());
+                item.put("title", v.getTitle());
+                data.add(item);
+            });
+            return data.toString();
         }
-        return "[]";
+//        return "[]";
     }
 
     @RequestMapping(value = "/dictionaryinfo", produces = "application/json; charset=utf-8")

@@ -17,7 +17,8 @@ $.widget("sokol.grid", {
         addable: false,
         addMethod: null,
         usePanel: true,
-        bottomPagination: true
+        bottomPagination: true,
+        showTableHeader: true
     },
 
     _create: function () {
@@ -137,7 +138,8 @@ $.widget("sokol.grid", {
                 conditions: (this.filter && this.filter.conditions) ? JSON.stringify(this.filter.conditions) : null,
                 sort: this.sortColumn,
                 sortAsc: this.sortAsc,
-                searchtext: this.options.searchtext
+                searchtext: this.options.searchtext,
+                docId: this.options.docId
             }, $.proxy(function (data) {
                 this.options.data = data.data;
                 this.options.total = data.total;
@@ -166,7 +168,7 @@ $.widget("sokol.grid", {
             '<span style="margin-right: 10px;">Найдено: <span name="gridItemsCount">0</span></span>' +
             '<button name="preview" class="btn btn-default" href = "#" disabled1="disable">' +
             '<span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Предыдущая</button>&nbsp;' +
-            '<select name="pageSelector" class="selectpicker"></select>&nbsp;' +
+            '<select name="pageSelector" class="selectpicker pageSelector"></select>&nbsp;' +
             '<button name="next" class="btn btn-default" href = "#">Следующая ' +
             '<span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></button>&nbsp;' +
             '<span style="margin-left: 10px;">Отображать ' +
@@ -205,6 +207,11 @@ $.widget("sokol.grid", {
         if (this.options.currentPage > pages) {
             this.options.currentPage = pages;
         }
+        if (this.options.pageCount > 1) {
+            this.element.find("[name='preview']").show();
+            this.element.find("[name='next']").show();
+            this.element.find(".pageSelector").show();
+        }
 
         var selectors = this.element.find("[name='pageSelector']");
         selectors.empty();
@@ -225,6 +232,12 @@ $.widget("sokol.grid", {
         this.element.find('select[name="pageSelector"]').val(this.options.currentPage + " / " + this.options.pageCount);
         this.element.find('select[name="pageSize"]').val(this.options.pageSize);
         this.element.find('.selectpicker').selectpicker('refresh');
+
+        if (this.options.pageCount <= 1) {
+            this.element.find("[name='preview']").hide();
+            this.element.find("[name='next']").hide();
+            this.element.find(".pageSelector").hide();
+        }
     },
 
     renderTableHeader: function() {
@@ -288,18 +301,25 @@ $.widget("sokol.grid", {
         } else {
             panel = this.element;
         }
-        var panelHeader = $('<div class="panel-heading"></div>');
-        if (!this.options.usePanel) {
-            panelHeader.addClass('panel-footer');
-            panelHeader.css('border-radius', '0');
+
+        if (this.options.showTableHeader) {
+            var panelHeader = $('<div class="panel-heading"></div>');
+            if (!this.options.usePanel) {
+                panelHeader.addClass('panel-footer');
+                panelHeader.css('border-radius', '0');
+            }
+            var panelTitle = $('<div>' + this.options.title + '</div>');
+            if (this.options.usePanel) {
+                panelTitle.addClass('panel-title');
+            }
+            panelTitle.appendTo(panelHeader);
+            panelHeader.appendTo(panel);
         }
-        var panelTitle = $('<div>' + this.options.title + '</div>');
-        if (this.options.usePanel) {
-            panelTitle.addClass('panel-title');
-        }
-        panelTitle.appendTo(panelHeader);
-        panelHeader.appendTo(panel);
+
         var table = $("<table class='table'></table>");
+        if (this.options.topBorder) {
+            table.css('border-top', '1px solid #ddd')
+        }
         table.appendTo(panel);
         var thead = $('<thead name="tableHead"></thead>');
         thead.appendTo(table);
@@ -333,8 +353,9 @@ $.widget("sokol.grid", {
 
     renderRow: function(row, rowObj) {
         var columns = this.options.columns;
+        var objectId = this.options.idField ? rowObj[this.options.idField] : rowObj.id;
         if (this.options.selectable) {
-            this.renderCheckboxColumn(row, rowObj.id);
+            this.renderCheckboxColumn(row, objectId);
         }
         for (var k = 0; k < columns.length; k++) {
             var column = columns[k];
@@ -474,12 +495,19 @@ $.widget("sokol.grid", {
                 return $(el).attr('dataId');
             }).toArray();
 
-            var objects = this.options.data.filter(function(element) {
-                return ids.indexOf(element.id) >= 0;
-            });
+            var objects = this.options.data.filter($.proxy(function(element) {
+                var objectId = this.options.idField ? element[this.options.idField] : element.id;
+                return ids.indexOf(objectId) >= 0;
+            }, this));
 
-            if (this.options.deleteMethod && objects.length > 0) {
-                this.options.deleteMethod(this, objects);
+            if (this.options.deleteMethod) {
+                if (objects.length > 0) {
+                    this.options.deleteMethod(this, objects);
+                } else {
+                    console.error("No selected for delete");
+                }
+            } else {
+                console.error("No deleteMethod found");
             }
         }, this));
         deleteButton.appendTo(element);
@@ -519,7 +547,7 @@ $.widget("sokol.grid", {
 
     doAddElement: function(row) {
         row = this.element.find('tbody tr').first();
-        var values = row.find("input").map(function(i, e) {
+        var values = row.find("input, select").map(function(i, e) {
             var ee = $(e);
             return {
                 id: ee.attr('name'),
@@ -531,9 +559,15 @@ $.widget("sokol.grid", {
             this.options.addMethod(values, $.proxy(function(reloadValue) {
                 var tbody = this.element.find('tbody');
                 row.remove();
-                row = $('<tr></tr>').prependTo(tbody);
-                this.options.data.push(reloadValue);
-                this.renderRow(row, reloadValue);
+
+                if ('reload' == reloadValue) {
+                    this.reload();
+                } else {
+                    row = $('<tr></tr>').prependTo(tbody);
+                    this.options.data.push(reloadValue);
+                    this.renderRow(row, reloadValue);
+                }
+
             }, this));
         }
     },
@@ -557,7 +591,7 @@ $.widget("sokol.grid", {
             if (colType != "hidden" && this.isColumnVisible(colId)) {
                 if (editor == "text") {
                     var td = $('<td></td>');
-                    var input = $('<input name="' + colId + '" type="text">').appendTo(td);
+                    var input = $('<input class="form-control" name="' + colId + '" type="text">').appendTo(td);
 
                     input.bind("keypress", $.proxy(function(event) {
                         if(event.which == 13) {
@@ -569,6 +603,8 @@ $.widget("sokol.grid", {
                     td.appendTo(row);
                 } else if (editor == "user") {
                     this.createEditorUser(row, column);
+                } else if (editor == "dictionary") {
+                    this.createEditorDictionary(row, column);
                 } else if (editor == "boolean") {
                     this.createEditorBoolean(row, column);
                 } else if (editor == "date") {
@@ -610,6 +646,56 @@ $.widget("sokol.grid", {
             locale: 'ru'
         });
 
+    },
+
+    createEditorDictionary: function(formNode, field, value, valueTitle) {
+        if( Object.prototype.toString.call(value) !== '[object Array]' ) {
+            value = value ? [value] : [];
+            valueTitle = valueTitle ? [valueTitle] : [];
+        }
+
+        var options = [];
+        var initialValues = [];
+        var titles = [];
+
+        for (var i = 0; i < value.length; i++) {
+            options.push({
+                id: value[i],
+                title: valueTitle[i]
+            });
+            initialValues.push(value[i]);
+            titles.push(valueTitle[i]);
+        }
+
+        var selector = $('<td><div class="no-dropdown' + (field.mandatory ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
+            '<select name="' + field.id + '" class="demo-default" id="selector_' + field.id + '">' + '</select>' +
+            '' +
+            '</div>' +
+            '</td>');
+        $(formNode).append(selector);
+
+        selector.find('select').selectize({
+            maxItems: field.multiple ? 1000 : 1,
+            plugins: ['restore_on_backspace', 'remove_button'],
+            valueField: 'id',
+            labelField: 'title',
+            searchField: 'title',
+            preload: true,
+            closeAfterSelect: true,
+            options: options,
+            load: function(query, callback) {
+                $.getJSON('app/dictionary', {
+                    id: field.dictionary,
+                    query: query
+                },  function(response) {
+                    callback(response);
+                }).fail(function() {
+                    $.notify({message: 'Не удалось загрузить данные для справочника.'},{type: 'danger', delay: 0, timer: 0});
+                });
+            },
+            create: false
+        });
+        selector.find('select')[0].selectize.setValue(initialValues);
     },
 
     createEditorUser: function(formNode, field, value, valueTitle) {

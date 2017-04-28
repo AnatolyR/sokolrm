@@ -274,6 +274,32 @@ public class DocumentCardController {
         return Boolean.toString(result);
     }
 
+    @RequestMapping("addDocumentLink")
+    public String addDictionaryValue(String docId, String data) throws IOException {
+        if (docId == null || docId.isEmpty()) {
+            throw new RuntimeException("docId is null");
+        }
+        com.fasterxml.jackson.databind.JsonNode node = mapper2.readTree(data);
+        String documentNumber = node.get("d.documentNumber").asText();
+        String type = node.get("l.linktype").asText();
+
+        if (documentNumber.isEmpty()) {
+            throw new RuntimeException("Empty documentNumber");
+        }
+
+        documentService.addDocumentLink(docId, documentNumber, type);
+
+        return "reload";
+    }
+
+    @RequestMapping("deleteDocumentLinks")
+    public String deleteDocumentLinks(String[] ids) {
+
+        documentService.deleteDocumentLinks(Arrays.asList(ids));
+
+        return "reload";
+    }
+
     public void setDocumentService(DocumentService documentService) {
         this.documentService = documentService;
     }

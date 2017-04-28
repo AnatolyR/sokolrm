@@ -37,6 +37,7 @@ DROP TABLE sokol.table2;
 DROP TABLE sokol.table1;
 DROP TABLE sokol.spaces;
 DROP TABLE sokol.registrationlists;
+DROP TABLE sokol.linkeddocuments;
 DROP TABLE sokol.groups;
 DROP TABLE sokol.favorites;
 DROP TABLE sokol.documents;
@@ -180,6 +181,18 @@ CREATE TABLE groups (
     id uuid NOT NULL,
     title character varying(255),
     ardata jsonb
+);
+
+
+--
+-- Name: linkeddocuments; Type: TABLE; Schema: sokol; Owner: -
+--
+
+CREATE TABLE linkeddocuments (
+    id uuid,
+    docid uuid,
+    linkid uuid,
+    linktype character varying(255)
 );
 
 
@@ -424,6 +437,9 @@ c8c55c67-89c8-46a8-9212-2d90ffb1d0ed	executionReportStatus	\N	Исполнено
 ebabac3d-b042-4721-883e-268745c1595f	executionReportStatus	\N	Не исполнено	\N	\N	\N	\N	\N	\N	\N	\N	\N
 f1a642c5-653e-4a49-87bd-bd5391b207d7	documentTitles	\N	О платежах	\N	\N	\N	\N	\N	\N	\N	\N	\N
 c97dd759-17bc-4f7d-b888-1f59726f7ac1	executionReportStatus	\N	укукуотуе	\N	\N	\N	\N	\N	\N	\N	\N	\N
+359dea8d-f68a-4876-ab86-3dee138669e0	documentLinkTypes	\N	В ответ на	\N	\N	\N	\N	\N	\N	\N	\N	\N
+fd599cc6-2f0d-43af-8667-6adf42d74ede	documentLinkTypes	\N	См	\N	\N	\N	\N	\N	\N	\N	\N	\N
+fe25d494-f5bc-4cd5-a7a4-b2d9f334e6a0	documentLinkTypes	\N	Test	\N	\N	\N	\N	\N	\N	\N	\N	\N
 \.
 
 
@@ -464,7 +480,7 @@ f3267d38-b674-4964-9003-1109edeaf1d7	internalDocument	draft	Все поля		201
 d0e38e2e-18bd-48fd-91ec-5e102519cd06	incomingDocument	\N	Test document 1rtyr2355777	Письмо	2016-04-23 23:32:00	65208064-e1ef-4bf5-be7b-39a3839668d3	КВАЛИТЕТ, строительная экспертиза				\N		\N	{bbb3bfbf-66af-41b8-8a6d-24f6e527386a,be547579-8664-4221-8dde-029ef242b517,137e29ed-acb2-4f06-b6f6-74ed1b332caa}	{"Середин Т. И.","Власов Л. И.","Козлов Я. В."}	\N	\N	\N	\N	\N		\N	\N	\N	\N		\N	\N
 de32b8fe-7c34-4417-87f7-844be0c4663f	incomingDocument	review	Проверка Рассмотрение		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N		\N	\N	\N	\N		Проверка Рассмотрение	\N
 001afe34-7912-4571-83a4-9ae0e7e9b8dc	incomingDocument	registered	Проверка Зарегистрирован		\N	\N	\N				\N		\N	{722b151c-f9d7-4222-b541-cfc554695510}	{"Ивашов В. Н."}	\N	\N	\N	\N	\N		\N	\N	\N	\N		Проверка Зарегистрирован	\N
-ed15fe1e-870a-4c01-92e1-39738e678edd	incomingDocument	draft	Проверка новых полей	Акт	\N	\N	\N				\N		1	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-01 16:10:00		\N	\N	\N	\N		Проверка новых полей	\N
+ed15fe1e-870a-4c01-92e1-39738e678edd	incomingDocument	draft	Проверка новых полей	Акт	\N	\N	\N				\N		1	{3379db0f-8221-43fd-8d46-e05edcef9686}	{"Ивашов Н. В."}	722b151c-f9d7-4222-b541-cfc554695510	\N	2	3	2017-04-01 16:10:00		\N	\N	\N	\N		Проверка новых полей	[{"date": "28.04.2017 15:42", "type": "Редактирование", "user": "722b151c-f9d7-4222-b541-cfc554695510", "fields": [], "userTitle": "Ивашов В. Н."}]
 \.
 
 
@@ -490,6 +506,16 @@ a838c335-0fdb-4b3e-9e30-da7fb51e676b	Test Group 4	\N
 7db50d24-7de5-46e8-87ae-aa9cfa08b144	Пользователи	\N
 bdc4e199-61e2-4cc6-81c8-0585d5e95b55	Делопроизводители	\N
 6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	Администраторы	\N
+\.
+
+
+--
+-- Data for Name: linkeddocuments; Type: TABLE DATA; Schema: sokol; Owner: -
+--
+
+COPY linkeddocuments (id, docid, linkid, linktype) FROM stdin;
+1023d492-0513-4f10-a312-a7b46c3aa616	d0004a5c-b3d9-4934-bed8-05ad15cc037c	49bb9b47-2ea1-4f63-9ceb-e89c0a42d19d	См
+0d4856d4-ad1c-402a-b8c3-35b236ce694a	d0004a5c-b3d9-4934-bed8-05ad15cc037c	698a2c4b-ac01-4b68-a5a4-cb4cd20ed751	См
 \.
 
 

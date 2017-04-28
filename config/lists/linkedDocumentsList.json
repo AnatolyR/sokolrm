@@ -1,0 +1,82 @@
+{
+  "condition": "l.docid = '${docId}'::uuid",
+  "join": "right join linkeddocuments l on d.id = l.linkId",
+  "gridConfig": {
+    "id": "linkedDocuments",
+    "url": "app/documents",
+    "title": "Связанные документы",
+    "idField": "l.id",
+    "columnsVisible": [
+      "l.id",
+      "d.id",
+      "l.linktype",
+      "d.documentNumber",
+      "d.type",
+      "d.status",
+      "d.title",
+      "d.registrationDate"
+    ],
+    "columns": [
+      {
+        "id": "l.id",
+        "type": "hidden"
+      },
+      {
+        "id": "d.id",
+        "type": "hidden"
+      },
+      {
+        "id": "l.linktype",
+        "title": "Тип связи",
+        "editor": "dictionary",
+        "dictionary": "documentLinkTypes"
+      },
+      {
+        "id": "d.documentNumber",
+        "title": "Номер",
+        "editor": "text"
+      },
+      {
+        "id": "d.type",
+        "title": "Тип",
+        "render": "doctype"
+      },
+      {
+        "id": "d.status",
+        "title": "Статус",
+        "render": "status"
+      },
+      {
+        "id": "d.title",
+        "title": "Заголовок",
+        "render": "link",
+        "linkType": "document"
+      },
+      {
+        "id": "d.registrationDate",
+        "title": "Дата регистрации",
+        "render": "datetime"
+      },
+      {
+        "id": "d.pagesQuantity",
+        "title": "Кол. стр."
+      },
+      {
+        "id": "d.addressee",
+        "title": "Адресаты (ИД)"
+      },
+      {
+        "id": "d.addresseeTitle",
+        "title": "Адресаты"
+      },
+      {
+        "id": "d.correspondent",
+        "title": "Корреспондент (ИД)"
+      },
+      {
+        "id": "d.correspondentTitle",
+        "title": "Корреспондент"
+      }
+    ]
+  }
+}

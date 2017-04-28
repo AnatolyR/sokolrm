@@ -15,7 +15,7 @@ $.widget('sokol.history', {
 
         var panelTitle = $('<div class="panel-title">История изменений</div>').appendTo(panelHeader);
 
-        var panelBody = $('<div class="panel-body"></div>');
+        var panelBody = $('<div style="height: 10px;"></div>');
         panelBody.appendTo(this.element);
         this.panelBody = panelBody;
     },
@@ -59,10 +59,12 @@ $.widget('sokol.history', {
             //filterable: true,
             sortable: false,
             pageSize: 5,
+            showTableHeader: false,
             usePanel: false,
-            bottomPagination: false
+            bottomPagination: false,
+            topBorder: true
         };
 
-        this.grid = $.sokol.grid(options, $("<div></div>").insertAfter(this.panelBody));
+        this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.element));
     }
 });

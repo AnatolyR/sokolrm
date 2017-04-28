@@ -12,6 +12,7 @@ import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.Specification;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -29,4 +30,8 @@ public interface DocumentService {
     boolean deleteDocument(String documentId);
 
     ArrayNode getHistory(String documentId);
+
+    UUID addDocumentLink(String docId, String documentNumber, String type);
+
+    void deleteDocumentLinks(List<String> strings);
 }

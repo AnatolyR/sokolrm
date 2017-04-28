@@ -57,7 +57,7 @@ public class DocumentListController {
     }
 
     @RequestMapping(value = "/documents")
-    public Object listDocuments(String listId, Integer offset, Integer size, String conditions, String sort, String sortAsc, String searchtext) throws IOException {
+    public Object listDocuments(String listId, Integer offset, Integer size, String conditions, String sort, String sortAsc, String searchtext, String docId) throws IOException {
         if (offset == null) {
             offset = 0;
         }
@@ -139,6 +139,12 @@ public class DocumentListController {
             User currentUser = userService.getCurrentUser();
             listConditionSql = listConditionSql.replaceAll("\\$\\{currentUser\\}", currentUser.getId().toString());
         }
+        if (docId != null && !docId.isEmpty()) {
+            if (listConditionSql.contains("${docId}")) {
+                UUID docIdUuid = UUID.fromString(docId);
+                listConditionSql = listConditionSql.replaceAll("\\$\\{docId\\}", docIdUuid.toString());
+            }
+        }
         condition.setOperation(ContainerOperation.AND);
         Condition listCondition = new SqlCondition(listConditionSql);
         condition.getConditions().add(listCondition);
@@ -161,6 +167,9 @@ public class DocumentListController {
             ObjectNode docFields = (ObjectNode) document.get("fields");
             document.remove("fields");
             document.setAll(docFields);
+            if (document.has("d.type")) {
+                document.set("type", document.get("d.type"));
+            }
 
             processServerRenders(document, fieldsRenders, typeTitleCash, flowStatusTitleCash);
 
