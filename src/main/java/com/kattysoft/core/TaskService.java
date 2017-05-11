@@ -12,6 +12,7 @@ import com.kattysoft.core.model.Task;
 import com.kattysoft.core.model.TasksList;
 import com.kattysoft.core.specification.Specification;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -35,4 +36,6 @@ public interface TaskService {
     void completeTask(Task task);
 
     TasksList getTaskExecutionList(UUID taskId);
+
+    void clearApprovalTasksState(String documentId);
 }

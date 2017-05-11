@@ -12,8 +12,10 @@ package com.kattysoft.core.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 /**
@@ -27,6 +29,9 @@ public class ActionServiceImpl implements ActionService {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     private RegistrationListService registrationListService;
@@ -53,6 +58,9 @@ public class ActionServiceImpl implements ActionService {
             if (actionId.equals("doregistration")) {
                 registrDocument(documentId, endState, space);
             } else {
+                if ("reject".equals(actionId)) {
+                    resetApprovalTasks(documentId);
+                }
                 Document holder = new Document();
                 holder.setId(documentId);
                 holder.getFields().put("status", endState);
@@ -61,6 +69,10 @@ public class ActionServiceImpl implements ActionService {
         } else {
             throw new SokolException("No end state");
         }
+    }
+
+    private void resetApprovalTasks(String documentId) {
+        taskService.clearApprovalTasksState(documentId);
     }
 
     private void registrDocument(String documentId, String endState, String space) {
@@ -85,5 +97,9 @@ public class ActionServiceImpl implements ActionService {
 
     public void setRegistrationListService(RegistrationListService registrationListService) {
         this.registrationListService = registrationListService;
+    }
+
+    public void setTaskService(TaskService taskService) {
+        this.taskService = taskService;
     }
 }

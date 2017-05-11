@@ -63,6 +63,7 @@ public class LoginFilter implements Filter {
                     res.getWriter().write("false");
                 }
             } catch (Exception e) {
+                log.error("Can not authenticate", e);
                 res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } else if (path.equals("/login")) {

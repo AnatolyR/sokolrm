@@ -905,6 +905,14 @@ $.widget('sokol.container', {
         if (this.attaches) {
             this.attaches.destroy();
         }
+
+        if (this.history) {
+            this.history.destroy();
+        }
+        if (this.linkeddocs) {
+            this.linkeddocs.destroy();
+        }
+
         for (var i = 0; i < this.childs.length; i++) {
             var child = this.childs[i];
             if (child.destroy) {
@@ -964,7 +972,7 @@ $.widget('sokol.container', {
             if (this.options.mode == 'read') {
                 this.history = $.sokol.history({id: data.id}, $('<div></div>').appendTo(this.element));
 
-                this.history = $.sokol.linkeddocs({id: data.id}, $('<div></div>').appendTo(this.element));
+                this.linkeddocs = $.sokol.linkeddocs({id: data.id}, $('<div></div>').appendTo(this.element));
             }
         }
 
@@ -989,6 +997,10 @@ $.widget('sokol.container', {
                 type: type,
                 taskId: taskId
             }, $("<div></div>").insertAfter(this.header.element));
+        } else {
+            $('html, body').animate({
+                scrollTop: $(this[type + "Form"].element).offset().top - 50
+            }, 2000);
         }
     },
 

@@ -41,9 +41,7 @@ public class ActionController {
         if (actionId == null) {
             throw new SokolException("Action is null");
         }
-        if (actionId.equals("toarchive")) {
-            throw new SokolException("Action В архив not supported");
-        }
+
         String documentId = data.get("documentId").textValue();
         if (documentId == null) {
             throw new SokolException("DocumentId is null");

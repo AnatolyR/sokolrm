@@ -93,27 +93,27 @@ public class TaskServiceImpl implements TaskService {
         boolean runningTasks = tasks.stream().filter(t -> "run".equals(t.getStatus())).findFirst().isPresent();
         if ("execution".equals(type)) {
             if (runningTasks) {
-                if (!"execution".equals(document.getStatus())) {
+                if ("executed".equals(document.getStatus())) {
                     updateDocumentStatus(documentId, "execution");
                 }
             } else {
-                if (!"executed".equals(document.getStatus())) {
+                if ("execution".equals(document.getStatus())) {
                     updateDocumentStatus(documentId, "executed");
                 }
             }
         } else if ("approval".equals(type)) {
             if (runningTasks) {
-                if (!"approval".equals(document.getStatus())) {
+                if ("project".equals(document.getStatus()) || "agreed".equals(document.getStatus()) || "not_agreed".equals(document.getStatus())) {
                     updateDocumentStatus(documentId, "approval");
                 }
             } else {
                 boolean done = !tasks.stream().filter(t -> !"agreed".equals(t.getResult())).findFirst().isPresent();
                 if (done) {
-                    if (!"agreed".equals(document.getStatus())) {
+                    if ("approval".equals(document.getStatus())) {
                         updateDocumentStatus(documentId, "agreed");
                     }
                 } else {
-                    if (!"not_agreed".equals(document.getStatus())) {
+                    if ("approval".equals(document.getStatus())) {
                         updateDocumentStatus(documentId, "not_agreed");
                     }
                 }
@@ -201,6 +201,20 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return tasksList;
+    }
+
+    @Override
+    public void clearApprovalTasksState(String documentId) {
+        List<Task> tasks = taskRepository.findAllByDocumentIdAndType(UUID.fromString(documentId), "approval");
+        tasks.stream().forEach(t -> {
+            //todo save task history SOKOL-90
+            t.setStatus("run");
+            t.setExecutedDate(null);
+            t.setComment("");
+            t.setResult(null);
+
+            taskRepository.save(t);
+        });
     }
 
     @Override

@@ -53,6 +53,8 @@ public class DocumentServiceImpl implements DocumentService {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
+    private SimpleDateFormat dateFormatSs = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
     public List<Document> listDocuments(Specification specification) {
         //todo проверка прав на поля
         List<Document> documentsList = documentDao.getDocumentsList(specification);
@@ -117,7 +119,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         ObjectNode item = mapper.createObjectNode();
 
-        item.put("date", dateFormat.format(new Date()));
+        item.put("date", dateFormatSs.format(new Date()));
         User user = userService.getCurrentUser();
         item.put("user", user.getId().toString());
         item.put("userTitle", user.getTitle());

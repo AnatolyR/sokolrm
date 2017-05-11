@@ -28,4 +28,6 @@ public interface TaskRepository extends CrudRepository<Task, UUID>, JpaSpecifica
 
     @Override
     Page<Task> findAll(Specification<Task> specification, Pageable pageable);
+
+    List<Task> findAllByDocumentIdAndType(UUID documentId, String type);
 }

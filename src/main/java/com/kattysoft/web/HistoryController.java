@@ -38,6 +38,8 @@ public class HistoryController {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
+    private SimpleDateFormat dateFormatSs = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
     @Autowired
     private DocumentService documentService;
 
@@ -59,8 +61,8 @@ public class HistoryController {
 
         List<JsonNode> sortedItems = StreamSupport.stream(history.spliterator(), false).sorted((o1, o2) -> {
             try {
-                Date date1 = dateFormat.parse(o1.get("date").asText());
-                Date date2 = dateFormat.parse(o2.get("date").asText());
+                Date date1 = dateFormatSs.parse(o1.get("date").asText());
+                Date date2 = dateFormatSs.parse(o2.get("date").asText());
                 return -date1.compareTo(date2);
             } catch (Exception e) {
                 log.error("History processing error", e);

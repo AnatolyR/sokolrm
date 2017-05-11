@@ -111,6 +111,10 @@ $.widget('sokol.container', {
                 type: type,
                 taskId: taskId
             }, $("<div></div>").insertAfter(this.header.element));
+        } else {
+            $('html, body').animate({
+                scrollTop: $(this[type + "Form"].element).offset().top - 50
+            }, 2000);
         }
     },
 

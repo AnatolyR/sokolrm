@@ -200,16 +200,21 @@
         <finalName>sokol</finalName>
         <plugins>
             <plugin>
+                <!-- sudo mvn tomcat7:run -Ddbproperties=/Users/anatolii/Documents/sokolsed/db/db.properties -->
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
+                    <!--<port>80</port>-->
                     <contextFile>./config/web-context-dev.xml</contextFile>
                     <uriEncoding>utf-8</uriEncoding>
                     <!--<systemProperties>-->
                         <!--<dbproperties2>/Users/anatolii/Documents/sokolsed/db/db.properties</dbproperties2>-->
                     <!--</systemProperties>-->
                     <path>/${project.build.finalName}</path>
+                    <!--<httpsPort>443</httpsPort>-->
+                    <!--<keystoreFile>${basedir}/certificates/keystore.jks</keystoreFile>-->
+                    <!--<keystorePass>g500shK15</keystorePass>-->
                 </configuration>
             </plugin>
 
