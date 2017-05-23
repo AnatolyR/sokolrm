@@ -6,6 +6,7 @@ CREATE TABLE documents (
   space varchar(255),
   status varchar(255),
   title varchar(255),
+  created timestamp,
   "documentKind" varchar(255),
   "registrationDate" timestamp,
   "executionDate" timestamp,

@@ -27,40 +27,46 @@
       "type": "header"
     },
     {
-      "id": "",
+      "id": "incomingReviewTasks",
       "title": "На рассмотрение"
     },
     {
-      "id": "",
+      "id": "incomingSignTasks",
       "title": "На подписание"
     },
     {
-      "id": "",
+      "id": "incomingApprovalTasks",
       "title": "На согласование"
     },
     {
-      "id": "",
+      "id": "incomingAcquaintanceTasks",
       "title": "На ознакомление"
     },
     {
-      "id": "",
+      "id": "incomingExecutionTasks",
       "title": "На исполнение"
-    },{
-      "id": "",
+    },
+    {
+      "id": "outgoingTasks",
       "title": "Исходящие задачи",
       "type": "header"
     },
     {
-      "id": "",
+      "id": "outgoingExecutionTasks",
       "title": "Исполнение"
     },
     {
-      "id": "",
-      "title": "Утвердить"
+      "id": "outgoingApprovalTasks",
+      "title": "Согласование"
     },
     {
-      "id": "",
-      "title": "Перенесение срока"
+      "id": "outgoingAcquaintanceTasks",
+      "title": "Ознакомление"
+    },
+    {
+      "id": "archivedDocuments",
+      "title": "Архив",
+      "type": "header"
     }
   ]
 }

@@ -36,6 +36,11 @@
         "linkType": "document"
       },
       {
+        "id": "created",
+        "title": "Дата создания",
+        "render": "datetime"
+      },
+      {
         "id": "registrationDate",
         "title": "Дата регистрации",
         "render": "datetime"
