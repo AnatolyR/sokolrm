@@ -29,7 +29,12 @@
         {
           "id": "doresolution",
           "title": "Резолюция",
-          "form": "resolution"
+          "form": "execution"
+        },
+        {
+          "id": "tocase",
+          "title": "В дело",
+          "state": "tocase"
         }
       ]
     },

@@ -130,6 +130,11 @@ public class UserServiceImpl implements UserService {
             pass += chars.charAt(random.nextInt(l));
         }
 
+        savePassword(id, pass);
+        return pass;
+    }
+
+    public String savePassword(String id, String pass) {
         User user = this.getUserById(id);
         if (user.getLogin() == null || user.getLogin().length() < 3) {
             throw new SokolException("Login length too small");

@@ -18,8 +18,20 @@
       "title": "Внутренние"
     },
     {
+      "id": "incomingReviewTasks",
+      "title": "На рассмотрение"
+    },
+    {
+      "id": "incomingSignTasks",
+      "title": "На подписание"
+    },
+    {
       "id": "myDocuments",
       "title": "Мои документы"
+    },
+    {
+      "id": "documentTemplates",
+      "title": "Шаблоны"
     },
     {
       "id": "incomingTasks",
@@ -27,12 +39,8 @@
       "type": "header"
     },
     {
-      "id": "incomingReviewTasks",
-      "title": "На рассмотрение"
-    },
-    {
-      "id": "incomingSignTasks",
-      "title": "На подписание"
+      "id": "incomingExecutionTasks",
+      "title": "На исполнение"
     },
     {
       "id": "incomingApprovalTasks",
@@ -43,8 +51,8 @@
       "title": "На ознакомление"
     },
     {
-      "id": "incomingExecutionTasks",
-      "title": "На исполнение"
+      "id": "archivedIncomingTasks",
+      "title": "Архив"
     },
     {
       "id": "outgoingTasks",
@@ -64,8 +72,12 @@
       "title": "Ознакомление"
     },
     {
+      "id": "archivedOutgoingTasks",
+      "title": "Архив"
+    },
+    {
       "id": "archivedDocuments",
-      "title": "Архив",
+      "title": "Архив документов",
       "type": "header"
     }
   ]

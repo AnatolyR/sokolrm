@@ -1,5 +1,5 @@
 {
-  "condition": "type = 'internalDocument' AND status IS DISTINCT FROM 'Черновик'",
+  "condition": "type = 'internalDocument' AND status IS DISTINCT FROM 'draft' AND status IS DISTINCT FROM 'template' AND status IS DISTINCT FROM 'archive'",
   "gridConfig": {
     "title": "Внутренние документы",
     "columnsVisible": [
@@ -26,11 +26,14 @@
       },
       {
         "id": "status",
-        "title": "Статус"
+        "title": "Статус",
+        "render": "status"
       },
       {
         "id": "title",
-        "title": "Заголовок"
+        "title": "Заголовок",
+        "render": "link",
+        "linkType": "document"
       },
       {
         "id": "registrationDate",

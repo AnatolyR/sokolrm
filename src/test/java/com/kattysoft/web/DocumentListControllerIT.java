@@ -2,6 +2,7 @@ package com.kattysoft.web;
 
 import com.kattysoft.core.DocumentService;
 import com.kattysoft.core.impl.ConfigServiceImpl;
+import com.kattysoft.core.impl.TitleServiceImpl;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.specification.Specification;
 import org.hamcrest.CoreMatchers;
@@ -47,6 +48,7 @@ public class DocumentListControllerIT {
         documentListController = new DocumentListController();
         MockitoAnnotations.initMocks(this);
         documentListController.setConfigService(configService);
+        documentListController.setTitleService(new TitleServiceImpl());
         this.mockMvc = MockMvcBuilders.standaloneSetup(documentListController).build();
     }
 
@@ -84,6 +86,6 @@ public class DocumentListControllerIT {
             .andExpect(jsonPath("$.data[1].id").value("2"))
             .andExpect(jsonPath("$.data[1].title").value("Title 2"));
 
-        MatcherAssert.assertThat(content, CoreMatchers.equalTo("{\"data\":[{\"id\":\"1\",\"title\":\"Title 1\",\"type\":\"Входящий\",\"space\":null,\"kind\":null,\"status\":null},{\"id\":\"2\",\"title\":\"Title 2\",\"type\":\"[notExistType]\",\"space\":null,\"kind\":null,\"status\":\"\"}],\"offset\":0,\"total\":2}"));
+        MatcherAssert.assertThat(content, CoreMatchers.equalTo("{\"data\":[{\"id\":\"1\",\"title\":\"Title 1\",\"type\":\"Входящий\",\"space\":null,\"kind\":null,\"status\":\"[null]\"},{\"id\":\"2\",\"title\":\"Title 2\",\"type\":\"[notExistType]\",\"space\":null,\"kind\":null,\"status\":\"[null]\"}],\"offset\":0,\"total\":2}"));
     }
 }

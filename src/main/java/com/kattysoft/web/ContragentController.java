@@ -48,7 +48,7 @@ public class ContragentController {
     private ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "/contragents")
-    public ObjectNode getContragents(Integer offset, Integer size, String conditions, String sort, String sortAsc) throws IOException {
+    public ObjectNode getContragents(Integer offset, Integer size, String conditions, String sort, String sortAsc, String searchtext) throws IOException {
         if (offset == null) {
             offset = 0;
         }
@@ -74,7 +74,18 @@ public class ContragentController {
         spec.setSize(size);
 
         if (clientCondition != null) {
-            spec.setCondition(clientCondition);
+            if (searchtext != null && !searchtext.isEmpty()) {
+                ContainerCondition and = new ContainerCondition(ContainerOperation.AND, new ValueCondition("title", Operation.FULLTEXTSEARCH, searchtext));
+                and.getConditions().add(clientCondition);
+                spec.setCondition(and);
+            } else {
+                spec.setCondition(clientCondition);
+            }
+        } else {
+            if (searchtext != null && !searchtext.isEmpty()) {
+                ContainerCondition and = new ContainerCondition(ContainerOperation.AND, new ValueCondition("title", Operation.FULLTEXTSEARCH, searchtext));
+                spec.setCondition(and);
+            }
         }
 
         Page<Contragent> contragents = contragentService.getContragents(spec);

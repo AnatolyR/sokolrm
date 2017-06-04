@@ -195,10 +195,11 @@ public class DocumentListController {
                     String typeTitle = typeTitleCash.get(type);
                     document.put(name, typeTitle);
                 } else if ("status".equals(renderer)) {
-                    cacheTypeData(typeId, typeTitleCash, flowStatusTitleCash);
-                    String status = value;
-                    String statusTitle = status != null && flowStatusTitleCash.containsKey(typeId) ? flowStatusTitleCash.get(typeId).get(status) : "";
-                    document.put(name, statusTitle);
+//                    cacheTypeData(typeId, typeTitleCash, flowStatusTitleCash);
+//                    String status = value;
+//                    String statusTitle = status != null && flowStatusTitleCash.containsKey(typeId) ? flowStatusTitleCash.get(typeId).get(status) : "";
+                    String titleValue = titleService.getTitleNotNull(renderer, value);
+                    document.put(name, titleValue);
                 } else if ("executionType".equals(renderer) || "executionStatus".equals(renderer)) {
                     String titleValue = titleService.getTitleNotNull(renderer, value);
                     document.put(name, titleValue);

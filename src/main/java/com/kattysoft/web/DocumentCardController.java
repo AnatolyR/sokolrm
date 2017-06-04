@@ -81,6 +81,7 @@ public class DocumentCardController {
         Document document = new Document();
         document.setType(type);
         document.getFields().put("status", "draft");
+        document.getFields().put("created", new Date());
         User currentUser = userService.getCurrentUser();
         document.getFields().put("author", currentUser.getId().toString());
         String id = documentService.saveDocument(document);
@@ -168,6 +169,11 @@ public class DocumentCardController {
                 }
             });
             ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).set("actions", filteredActions);
+            String currentUserId = userService.getCurrentUser().getId().toString();
+            if (accessRightService.checkDocumentRights(document, "", AccessRightLevel.DELETE)
+                || ("draft".equals(document.getStatus()) && currentUserId.equals(document.getFields().get("author")))) {
+                ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("deleteAction", true);
+            }
         }
     }
 

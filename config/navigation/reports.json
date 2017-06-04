@@ -5,8 +5,28 @@
       "title": "Зарегистрированные документы"
     },
     {
-      "id": "incomingDocuments",
-      "title": "Входящие документы"
+      "id": "incomingExecutingDocuments",
+      "title": "Входящие документы на исполнении"
+    },
+    {
+      "id": "incomingExecutedDocuments",
+      "title": "Исполненные входящие документы"
+    },
+    {
+      "id": "outgoingApproveDocuments",
+      "title": "Исходящие документы на согласовании"
+    },
+    {
+      "id": "executingTasks",
+      "title": "Задачи на исполнении"
+    },
+    {
+      "id": "failedExecutingTasks",
+      "title": "Просроченные задачи на исполнении"
+    },
+    {
+      "id": "documentsStatistic",
+      "title": "Статистика по документам"
     }
   ]
 }

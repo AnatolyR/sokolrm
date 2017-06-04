@@ -75,6 +75,30 @@ public class TitleServiceImpl implements TitleService {
         actionTitles.put("reject", "Вернуть");
         actionTitles.put("send", "Отправлено");
         values.put("action", actionTitles);
+
+        Map<String, String> fieldsTitles = new HashMap<>();
+        fieldsTitles.put("title", "Заголовок");
+        fieldsTitles.put("status", "Статус");
+        fieldsTitles.put("documentKind", "Вид документа");
+        fieldsTitles.put("addressee", "Адресаты");
+        fieldsTitles.put("correspondent", "Корреспондент");
+        fieldsTitles.put("externalSigner", "Кем подписано");
+        fieldsTitles.put("externalExecutor", "Исполнитель");
+        fieldsTitles.put("externalNumber", "Исходящий номер");
+        fieldsTitles.put("externalDate", "Исходящая дата");
+        fieldsTitles.put("documentNumber", "Номер документа");
+        fieldsTitles.put("registrationDate", "Дата регистрации");
+        fieldsTitles.put("executionDate", "Дата исполнения");
+        fieldsTitles.put("pagesQuantity", "Количество листов");
+        fieldsTitles.put("itemQuantity", "Количество экземпляров");
+        fieldsTitles.put("appQuantity", "Количество приложений");
+        fieldsTitles.put("comment", "Комментарий");
+        fieldsTitles.put("space", "Пространство");
+        fieldsTitles.put("archivecase", "Дело");
+        fieldsTitles.put("signer", "Подписант");
+        fieldsTitles.put("executors", "Исполнители");
+        values.put("fieldsTitles", fieldsTitles);
+
     }
 
     @Override

@@ -22,6 +22,8 @@ $.widget("sokol.grid", {
     },
 
     _create: function () {
+        this.sortColumn = this.options.sortColumn;
+        this.sortAsc = this.options.sortAsc;
         this.createList();
     },
 
@@ -607,6 +609,8 @@ $.widget("sokol.grid", {
                     this.createEditorDictionary(row, column);
                 } else if (editor == "boolean") {
                     this.createEditorBoolean(row, column);
+                } else if (column.editor == "radio") {
+                    this.createEditorRadio(row, column);
                 } else if (editor == "date") {
                     this.createEditorDate(row, column);
                 } else {

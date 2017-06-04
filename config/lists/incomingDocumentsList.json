@@ -1,5 +1,5 @@
 {
-  "condition": "type = 'incomingDocument' AND status IS DISTINCT FROM 'Черновик'",
+  "condition": "type = 'incomingDocument' AND status IS DISTINCT FROM 'draft' AND status IS DISTINCT FROM 'template' AND status IS DISTINCT FROM 'archive'",
   "gridConfig": {
     "title": "Входящие документы",
     "columnsVisible": [

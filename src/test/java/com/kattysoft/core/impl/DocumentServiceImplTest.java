@@ -43,6 +43,7 @@ public class DocumentServiceImplTest {
         documentService = new DocumentServiceImpl();
         MockitoAnnotations.initMocks(this);
         ((DocumentServiceImpl) documentService).setConfigService(configService);
+        ((DocumentServiceImpl) documentService).setTitleService(new TitleServiceImpl());
 
         User user = new User();
         user.setId(UUID.randomUUID());

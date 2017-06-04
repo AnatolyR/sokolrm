@@ -1,5 +1,5 @@
 {
-  "condition": "t.userId = '${currentUser}'::uuid",
+  "condition": "t.userId = '${currentUser}'::uuid AND t.status IS DISTINCT FROM 'complete'",
   "join": "right join tasks t on d.id = t.documentId",
   "gridConfig": {
     "id": "tasks",
@@ -8,6 +8,7 @@
     "columnsVisible": [
       "t.type",
       "t.author",
+      "t.duedate",
       "d.documentNumber",
       "d.title",
       "t.status"
@@ -26,6 +27,11 @@
         "id": "t.author",
         "title": "Автор",
         "render": "user"
+      },
+      {
+        "id": "t.duedate",
+        "title": "Срок исполнения",
+        "render": "datetime"
       },
       {
         "id": "d.documentNumber",

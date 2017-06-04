@@ -38,4 +38,6 @@ public interface UserService {
     void deleteUser(String id);
 
     String resetPassword(String id);
+
+    String savePassword(String id, String password);
 }

@@ -27,6 +27,8 @@ public interface DocumentService {
 
     String saveDocument(Document document);
 
+    void saveProcessAction(String documentId, String actionResult);
+
     boolean deleteDocument(String documentId);
 
     ArrayNode getHistory(String documentId);

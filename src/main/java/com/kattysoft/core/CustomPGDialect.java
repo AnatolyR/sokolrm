@@ -9,6 +9,7 @@
  */
 package com.kattysoft.core;
 
+import com.kattysoft.core.repository.PostgreSQLFullTextSearchFunction;
 import org.hibernate.dialect.PostgreSQL9Dialect;
 
 /**
@@ -19,6 +20,7 @@ public class CustomPGDialect extends PostgreSQL9Dialect {
     public static final int JSON_TYPE = 3001;
     public CustomPGDialect() {
         super();
-        this.registerColumnType(JSON_TYPE, "jsonb");
+        registerColumnType(JSON_TYPE, "jsonb");
+        registerFunction("fts", new PostgreSQLFullTextSearchFunction());
     }
 }

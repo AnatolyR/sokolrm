@@ -1,9 +1,7 @@
 {
-  "condition": "status IS DISTINCT FROM 'draft' AND status IS DISTINCT FROM 'template' AND status IS DISTINCT FROM 'archive'",
+  "condition": "status = 'archive'",
   "gridConfig": {
     "title": "Документы",
-    "sortColumn": "created",
-    "sortAsc": false,
     "columnsVisible": [
       "id",
       "documentNumber",
@@ -25,10 +23,6 @@
         "id": "type",
         "title": "Тип",
         "render": "doctype"
-      },
-      {
-        "id": "documentKind",
-        "title": "Вид документа"
       },
       {
         "id": "status",
@@ -70,22 +64,6 @@
       {
         "id": "correspondentTitle",
         "title": "Корреспондент"
-      },
-      {
-        "id": "executionDate",
-        "title": "Дата исполнения"
-      },
-      {
-        "id": "signer",
-        "title": "Подписант"
-      },
-      {
-        "id": "space",
-        "title": "Пространство"
-      },
-      {
-        "id": "archivecase",
-        "title": "Дело"
       }
     ]
   }

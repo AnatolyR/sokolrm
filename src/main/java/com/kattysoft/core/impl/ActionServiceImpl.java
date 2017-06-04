@@ -15,6 +15,7 @@ import com.kattysoft.core.model.Document;
 import com.kattysoft.core.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -81,6 +82,7 @@ public class ActionServiceImpl implements ActionService {
         Document holder = new Document();
         holder.setId(documentId);
         holder.getFields().put("status", endState);
+        holder.getFields().put("registrationDate", new Date());
         if (documentNumber != null) {
             holder.getFields().put("documentNumber", documentNumber);
         }

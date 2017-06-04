@@ -56,7 +56,7 @@ public class UserController {
     private ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "/users")
-    public ObjectNode getUsers(Integer offset, Integer size, String conditions, String sort, String sortAsc) throws IOException {
+    public ObjectNode getUsers(Integer offset, Integer size, String conditions, String sort, String sortAsc, String searchtext) throws IOException {
         if (offset == null) {
             offset = 0;
         }
@@ -95,7 +95,18 @@ public class UserController {
         spec.setSize(size);
 
         if (clientCondition != null) {
-            spec.setCondition(clientCondition);
+            if (searchtext != null && !searchtext.isEmpty()) {
+                ContainerCondition and = new ContainerCondition(ContainerOperation.AND, new ValueCondition("title", Operation.FULLTEXTSEARCH, searchtext));
+                and.getConditions().add(clientCondition);
+                spec.setCondition(and);
+            } else {
+                spec.setCondition(clientCondition);
+            }
+        } else {
+            if (searchtext != null && !searchtext.isEmpty()) {
+                ContainerCondition and = new ContainerCondition(ContainerOperation.AND, new ValueCondition("title", Operation.FULLTEXTSEARCH, searchtext));
+                spec.setCondition(and);
+            }
         }
 
         Page<User> users = userService.getUsers(spec);
@@ -191,6 +202,32 @@ public class UserController {
         }
 
         String id = userService.saveUser(user);
+
+        return id;
+    }
+
+    @RequestMapping(value = "/saveProfile")
+    public String saveProfile(Reader reader) throws IOException {
+        String requestBody = IOUtils.toString(reader);
+        ObjectNode data = (ObjectNode) mapper.readTree(requestBody);
+
+        ObjectNode fields = (ObjectNode) data.get("fields");
+
+        String oldPassword = fields.get("oldPassword").asText();
+        String newPassword = fields.get("newPassword").asText();
+        String newPasswordConfirm = fields.get("newPasswordConfirm").asText();
+        if (!newPassword.equals(newPasswordConfirm)) {
+            throw new SokolException("Подтверждение пароля некорректное");
+        }
+
+        User currentUser = userService.getCurrentUser();
+        User userByLoginAndPassword = userService.getUserByLoginAndPassword(currentUser.getLogin(), oldPassword);
+        if (userByLoginAndPassword == null) {
+            throw new SokolException("Неверный старый пароль");
+        }
+
+        //todo check password for rules
+        String id = userService.savePassword(currentUser.getId().toString(), newPassword);
 
         return id;
     }

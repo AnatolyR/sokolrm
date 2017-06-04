@@ -89,7 +89,7 @@ public class ReportServiceImpl implements ReportService {
             String name = dateFormat.format(date) + ".pdf";
             attachService.addContent(reportObjectId, name, user, date, report);
         } catch (Exception e) {
-            throw new SokolException("Can not create report");
+            throw new SokolException("Can not create report", e);
         } finally {
             try {
                 reportStream.close();

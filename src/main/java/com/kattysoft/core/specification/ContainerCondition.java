@@ -10,6 +10,7 @@
 package com.kattysoft.core.specification;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,7 +25,8 @@ public class ContainerCondition extends Condition {
     }
 
     public ContainerCondition(ContainerOperation operation, Condition... condition) {
-
+        this.operation = operation;
+        this.conditions = new ArrayList<>(Arrays.asList(condition));
     }
 
     public List<Condition> getConditions() {

@@ -127,6 +127,8 @@ public class SpecificationUtil {
                 } else {
                     predicate = criteriaBuilder.isMember((String) valueCondition.getValue(), path);
                 }
+            } else if (valueCondition.getOperation() == Operation.FULLTEXTSEARCH && valueCondition.getValue() instanceof String) {
+                predicate = criteriaBuilder.isTrue(criteriaBuilder.function("fts", Boolean.class, path, criteriaBuilder.literal(valueCondition.getValue())));
             } else if (valueCondition.getOperation() == Operation.LIKE && valueCondition.getValue() instanceof String) {
                 predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue() + "%");
             } else if (valueCondition.getOperation() == Operation.STARTS && valueCondition.getValue() instanceof String) {

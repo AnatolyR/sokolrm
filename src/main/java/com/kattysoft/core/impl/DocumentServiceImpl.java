@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -45,6 +46,9 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Autowired
     private TitleService titleService;
+
+    @Autowired
+    private AccessRightService accessRightService;
 
     @Autowired
     private DocumentLinkRepository documentLinkRepository;
@@ -74,6 +78,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public String saveDocument(Document document) {
+        String author = document.getFields().containsKey("author") ? document.getFields().get("author").toString() : null;
+        boolean systemAuthor = false;
+        if ("system".equals(author)) {
+            systemAuthor = true;
+            document.getFields().remove("author");
+        }
+
         //todo проверка прав на поля
         Document existDocument = documentDao.getDocument(document.getId(), new ArrayList<String>(document.getFields().keySet()));
         if (document.getId() != null && existDocument == null) {
@@ -95,16 +106,13 @@ public class DocumentServiceImpl implements DocumentService {
             existDocument = new Document();
             existDocument.setId(id);
         }
-        saveHistory(existDocument, document);
+        saveHistory(existDocument, document, systemAuthor);
 
         return id;
     }
 
-    private void saveHistory(Document existDocument, Document document) {
-        if (existDocument == null) {
-            return;
-        }
-        String documentId = document.getId();
+    @Override
+    public void saveProcessAction(String documentId, String actionResult) {
         String historyJson = documentDao.getHistory(documentId);
         ArrayNode history;
         if (historyJson == null) {
@@ -125,16 +133,57 @@ public class DocumentServiceImpl implements DocumentService {
         item.put("userTitle", user.getTitle());
 
         ArrayNode fieldDiffs = mapper.createArrayNode();
+        item.set("fields", fieldDiffs);
+
+        item.put("type", actionResult);
+
+        history.add(item);
+
+        documentDao.saveHistory(documentId, history.toString());
+    }
+
+    private void saveHistory(Document existDocument, Document document, boolean systemAuthor) {
+        String documentId = document.getId();
+        String historyJson = documentDao.getHistory(documentId);
+        ArrayNode history;
+        if (historyJson == null) {
+            history = mapper.createArrayNode();
+        } else {
+            try {
+                history = (ArrayNode) mapper.readTree(historyJson);
+            } catch (IOException e) {
+                throw new SokolException("Can not read document '" + documentId + "' history", e);
+            }
+        }
+
+        ObjectNode item = mapper.createObjectNode();
+
+        Date date = new Date();
+        String dateStr = dateFormatSs.format(new Date());
+        if (StreamSupport.stream(history.spliterator(), false).filter(n -> n.get("date").asText().equals(dateStr)).findAny().isPresent()) {
+            item.put("date", dateFormatSs.format(new Date(date.getTime() + 1000)));
+        } else {
+            item.put("date", dateStr);
+        }
+
+        User user = userService.getCurrentUser();
+        item.put("user", systemAuthor ? "c8f30782-2daf-48d3-a4a5-f5aeeb31efb0" : user.getId().toString());
+        item.put("userTitle", systemAuthor ? "Система" : user.getTitle());
+
+        ArrayNode fieldDiffs = mapper.createArrayNode();
         document.getFields().entrySet().stream().forEach(e -> {
             String fieldName = e.getKey();
             Object newValue = e.getValue() != null ? e.getValue() : "";
-            Object oldValue = existDocument.getFields().get(fieldName);
+            Object oldValue = existDocument != null ? existDocument.getFields().get(fieldName) : null;
             if (oldValue == null) {
                 oldValue = "";
             }
             if (!newValue.equals(oldValue)) {
                 ObjectNode fieldDiff = mapper.createObjectNode();
-                fieldDiff.put("field", fieldName);
+
+                String fieldTitle = titleService.getTitleNotNull("fieldsTitles", fieldName);
+                fieldDiff.put("field", fieldTitle + " (" + fieldName + ")");
+
                 fieldDiff.put("oldValue", oldValue.toString());
                 fieldDiff.put("newValue", newValue.toString());
                 fieldDiffs.add(fieldDiff);
@@ -142,7 +191,9 @@ public class DocumentServiceImpl implements DocumentService {
         });
         item.set("fields", fieldDiffs);
 
-        if (document.getFields().get("status") != null) {
+        if (document.getFields() == null) {
+            item.put("type", "Создание");
+        } else if (document.getFields().get("status") != null) {
             String status = document.getFields().get("status").toString();
             if ("draft".equals(status)) {
                 item.put("type", "Создание");
@@ -150,8 +201,6 @@ public class DocumentServiceImpl implements DocumentService {
                 String statusTitle = titleService.getTitle("status", status);
                 item.put("type", statusTitle);
             }
-        } else if (document.getFields() == null) {
-            item.put("type", "Создание");
         } else {
             item.put("type", "Редактирование");
         }
@@ -214,6 +263,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public boolean deleteDocument(String documentId) {
+        Document existDocument = documentDao.getDocument(documentId, null);
+        if (documentId != null && existDocument == null) {
+            throw new SokolException("Document not found");
+        }
+        if (!accessRightService.checkDocumentRights(existDocument, "", AccessRightLevel.DELETE)) {
+            throw new NoAccessRightsException("No access rights for delete document");
+        }
         boolean result = documentDao.deleteDocument(documentId);
         return result;
     }
@@ -291,5 +347,9 @@ public class DocumentServiceImpl implements DocumentService {
 
     public void setDocumentLinkRepository(DocumentLinkRepository documentLinkRepository) {
         this.documentLinkRepository = documentLinkRepository;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

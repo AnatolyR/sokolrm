@@ -32,11 +32,13 @@ $.widget('sokol.formButtons', {
             this.addTemplatesButton(buttons);
         }
 
-        var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
-        deleteButton.click($.proxy(function() {
-            this.options.dispatcher.deleteDocument();
-        }, this));
-        deleteButton.appendTo(buttons);
+        if (this.options.deleteAction) {
+            var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
+            deleteButton.click($.proxy(function () {
+                this.options.dispatcher.deleteDocument();
+            }, this));
+            deleteButton.appendTo(buttons);
+        }
 
         var actions = this.options.actions;
 
@@ -44,8 +46,8 @@ $.widget('sokol.formButtons', {
             var actionButton = $('<button data-type="action" type="button" name="' + a.id + '" style="display: none;" class="btn btn-default controlElementLeftMargin">' + a.title + '</button>');
             actionButton.click($.proxy(function() {
                 if (a.form) {
-                    if (a.form == 'resolution') {
-                        this.options.dispatcher.execution('resolution');
+                    if (a.form == 'execution') {
+                        this.options.dispatcher.execution('execution');
                     } else if (a.form == 'approval') {
                         this.options.dispatcher.execution('approval');
                     }

@@ -66,6 +66,7 @@ $.widget('sokol.container', {
                 dispatcher: this,
                 containerType: this.options.containerType,
                 actions: this.options.form.actions,
+                deleteAction: this.options.form.deleteAction,
                 id: this.options.id
             }, $('<div></div>').prependTo(this.element));
         }

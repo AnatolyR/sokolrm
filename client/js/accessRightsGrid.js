@@ -232,7 +232,7 @@ $.widget('sokol.accessRightsGrid', {
 
         arSelector.selectpicker({
             noneSelectedText: '',
-            width: '120px'
+            width: '100px'
         });
 
         var addButton = $('<div class="btn-group " style=""><button type="button" class="form-control btn btn-success controlElementLeftMargin" >' +

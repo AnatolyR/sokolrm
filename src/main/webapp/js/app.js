@@ -232,7 +232,7 @@ $.widget('sokol.accessRightsGrid', {
 
         arSelector.selectpicker({
             noneSelectedText: '',
-            width: '120px'
+            width: '100px'
         });
 
         var addButton = $('<div class="btn-group " style=""><button type="button" class="form-control btn btn-success controlElementLeftMargin" >' +
@@ -601,6 +601,9 @@ $.widget('sokol.app', {
         } else if (id.startsWith('admin')) {
             this.container = $.sokol.admin({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
 
+        } else if (id.startsWith('profile')) {
+            this.container = $.sokol.profile({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
+
         } else {
             this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить объект "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
         }
@@ -952,6 +955,7 @@ $.widget('sokol.container', {
                 dispatcher: this,
                 containerType: this.options.containerType,
                 actions: this.options.form.actions,
+                deleteAction: this.options.form.deleteAction,
                 id: this.options.id
             }, $('<div></div>').prependTo(this.element));
         }
@@ -1519,7 +1523,7 @@ $.widget('sokol.executionForm', {
                         "id": "comment",
                         "title": this.options.type == 'resolution' ? 'Резолюция' : 'Комментарий',
                         "type": "text",
-                        "mandatory": true
+                        "mandatory": false
                     }
                 ]
             },
@@ -2263,6 +2267,8 @@ $.widget('sokol.form', {
         button.click($.proxy(function() {
             if (this[field.method]) {
                 this[field.method]();
+            } else if (this.options.dispatcher[field.method]) {
+                this.options.dispatcher[field.method]();
             }
         }, this));
         button.appendTo(formNode);
@@ -2275,6 +2281,15 @@ $.widget('sokol.form', {
                 body: data
             });
         });
+    },
+
+    createFieldPassword: function(formNode, field, value, edit) {
+        $(formNode).append('' +
+            '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
+            '<label class="control-label">' + field.title + ':</label>' +
+            (edit ? ('<input name="' + field.id + '" class="form-control" type="password" value="' + value + '">') :
+                ('<div>' + value + '</div>')) +
+            '</div>');
     },
 
     createFieldString: function(formNode, field, value, edit) {
@@ -2645,6 +2660,8 @@ $.widget('sokol.form', {
             this.createFieldString(formNode, field, value, edit);
         } else if (type == "text") {
             this.createFieldText(formNode, field, value, edit);
+        } else if (type == "password") {
+            this.createFieldPassword(formNode, field, value, edit);
         } else if (type == "button") {
             this.createButton(formNode, field, value, edit);
         } else if (type == "date") {
@@ -2804,11 +2821,13 @@ $.widget('sokol.formButtons', {
             this.addTemplatesButton(buttons);
         }
 
-        var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
-        deleteButton.click($.proxy(function() {
-            this.options.dispatcher.deleteDocument();
-        }, this));
-        deleteButton.appendTo(buttons);
+        if (this.options.deleteAction) {
+            var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
+            deleteButton.click($.proxy(function () {
+                this.options.dispatcher.deleteDocument();
+            }, this));
+            deleteButton.appendTo(buttons);
+        }
 
         var actions = this.options.actions;
 
@@ -2816,8 +2835,8 @@ $.widget('sokol.formButtons', {
             var actionButton = $('<button data-type="action" type="button" name="' + a.id + '" style="display: none;" class="btn btn-default controlElementLeftMargin">' + a.title + '</button>');
             actionButton.click($.proxy(function() {
                 if (a.form) {
-                    if (a.form == 'resolution') {
-                        this.options.dispatcher.execution('resolution');
+                    if (a.form == 'execution') {
+                        this.options.dispatcher.execution('execution');
                     } else if (a.form == 'approval') {
                         this.options.dispatcher.execution('approval');
                     }
@@ -2943,6 +2962,8 @@ $.widget("sokol.grid", {
     },
 
     _create: function () {
+        this.sortColumn = this.options.sortColumn;
+        this.sortAsc = this.options.sortAsc;
         this.createList();
     },
 
@@ -3528,6 +3549,8 @@ $.widget("sokol.grid", {
                     this.createEditorDictionary(row, column);
                 } else if (editor == "boolean") {
                     this.createEditorBoolean(row, column);
+                } else if (column.editor == "radio") {
+                    this.createEditorRadio(row, column);
                 } else if (editor == "date") {
                     this.createEditorDate(row, column);
                 } else {
@@ -4066,7 +4089,9 @@ $.widget('sokol.list', {
                     url: data.url ? data.url : 'app/documents',
                     id: id,
                     filterable: true,
-                    sortable: true
+                    sortable: true,
+                    sortColumn: data.sortColumn,
+                    sortAsc: data.sortAsc
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
                 if (this.options.dispatcher) {
@@ -4118,6 +4143,94 @@ $.widget('sokol.smodal', {
         modal.modal();
     }
 });
+$.widget('sokol.profile', {
+    options: {
+
+    },
+    _create: function () {
+        this.createHeader();
+        this.createBlock();
+    },
+    _destroy: function() {
+        this.element.detach();
+    },
+
+    createHeader: function() {
+        this.element.addClass('panel panel-default');
+        this.element.attr('name', 'attachmentsPanel');
+
+        var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
+
+        var panelTitle = $('<div class="panel-title">Профиль пользователя</div>').appendTo(panelHeader);
+
+        var panelBody = $('<div class="panel-body"></div>');
+        panelBody.appendTo(this.element);
+        this.panelBody = panelBody;
+    },
+
+    createBlock: function () {
+        if (this.form) {
+            this.form.destroy();
+        }
+        this.form = $.sokol.form({
+            mode: "edit",
+            data: this.options.data ? this.options.data : {},
+            form: {
+                "id": "userSystem",
+                "fields": [
+                    {
+                        "id": "oldPassword",
+                        "title": "Старый пароль",
+                        "type": "password",
+                        "mandatory": true
+                    },
+                    {
+                        "id": "newPassword",
+                        "title": "Новый пароль",
+                        "type": "password",
+                        "mandatory": true
+                    },
+                    {
+                        "id": "newPasswordConfirm",
+                        "title": "Новый пароль подтверждение",
+                        "type": "password",
+                        "mandatory": true
+                    },
+                    {
+                        "id": "newPasswordButton",
+                        "title": "Сохранить",
+                        "type": "button",
+                        "method": "saveProfile",
+                        "class": "btn-danger"
+                    }
+                ]
+            },
+            usePanel: false,
+            dispatcher: this,
+            containerType: 'profile'
+        }, $('<div></div>').appendTo(this.panelBody));
+
+        //this.createButtons();
+    },
+
+    saveProfile: function() {
+        if (!this.form.validateForm()) {
+            return;
+        }
+
+        var data = this.form.getData();
+        var saveUrl = 'app/saveProfile';
+        var message = 'Не удалось сохранить профиль пользователя.';
+
+        $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
+            $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
+            this.options.dispatcher.open('profile');
+        }, this)).fail($.proxy(function() {
+            $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
+        }, this));
+    }
+});
+
 $.widget('sokol.reports', {
     options: {
         mode: 'normal'

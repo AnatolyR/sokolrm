@@ -50,6 +50,8 @@ $.widget('sokol.form', {
         button.click($.proxy(function() {
             if (this[field.method]) {
                 this[field.method]();
+            } else if (this.options.dispatcher[field.method]) {
+                this.options.dispatcher[field.method]();
             }
         }, this));
         button.appendTo(formNode);
@@ -62,6 +64,15 @@ $.widget('sokol.form', {
                 body: data
             });
         });
+    },
+
+    createFieldPassword: function(formNode, field, value, edit) {
+        $(formNode).append('' +
+            '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
+            '<label class="control-label">' + field.title + ':</label>' +
+            (edit ? ('<input name="' + field.id + '" class="form-control" type="password" value="' + value + '">') :
+                ('<div>' + value + '</div>')) +
+            '</div>');
     },
 
     createFieldString: function(formNode, field, value, edit) {
@@ -432,6 +443,8 @@ $.widget('sokol.form', {
             this.createFieldString(formNode, field, value, edit);
         } else if (type == "text") {
             this.createFieldText(formNode, field, value, edit);
+        } else if (type == "password") {
+            this.createFieldPassword(formNode, field, value, edit);
         } else if (type == "button") {
             this.createButton(formNode, field, value, edit);
         } else if (type == "date") {

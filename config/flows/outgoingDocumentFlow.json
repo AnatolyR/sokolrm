@@ -19,6 +19,11 @@
           "id": "toapproval",
           "title": "На согласование",
           "form": "approval"
+        },
+        {
+          "id": "tosign",
+          "title": "На подписание",
+          "state": "sign"
         }
       ]
     },

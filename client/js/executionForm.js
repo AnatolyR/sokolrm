@@ -83,7 +83,7 @@ $.widget('sokol.executionForm', {
                         "id": "comment",
                         "title": this.options.type == 'resolution' ? 'Резолюция' : 'Комментарий',
                         "type": "text",
-                        "mandatory": true
+                        "mandatory": false
                     }
                 ]
             },

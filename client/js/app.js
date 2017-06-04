@@ -112,6 +112,9 @@ $.widget('sokol.app', {
         } else if (id.startsWith('admin')) {
             this.container = $.sokol.admin({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
 
+        } else if (id.startsWith('profile')) {
+            this.container = $.sokol.profile({id: id, dispatcher: this}, $("<div></div>").appendTo("body"));
+
         } else {
             this.error = $('<div class="alert alert-danger" role="alert">Не удалось загрузить объект "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
         }
