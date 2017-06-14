@@ -18,7 +18,8 @@ $.widget("sokol.grid", {
         addMethod: null,
         usePanel: true,
         bottomPagination: true,
-        showTableHeader: true
+        showTableHeader: true,
+        additionalButtonClass: null
     },
 
     _create: function () {
@@ -63,7 +64,7 @@ $.widget("sokol.grid", {
         if (this.topBar) {
             topBar = this.topBar.empty();
         } else {
-            var topBar = $('<div style="margin-bottom: 10px;"></div>');
+            var topBar = $('<div name="tableButtons" style="margin-bottom: 10px;"></div>');
             topBar.appendTo(this.element);
 
             if (!this.options.usePanel) {
@@ -540,6 +541,9 @@ $.widget("sokol.grid", {
             addButton.appendTo(buttonBar);
         } else {
             var addButton = $('<button type="button" name="add" style="" class="btn btn-success controlElementLeftMargin">Добавить</button>');
+            if (this.options.additionalButtonClass) {
+                addButton.addClass(this.options.additionalButtonClass);
+            }
             addButton.click($.proxy(function() {
                 this.renderAddNewRow();
             }, this));

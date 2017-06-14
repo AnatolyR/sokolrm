@@ -32,7 +32,7 @@ $.widget('sokol.list', {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
                     }
                     var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
-                    category.find("a").click(produceHandler(item));
+                    category.find("a").addClass("listMenuItemLink").click(produceHandler(item));
                 }
             }, this));
             if (this.options.id) {

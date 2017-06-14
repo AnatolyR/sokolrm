@@ -1592,6 +1592,7 @@ $.widget('sokol.executionForm', {
                 ],
                 'id': 'tasks',
                 'filterable': false,
+                additionalButtonClass: 'executionFormButtons',
                 'deleteMethod': $.proxy(this.doDelete, this)
         };
 
@@ -1703,6 +1704,7 @@ $.widget('sokol.executionForm', {
         buttons.empty();
 
         var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
+        saveButton.addClass('executionFormButtons');
         saveButton.click($.proxy(function() {
             this.saveExecution();
         }, this));
@@ -2019,6 +2021,7 @@ $.widget('sokol.executionReportForm', {
         buttons.empty();
 
         var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">' + saveTitle + '</button>');
+        saveButton.addClass('executionReportButton');
         saveButton.click($.proxy(function() {
             this.saveReportForm();
         }, this));
@@ -2832,7 +2835,7 @@ $.widget('sokol.formButtons', {
         var actions = this.options.actions;
 
         $.each(actions, $.proxy(function(i, a) {
-            var actionButton = $('<button data-type="action" type="button" name="' + a.id + '" style="display: none;" class="btn btn-default controlElementLeftMargin">' + a.title + '</button>');
+            var actionButton = $('<button data-type="action" type="button" name="' + a.id + '" style="display: none;" class="btn btn-default controlElementLeftMargin documentActionButton">' + a.title + '</button>');
             actionButton.click($.proxy(function() {
                 if (a.form) {
                     if (a.form == 'execution') {
@@ -2958,7 +2961,8 @@ $.widget("sokol.grid", {
         addMethod: null,
         usePanel: true,
         bottomPagination: true,
-        showTableHeader: true
+        showTableHeader: true,
+        additionalButtonClass: null
     },
 
     _create: function () {
@@ -3003,7 +3007,7 @@ $.widget("sokol.grid", {
         if (this.topBar) {
             topBar = this.topBar.empty();
         } else {
-            var topBar = $('<div style="margin-bottom: 10px;"></div>');
+            var topBar = $('<div name="tableButtons" style="margin-bottom: 10px;"></div>');
             topBar.appendTo(this.element);
 
             if (!this.options.usePanel) {
@@ -3480,6 +3484,9 @@ $.widget("sokol.grid", {
             addButton.appendTo(buttonBar);
         } else {
             var addButton = $('<button type="button" name="add" style="" class="btn btn-success controlElementLeftMargin">Добавить</button>');
+            if (this.options.additionalButtonClass) {
+                addButton.addClass(this.options.additionalButtonClass);
+            }
             addButton.click($.proxy(function() {
                 this.renderAddNewRow();
             }, this));
@@ -3777,8 +3784,10 @@ $.widget('sokol.header', {
         for (var i = 0; i < menu.length; i++) {
             var item = menu[i];
             var title = item.title;
+            var additionalClass = '';
             if (title == "$userName") {
                 title = this.options.userName;
+                additionalClass = 'class="headerUserMenu"';
             }
 
             var produceHandler = $.proxy(function produceHandler(id) {
@@ -3808,7 +3817,7 @@ $.widget('sokol.header', {
                 }
 
                 node.append($('<li></li>').addClass('dropdown')
-                    .append($('<a href="#">' + title + ' <span class="caret"></a>').addClass('dropdown-toggle').attr('data-toggle', 'dropdown'))
+                    .append($('<a href="#" ' + additionalClass + '>' + title + ' <span class="caret"></a>').addClass('dropdown-toggle').attr('data-toggle', 'dropdown'))
                     .append(submenu));
             } else {
                 node.append($('<li><a href="' + item.link + '">' + title + '</a></li>'));
@@ -4057,7 +4066,7 @@ $.widget('sokol.list', {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
                     }
                     var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
-                    category.find("a").click(produceHandler(item));
+                    category.find("a").addClass("listMenuItemLink").click(produceHandler(item));
                 }
             }, this));
             if (this.options.id) {

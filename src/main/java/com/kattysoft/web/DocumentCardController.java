@@ -162,10 +162,18 @@ public class DocumentCardController {
             }
             com.fasterxml.jackson.databind.node.ArrayNode actions = (com.fasterxml.jackson.databind.node.ArrayNode) state.get("actions");
             com.fasterxml.jackson.databind.node.ArrayNode filteredActions = mapper2.createArrayNode();
+            User currentUser = userService.getCurrentUser();
             actions.forEach(a -> {
                 String actionId = a.get("id").textValue();
                 if (accessRightService.checkDocumentRights(document, "*" + actionId, AccessRightLevel.ALLOW)) {
-                    filteredActions.add(a);
+                    if ("doresolution".equals(actionId)) {
+                        List<String> addressee = (List<String>) document.getFields().get("addressee");
+                        if (addressee.contains(currentUser.getId().toString())) {
+                            filteredActions.add(a);
+                        }
+                    } else {
+                        filteredActions.add(a);
+                    }
                 }
             });
             ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).set("actions", filteredActions);

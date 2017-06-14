@@ -41,13 +41,36 @@ public class TestService {
     private Robot robot;
     private RemoteWebDriver driver;
 
-    public static final String screenPath = "/Users/anatolii/Documents/sokolsed/tests/";
+//    public static String screenPath = "/Users/anatolii/Documents/sokolsed/tests/";
+    public static String screenPath = "/Users/anatolii/Desktop/tests";
 
     public static TestService getInstance() throws InterruptedException, AWTException, MalformedURLException {
         if (instance == null) {
             instance = new TestService();
             instance.create();
-            instance.login("test", "123");
+            instance.login("ivashov", "123");
+            Thread.sleep(3000);
+        } else {
+            instance.open();
+        }
+        return instance;
+    }
+
+    public static TestService getInstanceWithoutLogin() throws InterruptedException, AWTException, MalformedURLException {
+        if (instance == null) {
+            instance = new TestService();
+            instance.create();
+        } else {
+            instance.open();
+        }
+        return instance;
+    }
+
+    public static TestService getInstance(String user, String pass) throws InterruptedException, AWTException, MalformedURLException {
+        if (instance == null) {
+            instance = new TestService();
+            instance.create();
+            instance.login(user, pass);
             Thread.sleep(3000);
         } else {
             instance.open();
@@ -239,7 +262,7 @@ public class TestService {
         robot.keyRelease(KeyEvent.VK_META);
     }
 
-    private void screen() throws InterruptedException, IOException {
+    public void screen() throws InterruptedException, IOException {
         Thread.sleep(2000);
 
         WebDriver.Window window = driver.manage().window();

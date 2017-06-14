@@ -1,0 +1,59 @@
+[
+  {
+    "action": "logout"
+  },
+  {
+    "action": "login",
+    "user": "ivashov",
+    "pass": "123"
+  },
+  {
+    "action": "newDocument",
+    "type": "Входящий",
+    "data": [
+      {
+        "name": "title",
+        "type": "string",
+        "value": "Входящий ${date3}"
+      },
+      {
+        "name": "addressee",
+        "type": "select",
+        "value": "Ивашов В. Н."
+      },
+      {
+        "name": "correspondent",
+        "type": "select",
+        "value": "ПРОФИНТЕР"
+      },
+      {
+        "name": "space",
+        "type": "select",
+        "value": "Входящие"
+      }
+    ],
+    "mainAttributes": "mainAttributes1",
+    "header": "header1"
+  },
+  {
+    "action": "doAction",
+    "name": "Зарегистрировать",
+    "mainAttributes": "mainAttributesRegistered",
+    "header": "headerRegistered",
+    "objects": [
+      {
+        "name": "documentNumber",
+        "type": "documentNumber",
+        "param": "Входящие документы"
+      }
+    ]
+  },
+  {
+    "action": "doAction",
+    "name": "На рассмотрение",
+    "header": "header.review"
+  },
+  {
+    "action": "close"
+  }
+]

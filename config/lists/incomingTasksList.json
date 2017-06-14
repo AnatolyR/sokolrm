@@ -5,6 +5,8 @@
     "id": "tasks",
     "url": "app/documents",
     "title": "Входящие задачи",
+    "sortColumn": "t.created",
+    "sortAsc": false,
     "columnsVisible": [
       "t.type",
       "t.author",
@@ -50,6 +52,16 @@
         "id": "t.status",
         "title": "Статус",
         "render": "executionStatus"
+      },
+      {
+        "id": "t.duedate",
+        "title": "Срок исполнения",
+        "render": "datetime"
+      },
+      {
+        "id": "t.created",
+        "title": "Дата создания задачи",
+        "render": "datetime"
       }
     ]
   }

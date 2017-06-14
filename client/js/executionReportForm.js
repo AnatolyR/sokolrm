@@ -251,6 +251,7 @@ $.widget('sokol.executionReportForm', {
         buttons.empty();
 
         var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">' + saveTitle + '</button>');
+        saveButton.addClass('executionReportButton');
         saveButton.click($.proxy(function() {
             this.saveReportForm();
         }, this));

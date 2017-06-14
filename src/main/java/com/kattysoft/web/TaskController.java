@@ -75,6 +75,10 @@ public class TaskController {
         if (documentId == null || documentId.isEmpty()) {
             throw new SokolException("Empty documentId");
         }
+
+        UUID taskId = data.has("taskId") && !data.get("taskId").asText().isEmpty() && !data.get("taskId").isNull() ? UUID.fromString(data.get("taskId").asText()) : null;
+        User currentUser = userService.getCurrentUser();
+
         Document document = documentService.getDocument(documentId);
         if (!accessRightService.checkDocumentRights(document, "", AccessRightLevel.READ)) {
             throw new NoAccessRightsException("Not access rights to read document");
@@ -82,6 +86,13 @@ public class TaskController {
         if ("execution".equals(type)) {
             if (!accessRightService.checkDocumentRights(document, "*doresolution", AccessRightLevel.ALLOW)) {
                 throw new NoAccessRightsException("Not access rights to start execution document");
+            }
+            if (taskId == null) {
+                //Если это не внутреннее исполнение, то исполнение доступно только для пользователя из адресатов
+                List<String> addressee = (List<String>) document.getFields().get("addressee");
+                if (!addressee.contains(currentUser.getId().toString())) {
+                    throw new NoAccessRightsException("Current user not in document addressee");
+                }
             }
         } else if ("approval".equals(type)) {
             if (!accessRightService.checkDocumentRights(document, "*toapproval", AccessRightLevel.ALLOW)) {
@@ -98,10 +109,9 @@ public class TaskController {
         TasksList tasksList = new TasksList();
         tasksList.setId(uuid);
 
-        UUID taskId = data.has("taskId") && !data.get("taskId").asText().isEmpty() && !data.get("taskId").isNull() ? UUID.fromString(data.get("taskId").asText()) : null;
         if (taskId != null) {
             Task task = taskService.getTaskById(taskId);
-            User currentUser = userService.getCurrentUser();
+
             if (!task.getUserId().equals(currentUser.getId())) {
                 throw new NoAccessRightsException("Current user not executor of this task");
             }

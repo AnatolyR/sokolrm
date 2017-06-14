@@ -76,6 +76,9 @@ public class LoginFilter implements Filter {
         } else if (ses.getAttribute("user") != null) {
             User user = (User) ses.getAttribute("user");
             userService.setCurrentUser(user);
+            if (path.startsWith("/app/")) {
+                log.info("[WEB][{}] {} {}", user.getLogin(), path.substring(5));
+            }
             chain.doFilter(request, response);
             userService.setCurrentUser(null);
         } else if (path.startsWith("/js/") || path.startsWith("/css/")) {

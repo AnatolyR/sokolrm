@@ -35,8 +35,10 @@ $.widget('sokol.header', {
         for (var i = 0; i < menu.length; i++) {
             var item = menu[i];
             var title = item.title;
+            var additionalClass = '';
             if (title == "$userName") {
                 title = this.options.userName;
+                additionalClass = 'class="headerUserMenu"';
             }
 
             var produceHandler = $.proxy(function produceHandler(id) {
@@ -66,7 +68,7 @@ $.widget('sokol.header', {
                 }
 
                 node.append($('<li></li>').addClass('dropdown')
-                    .append($('<a href="#">' + title + ' <span class="caret"></a>').addClass('dropdown-toggle').attr('data-toggle', 'dropdown'))
+                    .append($('<a href="#" ' + additionalClass + '>' + title + ' <span class="caret"></a>').addClass('dropdown-toggle').attr('data-toggle', 'dropdown'))
                     .append(submenu));
             } else {
                 node.append($('<li><a href="' + item.link + '">' + title + '</a></li>'));

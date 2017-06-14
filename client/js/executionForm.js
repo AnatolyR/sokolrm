@@ -152,6 +152,7 @@ $.widget('sokol.executionForm', {
                 ],
                 'id': 'tasks',
                 'filterable': false,
+                additionalButtonClass: 'executionFormButtons',
                 'deleteMethod': $.proxy(this.doDelete, this)
         };
 
@@ -263,6 +264,7 @@ $.widget('sokol.executionForm', {
         buttons.empty();
 
         var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
+        saveButton.addClass('executionFormButtons');
         saveButton.click($.proxy(function() {
             this.saveExecution();
         }, this));

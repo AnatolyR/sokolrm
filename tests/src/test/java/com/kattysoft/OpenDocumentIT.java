@@ -33,56 +33,67 @@ public class OpenDocumentIT {
     public Object[][] createData1() {
         return new Object[][]{
             {
-                "Исходящий 1",
-                "Исходящий № ИСХ-100500 от 22.03.2017 (Указ)\n" +
-                    "Исходящий 1\n" +
-                    "Статус: Согласование",
+                "Отчет о закупках",
+                "Входящий № ВХ-166 от 31.05.2017 (Отчет)\n" +
+                    "Отчет о закупках\n" +
+                    "Статус: Рассмотрение",
                 "Основные реквизиты\n" +
                     "Заголовок:\n" +
-                    "Исходящий 1\n" +
+                    "Отчет о закупках\n" +
                     "Вид документа:\n" +
-                    "Указ\n" +
-                    " Корреспондент:\n" +
-                    "ИСКУССТВО СТИЛЯ, имидж-агентство\n" +
-                    " Подписант:\n" +
-                    "Поляков И. В.\n" +
-                    "Исполнители:\n" +
-                    "Луков Б. П., Захаров Н. В.\n" +
-                    "Номер документа:\n" +
-                    "ИСХ-100500\n" +
-                    "Дата регистрации:\n" +
-                    "22.03.2017 17:25\n" +
-                    "Дата согласования:\n" +
-                    "23.03.2017 17:25\n" +
-                    "Количество листов:\n" +
-                    "1\n" +
-                    "Количество экземпляров:\n" +
-                    "2\n" +
-                    "Количество приложений:\n" +
-                    "3\n" +
-                    "Комментарий:\n" +
-                    "Olololo THIS IS COMMMENT!!!!!\n" +
-                    "Пространство:\n" +
-                    "Дело:",
-                "Согласование\n" +
-                    "Автор:\n" +
+                    "Отчет\n" +
+                    "Адресаты:\n" +
                     "Ивашов В. Н.\n" +
-                    "Дата:\n" +
-                    "07.03.2017 11:23\n" +
+                    " Корреспондент:\n" +
+                    "АЛАТОО ИТЦ, электромонтажные работы\n" +
+                    "Кем подписано:\n" +
+                    "Исполнитель:\n" +
+                    "Исходящий номер:\n" +
+                    "Исходящая дата:\n" +
+                    " Номер документа:\n" +
+                    "ВХ-166\n" +
+                    "Дата регистрации:\n" +
+                    "31.05.2017 15:04\n" +
+                    "Дата исполнения:\n" +
+                    "Количество листов:\n" +
+                    "Количество экземпляров:\n" +
+                    "Количество приложений:\n" +
                     "Комментарий:\n" +
-                    "111\n" +
-                    "Найдено: 4\n" +
-                    "Колонки\n" +
-                    "Согласующие\n" +
-                    "Согласующий Срок Завершено Статус\n" +
-                    "Ивашов В. Н. 15.03.2017 00:00\n" +
-                    "Волков Б. П. 08.03.2017 00:00 07.03.2017 15:08 Согласовано\n" +
-                    "Былинкин Б. Н. 18.03.2017 00:00\n" +
-                    "Агапов Г. В. 17.03.2017 00:00\n" +
-                    "Редактировать",
+                    "Пространство:\n" +
+                    "Входящие\n" +
+                    "Дело:",
+                null,
                 "Вложения\n" +
                     "Название Размер Дата добавления Кто добавил\n" +
-                    "71aQHzbTKlL.jpg 128 KB\n" +
+                    "Добавить вложение"
+            },
+            {
+                "Договор о сотрудничестве",
+                "Исходящий № - от -\n" +
+                    "Договор о сотрудничестве\n" +
+                    "Статус: Согласовано",
+                "Основные реквизиты\n" +
+                    "Заголовок:\n" +
+                    "Договор о сотрудничестве\n" +
+                    "Вид документа:\n" +
+                    " Корреспондент:\n" +
+                    "ПРОФИНТЕР ООО, реклама\n" +
+                    " Подписант:\n" +
+                    "Ивашов В. Н.\n" +
+                    "Исполнители:\n" +
+                    "Номер документа:\n" +
+                    "Дата регистрации:\n" +
+                    "Дата согласования:\n" +
+                    "Количество листов:\n" +
+                    "Количество экземпляров:\n" +
+                    "Количество приложений:\n" +
+                    "Комментарий:\n" +
+                    "Пространство:\n" +
+                    "Исходящие\n" +
+                    "Дело:",
+                null,
+                "Вложения\n" +
+                    "Название Размер Дата добавления Кто добавил\n" +
                     "Добавить вложение"
             }
         };
@@ -117,21 +128,27 @@ public class OpenDocumentIT {
 
         WebElement header = ts.elementByXpath("//*[contains(@class, 'sokolHeaderPanel')]");
         System.out.println("\nHeader:\n" + header.getText());
-        assertThat(header.getText(), equalTo(headerContent));
+
 
         WebElement mainPanel = ts.elementByXpath("//*[contains(@class, 'sokolMainAttributesPanel')]");
         System.out.println("\nMain attributes:\n" + mainPanel.getText());
-        assertThat(mainPanel.getText(), equalTo(mainAttributesContent));
+
 
         List<WebElement> agreementPanelList = ts.elementsByXpath("//*[contains(@class, 'sokolApprovalPanel')]");
         WebElement agreementPanel = agreementPanelList.size() > 0 ? agreementPanelList.get(0) : null;
         if (agreementContent != null) {
             System.out.println("\nAgreement:\n" + (agreementPanel != null ?agreementPanel.getText() : null));
-            assertThat(agreementPanel != null ? agreementPanel.getText() : null, equalTo(agreementContent));
         }
 
         WebElement attachesPanel = ts.elementByXpath("//*[contains(@class, 'sokolAttachesPanel')]");
         System.out.println("\nAttaches:\n" + attachesPanel.getText());
+
+        assertThat(header.getText(), equalTo(headerContent));
+        assertThat(mainPanel.getText(), equalTo(mainAttributesContent));
+        if (agreementContent != null) {
+            System.out.println("\nAgreement:\n" + (agreementPanel != null ?agreementPanel.getText() : null));
+            assertThat(agreementPanel != null ? agreementPanel.getText() : null, equalTo(agreementContent));
+        }
         assertThat(attachesPanel.getText(), equalTo(attachesContent));
 
         ts.getDriver().close();

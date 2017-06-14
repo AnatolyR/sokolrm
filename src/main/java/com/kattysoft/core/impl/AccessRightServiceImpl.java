@@ -19,6 +19,8 @@ import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.AccessRightRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -115,24 +117,26 @@ public class AccessRightServiceImpl implements AccessRightService {
 
     public boolean hasRights(String space, String element, String subelement, AccessRightLevel level) {
         User user = userService.getCurrentUser();
-        log.debug("Has rights for user {}: {}.{}.{}.{}", user.getTitle() + " (" + user.getId() + ")", space, element, subelement, level);
-        List<UUID> groups = user.getGroups();
-        if (log.isDebugEnabled()) {
-            groups.forEach(groupId -> {
-                log.debug("User groups {}: {}", user.getTitle() + " (" + user.getId() + ")", String.join(", ", groups.stream().map(UUID::toString).collect(Collectors.toList())));
-            });
-        }
-        for (UUID groupId : groups) {
 
+//        log.debug("Has rights for user {}: {}.{}.{}.{}", user.getTitle() + " (" + user.getId() + ")", space, element, subelement, level);
+        List<UUID> groups = user.getGroups();
+//        if (log.isDebugEnabled()) {
+//            groups.forEach(groupId -> {
+//                log.debug("User groups {}: {}", user.getTitle() + " (" + user.getId() + ")", String.join(", ", groups.stream().map(UUID::toString).collect(Collectors.toList())));
+//            });
+//        }
+        for (UUID groupId : groups) {
             List<AccessRightRecord> records = accessRightRecordRepository.findAllByGroupIdAndSpaceAndElementAndSubelementAndLevel(groupId, space, element, subelement, level.toString());
-            if (log.isDebugEnabled()) {
-                records.forEach(r -> log.debug("Record : {}", r));
-            }
+//            if (log.isDebugEnabled()) {
+//                records.forEach(r -> log.debug("Record : {}", r));
+//            }
             List<String> generalLevels = records.stream().map(AccessRightRecord::getLevel).collect(Collectors.toList());
             if (generalLevels.contains(level.toString())) {
+                log.debug("[AR][{}] <1> {}.{}.{}.{}", user.getLogin(), space, element, subelement, level);
                 return true;
             }
         }
+        log.debug("[AR][{}] <0> {}.{}.{}.{}", user.getLogin(), space, element, subelement, level);
         return false;
     }
 

@@ -43,7 +43,7 @@ $.widget('sokol.formButtons', {
         var actions = this.options.actions;
 
         $.each(actions, $.proxy(function(i, a) {
-            var actionButton = $('<button data-type="action" type="button" name="' + a.id + '" style="display: none;" class="btn btn-default controlElementLeftMargin">' + a.title + '</button>');
+            var actionButton = $('<button data-type="action" type="button" name="' + a.id + '" style="display: none;" class="btn btn-default controlElementLeftMargin documentActionButton">' + a.title + '</button>');
             actionButton.click($.proxy(function() {
                 if (a.form) {
                     if (a.form == 'execution') {

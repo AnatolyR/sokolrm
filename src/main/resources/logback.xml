@@ -7,10 +7,27 @@
         </encoder>
     </appender>
 
+    <!--<appender name="XMLFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+            <!--&lt;!&ndash; daily rollover &ndash;&gt;-->
+            <!--<fileNamePattern>${user.home}/sokollogs/sokolsed.%d{yyyy-MM-dd}.xml</fileNamePattern>-->
+
+            <!--&lt;!&ndash; keep 30 days' worth of history &ndash;&gt;-->
+            <!--<maxHistory>30</maxHistory>-->
+        <!--</rollingPolicy>-->
+
+        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
+            <!--<layout class="ch.qos.logback.classic.log4j.XMLLayout">-->
+                <!--<locationInfo>true</locationInfo>-->
+            <!--</layout>-->
+        <!--</encoder>-->
+    <!--</appender>-->
+
+    <!--<logger name="com.kattysoft.core.impl.AccessRightServiceImpl" level="debug" />-->
+
     <root level="INFO">
         <appender-ref ref="STDOUT" />
+        <!--<appender-ref ref="XMLFILE" />-->
     </root>
-
-    <logger name="com.kattysoft.core.impl.AccessRightServiceImpl" level="INFO" />
 
 </configuration>
