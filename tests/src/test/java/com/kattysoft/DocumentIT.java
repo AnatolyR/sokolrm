@@ -13,28 +13,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.io.IOUtils;
+import org.hamcrest.MatcherAssert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -47,6 +44,7 @@ public class DocumentIT {
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     SimpleDateFormat dateFormat2 = new SimpleDateFormat("MMddHHmm");
     SimpleDateFormat dateFormat3 = new SimpleDateFormat("EE dd MMMM HH:mm", new Locale("ru"));
+    private boolean doAssert = true;
 
     @DataProvider(name = "flows")
     public Object[][] createData() {
@@ -56,8 +54,26 @@ public class DocumentIT {
         };
     }
 
-    @Test(dataProvider = "flows")
-    public void testIncomingDocument(String flowName) throws IOException {
+    @Test
+    public void testIncomingDocumentNoExecutors() throws IOException {
+        doAssert = true;
+        testDocument("incomingNoExecutors");
+    }
+
+    @Test
+    public void testIncomingDocumentTwoSuccessExecutors() throws IOException {
+        doAssert = true;
+        testDocument("incomingTwoSuccessExecutors");
+    }
+
+    @Test
+    public void testIncomingDocumentTwoExecutors() throws IOException {
+        doAssert = true;
+        testDocument("incomingTwoExecutors");
+    }
+
+    //@Test(dataProvider = "flows")
+    public void testDocument(String flowName) throws IOException {
         ArrayNode steps = (ArrayNode) mapper.readTree(DocumentIT.class.getResourceAsStream("/" + flowName + ".json"));
         Map<String, Object> objects = new HashMap<>();
         objects.put("testName", flowName);
@@ -155,7 +171,14 @@ public class DocumentIT {
 //            }
 
         });
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (!doAssert) {
+            throw new RuntimeException("doAssert set to false");
+        }
 
         //create document
         //register
@@ -201,7 +224,9 @@ public class DocumentIT {
         fillFirstString("comment", comment);
 
         ts.click("Сохранить отчет", "executionReportButton", false);
-        Thread.sleep(1000);
+        Thread.sleep(2000);
+
+        checkDocument(step, objects);
     }
 
     private void doClick(JsonNode step, Map<String, Object> objects) throws InterruptedException {
@@ -233,6 +258,8 @@ public class DocumentIT {
                 break;
             }
         }
+        Thread.sleep(1000);
+        checkDocument(step, objects);
     }
 
     private void doActionAction(JsonNode step, Map<String, Object> objects) throws InterruptedException {
@@ -283,7 +310,7 @@ public class DocumentIT {
         });
 
         ts.click("Сохранить", "executionFormButtons", false);
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         checkDocument(step, objects);
     }
@@ -312,6 +339,8 @@ public class DocumentIT {
         String date3 = dateFormat3.format(date);
         objects.put("date3", date3);
         objects.put("date", dateFormat.format(date));
+        objects.put("datePlus3d", dateFormat.format(new Date(date.getTime() + 3*24*60*60*1000)));
+
 
         ArrayNode data = (ArrayNode) step.get("data");
 
@@ -384,7 +413,7 @@ public class DocumentIT {
             try {
                 String header = IOUtils.toString(DocumentIT.class.getResourceAsStream(headerFileName));
                 header = populate(header, objects, headerPanel.getText());
-                assertThat(headerPanel.getText(), equalTo(header));
+                assertThat(headerPanel.getText(), header);
             } catch (IOException e) {
                 throw new RuntimeException("Can not load header file", e);
             }
@@ -395,6 +424,11 @@ public class DocumentIT {
             checkBlock(fileName, "sokolExecutionPanel", objects);
         }
 
+        if (step.has("sokolExecutionReportPanel")) {
+            String fileName = "/" + testName + "/" + step.get("sokolExecutionReportPanel").asText() + ".txt";
+            checkBlock(fileName, "sokolExecutionReportPanel", objects);
+        }
+
         if (step.has("mainAttributes")) {
             String mainAttributesFileName = "/" + testName + "/" + step.get("mainAttributes").asText() + ".txt";
             WebElement mainPanel = ts.elementByXpath("//*[contains(@class, 'sokolMainAttributesPanel')]");
@@ -402,7 +436,7 @@ public class DocumentIT {
             try {
                 String mainAttributes = IOUtils.toString(DocumentIT.class.getResourceAsStream(mainAttributesFileName));
                 mainAttributes = populate(mainAttributes, objects, mainPanel.getText());
-                assertThat(mainPanel.getText(), equalTo(mainAttributes));
+                assertThat(mainPanel.getText(), mainAttributes);
             } catch (IOException e) {
                 throw new RuntimeException("Can not load mainAttributes file", e);
             }
@@ -410,14 +444,46 @@ public class DocumentIT {
     }
 
     private void checkBlock(String fileName, String blockId, Map<String, Object> objects) {
-        WebElement mainPanel = ts.elementByXpath("//*[contains(@class, '" + blockId + "')]");
+        WebElement mainPanel = ts.elementByXpath("//*[@name = '" + blockId + "']");
+        if (mainPanel == null) {
+            mainPanel = ts.elementByXpath("//*[contains(@class, '" + blockId + "')]");
+        }
         System.out.println("\n[" + fileName + "] <-?->\n" + mainPanel.getText());
         try {
             String mainAttributes = IOUtils.toString(DocumentIT.class.getResourceAsStream(fileName));
             mainAttributes = populate(mainAttributes, objects, mainPanel.getText());
-            assertThat(mainPanel.getText(), equalTo(mainAttributes));
+            assertThat(mainPanel.getText(), mainAttributes);
         } catch (IOException e) {
             throw new RuntimeException("Can not load " + fileName + " file", e);
+        }
+    }
+
+    private void assertThat(String actualText, String textFromFile) {
+        if (doAssert) {
+            MatcherAssert.assertThat(actualText, equalTo(textFromFile));
+        } else {
+            if (!textFromFile.equals(actualText)) {
+//                System.err.println("java.lang.AssertionError:\n" +
+//                    "Expected :" + textFromFile + "\n" +
+//                    "Actual   :" + actualText);
+                StringBuilder builder = new StringBuilder();
+                String[] actualTextLines = actualText.split("\n");
+                String[] textFromFileLines = textFromFile.split("\n");
+
+                for (int i = 0; i < textFromFileLines.length; i++) {
+                    String textFromFileLine = textFromFileLines[i];
+                    String actualTextLine = i < actualTextLines.length ? actualTextLines[i] : "";
+                    if (!textFromFileLine.equals(actualTextLine)) {
+                        builder.append(textFromFileLine);
+                        builder.append(" <-> ");
+                        builder.append(actualTextLine);
+                        builder.append("\n");
+                    }
+                }
+//                new AssertionError("Expected :" + textFromFile.replace("\n", "\\n") + "\n" +
+//                    "Actual   :" + actualText.replace("\n", "\\n")).printStackTrace();
+                System.out.println("[!!!] NOT MATCH Expected <-> Actual\n" + builder.toString());
+            }
         }
     }
 

@@ -14,7 +14,7 @@ $.widget('sokol.executionForm', {
 
     createHeader: function() {
         this.element.addClass('panel panel-default');
-        this.element.attr('name', 'attachmentsPanel');
+        this.element.attr('name', 'sokolExecutionPanel');
 
         var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
 

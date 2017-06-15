@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -274,6 +275,7 @@ public class TaskServiceImpl implements TaskService {
 
         if (tasksList != null) {
             List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());
+            Collections.sort(tasks, (t1, t2) -> t1.getUserId().compareTo(t2.getUserId()));
             tasksList.setTasks(tasks);
         }
 
