@@ -10,6 +10,7 @@ $.widget('sokol.history', {
 
     createHeader: function() {
         this.element.addClass('panel panel-default');
+        this.element.attr('name', 'sokolHistoryPanel');
 
         var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
 

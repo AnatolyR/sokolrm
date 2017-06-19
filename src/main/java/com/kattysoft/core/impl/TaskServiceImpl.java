@@ -101,8 +101,15 @@ public class TaskServiceImpl implements TaskService {
                     updateDocumentStatus(documentId, "execution", systemUser);
                 }
             } else {
-                if ("execution".equals(document.getStatus())) {
-                    updateDocumentStatus(documentId, "executed", systemUser);
+                boolean done = !tasks.stream().filter(t -> !"done".equals(t.getResult())).findFirst().isPresent();
+                if (done) {
+                    if ("execution".equals(document.getStatus())) {
+                        updateDocumentStatus(documentId, "executed", systemUser);
+                    }
+                } else {
+                    if ("execution".equals(document.getStatus())) {
+                        updateDocumentStatus(documentId, "not_executed", systemUser);
+                    }
                 }
             }
         } else if ("approval".equals(type)) {
@@ -192,6 +199,7 @@ public class TaskServiceImpl implements TaskService {
 
         if (tasksList != null) {
             List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());
+            Collections.sort(tasks, (t1, t2) -> t1.getUserId().compareTo(t2.getUserId()));
             tasksList.setTasks(tasks);
         }
 
@@ -204,6 +212,7 @@ public class TaskServiceImpl implements TaskService {
 
         if (tasksList != null) {
             List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());
+            Collections.sort(tasks, (t1, t2) -> t1.getUserId().compareTo(t2.getUserId()));
             tasksList.setTasks(tasks);
         }
 
@@ -230,6 +239,7 @@ public class TaskServiceImpl implements TaskService {
 
         if (tasksList != null) {
             List<Task> tasks = taskRepository.findAllByListId(tasksList.getId());
+            Collections.sort(tasks, (t1, t2) -> t1.getUserId().compareTo(t2.getUserId()));
             tasksList.setTasks(tasks);
         }
 

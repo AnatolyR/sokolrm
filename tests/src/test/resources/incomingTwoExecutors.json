@@ -157,7 +157,8 @@
     "action": "openObject",
     "value": "Входящий ${date3}",
     "header": "header.executed",
-    "sokolExecutionPanel": "sokolExecutionPanel.executed"
+    "sokolExecutionPanel": "sokolExecutionPanel.executed",
+    "sokolHistoryPanel": "sokolHistoryPanel"
   },
   {
     "action": "close"

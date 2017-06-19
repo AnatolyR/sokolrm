@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.hamcrest.MatcherAssert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -73,11 +74,16 @@ public class DocumentIT {
     }
 
     //@Test(dataProvider = "flows")
-    public void testDocument(String flowName) throws IOException {
+    public void testDocument(String flowName, Integer...  stepNumbers) throws IOException {
         ArrayNode steps = (ArrayNode) mapper.readTree(DocumentIT.class.getResourceAsStream("/" + flowName + ".json"));
         Map<String, Object> objects = new HashMap<>();
         objects.put("testName", flowName);
+        final Integer[] currentStepNumber = {0};
         steps.forEach(s -> {
+            currentStepNumber[0]++;
+            if (stepNumbers.length > 0 && !ArrayUtils.contains(stepNumbers, currentStepNumber[0])) {
+                return;
+            }
             String action = s.get("action").asText();
 
             switch (action) {
@@ -115,6 +121,13 @@ public class DocumentIT {
                         newDocumentAction(s, objects);
                     } catch (Exception e) {
                         throw new RuntimeException("Can not create new document", e);
+                    }
+                    break;
+                case "editDocument":
+                    try {
+                        editDocumentAction(s, objects);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Can not edit document", e);
                     }
                     break;
                 case "doAction":
@@ -288,7 +301,7 @@ public class DocumentIT {
     private void doExecute(JsonNode step, Map<String, Object> objects) throws InterruptedException {
         String comment = step.get("comment").asText();
 
-        fillString("comment", comment);
+        fillString("comment", comment, false);
 
         ArrayNode executors = (ArrayNode) step.get("executors");
         executors.forEach(e -> {
@@ -334,7 +347,9 @@ public class DocumentIT {
             }
         }
 
-
+        editDocumentAction(step, objects);
+    }
+    private void editDocumentAction(JsonNode step, Map<String, Object> objects) throws InterruptedException {
         Date date = new Date();
         String date3 = dateFormat3.format(date);
         objects.put("date3", date3);
@@ -348,13 +363,16 @@ public class DocumentIT {
             String name = f.get("name").asText();
             String fieldType = f.get("type").asText();
             String value = f.get("value").asText();
-            value = value.replace("${date3}", date3);
+            for (Map.Entry<String, Object> entry : objects.entrySet()) {
+                value = value.replace("${" + entry.getKey() + "}", entry.getValue().toString());
+            }
+            boolean clear = f.has("clear") && f.get("clear").asBoolean();
 
             switch (fieldType) {
-                case "string": fillString(name, value); break;
+                case "string": fillString(name, value, clear); break;
                 case "select":
                     try {
-                        fillSelect(name, value);
+                        fillSelect(name, value, clear);
                     } catch (InterruptedException e) {
                         throw new RuntimeException("Can not fill select", e);
                     }
@@ -388,7 +406,7 @@ public class DocumentIT {
                     String[] actualWords = actualTextLine.split(" ");
                     for (int j = 0; j < words.length; j++) {
                         String word = words[j];
-                        String actualWord = actualWords[j];
+                        String actualWord = j < actualWords.length ? actualWords[j] : "[no data]";
                         if (word.equals("${ignore}")) {
                             ignores.add(actualWord);
                         }
@@ -427,6 +445,11 @@ public class DocumentIT {
         if (step.has("sokolExecutionReportPanel")) {
             String fileName = "/" + testName + "/" + step.get("sokolExecutionReportPanel").asText() + ".txt";
             checkBlock(fileName, "sokolExecutionReportPanel", objects);
+        }
+
+        if (step.has("sokolHistoryPanel")) {
+            String fileName = "/" + testName + "/" + step.get("sokolHistoryPanel").asText() + ".txt";
+            checkBlock(fileName, "sokolHistoryPanel", objects);
         }
 
         if (step.has("mainAttributes")) {
@@ -524,10 +547,13 @@ public class DocumentIT {
         }
     }
 
-    public void fillSelect(String selectName, String value) throws InterruptedException {
+    public void fillSelect(String selectName, String value, boolean clear) throws InterruptedException {
         WebElement select = ts.elementByXpath("//*[@name = '" + selectName + "']");
         WebElement div = select.findElement(By.xpath(".."));
         WebElement input = div.findElement(By.xpath(".//input"));
+        if (clear) {
+            input.sendKeys("\b");
+        }
         input.sendKeys(value);
         Thread.sleep(1000);
         ts.click(value, "highlight", true);
@@ -549,8 +575,11 @@ public class DocumentIT {
         Thread.sleep(500);
     }
 
-    public void fillString(String name, String value) {
+    public void fillString(String name, String value, boolean clear) {
         WebElement input = ts.elementByXpath("//*[@name = '" + name + "']");
+        if (clear) {
+            input.clear();
+        }
         input.sendKeys(value);
     }
 

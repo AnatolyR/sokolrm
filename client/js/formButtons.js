@@ -8,20 +8,20 @@ $.widget('sokol.formButtons', {
         var buttons = this.element;
         buttons.addClass('formMainPanel');
 
-        var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
+        var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin documentActionButton">Сохранить</button>');
         saveButton.click($.proxy(function() {
             this.options.dispatcher.saveForm();
         }, this));
         saveButton.appendTo(buttons);
 
-        var editButton = $('<button type="button" name="edit" style="display: none;" class="btn btn-default controlElementLeftMargin">Редактировать</button>');
+        var editButton = $('<button type="button" name="edit" style="display: none;" class="btn btn-default controlElementLeftMargin documentActionButton">Редактировать</button>');
         editButton.click($.proxy(function() {
             this.options.dispatcher.goToMode("edit");
         }, this));
         editButton.appendTo(buttons);
 
         if (this.options.id) {
-            var cancelButton = $('<button type="button" name="cancel" style="display: none;" class="btn btn-default controlElementLeftMargin">Отменить</button>');
+            var cancelButton = $('<button type="button" name="cancel" style="display: none;" class="btn btn-default controlElementLeftMargin documentActionButton">Отменить</button>');
             cancelButton.click($.proxy(function () {
                 this.options.dispatcher.goToMode("read");
             }, this));
@@ -33,7 +33,7 @@ $.widget('sokol.formButtons', {
         }
 
         if (this.options.deleteAction) {
-            var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin">Удалить</button>');
+            var deleteButton = $('<button type="button" name="delete" style="display: none;" class="btn btn-danger controlElementLeftMargin documentActionButton">Удалить</button>');
             deleteButton.click($.proxy(function () {
                 this.options.dispatcher.deleteDocument();
             }, this));

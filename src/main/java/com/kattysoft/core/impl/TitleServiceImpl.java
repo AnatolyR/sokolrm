@@ -50,6 +50,7 @@ public class TitleServiceImpl implements TitleService {
         status.put("review", "Рассмотрение");
         status.put("execution", "Исполнение");
         status.put("executed", "Исполнено");
+        status.put("not_executed", "Не исполнено");
         status.put("tocase", "В дело");
         status.put("archive", "Архив");
 
