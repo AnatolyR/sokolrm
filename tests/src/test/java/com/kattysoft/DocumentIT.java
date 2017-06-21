@@ -92,6 +92,12 @@ public class DocumentIT {
         doAssert = true;
         testDocument("outgoingTwoSuccessApprovers");
     }
+
+    @Test
+    public void testOutgoingFromTemplate() throws IOException {
+        doAssert = true;
+        testDocument("outgoingFromTemplate");
+    }
     
     public Integer[] range(Integer start, Integer end) {
         List<Integer> collect = IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
@@ -189,6 +195,13 @@ public class DocumentIT {
                 case "click":
                     try {
                         doClick(s, objects);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Can not click", e);
+                    }
+                    break;
+                case "clickcontain":
+                    try {
+                        doClickContain(s, objects);
                     } catch (Exception e) {
                         throw new RuntimeException("Can not click", e);
                     }
@@ -291,6 +304,12 @@ public class DocumentIT {
     private void doClick(JsonNode step, Map<String, Object> objects) throws InterruptedException {
         String value = step.get("value").asText();
         ts.click(value, null, false);
+        Thread.sleep(1000);
+    }
+
+    private void doClickContain(JsonNode step, Map<String, Object> objects) throws InterruptedException {
+        String value = step.get("value").asText();
+        ts.click(value, null, true);
         Thread.sleep(1000);
     }
 
@@ -397,7 +416,9 @@ public class DocumentIT {
             }
         }
 
-        editDocumentAction(step, objects);
+        if (step.has("data")) {
+            editDocumentAction(step, objects);
+        }
     }
     private void editDocumentAction(JsonNode step, Map<String, Object> objects) throws InterruptedException {
         Date date = new Date();
@@ -409,26 +430,28 @@ public class DocumentIT {
 
         ArrayNode data = (ArrayNode) step.get("data");
 
-        data.forEach(f -> {
-            String name = f.get("name").asText();
-            String fieldType = f.get("type").asText();
-            String value = f.get("value").asText();
-            for (Map.Entry<String, Object> entry : objects.entrySet()) {
-                value = value.replace("${" + entry.getKey() + "}", entry.getValue().toString());
-            }
-            boolean clear = f.has("clear") && f.get("clear").asBoolean();
+        if (data != null) {
+            data.forEach(f -> {
+                String name = f.get("name").asText();
+                String fieldType = f.get("type").asText();
+                String value = f.get("value").asText();
+                for (Map.Entry<String, Object> entry : objects.entrySet()) {
+                    value = value.replace("${" + entry.getKey() + "}", entry.getValue().toString());
+                }
+                boolean clear = f.has("clear") && f.get("clear").asBoolean();
 
-            switch (fieldType) {
-                case "string": fillString(name, value, clear); break;
-                case "select":
-                    try {
-                        fillSelect(name, value, clear);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException("Can not fill select", e);
-                    }
-                    break;
-            }
-        });
+                switch (fieldType) {
+                    case "string": fillString(name, value, clear); break;
+                    case "select":
+                        try {
+                            fillSelect(name, value, clear);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException("Can not fill select", e);
+                        }
+                        break;
+                }
+            });
+        }
 
         ts.getDriver().executeScript("window.scrollTo(0, 0);");
         Thread.sleep(500);

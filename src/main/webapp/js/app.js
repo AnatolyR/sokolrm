@@ -1096,6 +1096,7 @@ $.widget('sokol.container', {
     updateCardFromTemplate: function(templateDocumentId) {
         $.getJSON('app/card', {id: templateDocumentId},
             $.proxy(function (data) {
+                data.data.id = this.options.data.id;
                 this.options.data = data.data;
                 this.form.options.data = data.data;
                 this.form.setMode('edit');

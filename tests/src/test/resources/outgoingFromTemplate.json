@@ -1,0 +1,36 @@
+[
+  {
+    "action": "logout"
+  },
+  {
+    "action": "login",
+    "user": "ivashov",
+    "pass": "123"
+  },
+  {
+    "action": "newDocument",
+    "type": "Исходящий"
+  },
+  {
+    "action": "clickcontain",
+    "value": "Из шаблона"
+  },
+  {
+    "action": "clickcontain",
+    "value": "Запрос дополнительных документов"
+  },
+  {
+    "action": "editDocument",
+    "mainAttributes": "mainAttributes1",
+    "data": [
+      {
+        "name": "title",
+        "type": "string",
+        "value": ". Исходящий из шаблона ${date3}"
+      }
+    ]
+  },
+  {
+    "action": "close"
+  }
+]

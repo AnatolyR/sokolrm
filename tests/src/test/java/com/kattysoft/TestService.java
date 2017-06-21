@@ -150,7 +150,7 @@ public class TestService {
 
     public boolean click(String text, String clazzWanted, boolean contains) throws InterruptedException {
         text = text.trim();
-        log.info("Click '${text}'");
+        log.info("Click '" + text + "'");
         java.util.List<WebElement> elements = contains ?
             driver.findElements(By.xpath("//*[contains(text(), '" + text + "')]"))
             : driver.findElements(By.xpath("//*[text() = '" + text + "']"));

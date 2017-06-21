@@ -1,5 +1,5 @@
 {
-  "condition": "status = 'template'",
+  "condition": "status = 'template' AND author = '${currentUser}'",
   "gridConfig": {
     "title": "Документы",
     "columnsVisible": [
