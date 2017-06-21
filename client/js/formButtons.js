@@ -6,7 +6,8 @@ $.widget('sokol.formButtons', {
 
     _create: function () {
         var buttons = this.element;
-        buttons.addClass('formMainPanel');
+        buttons.addClass('formButtonsPanel');
+        buttons.attr('name', 'formButtonsPanel');
 
         var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin documentActionButton">Сохранить</button>');
         saveButton.click($.proxy(function() {

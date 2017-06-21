@@ -637,7 +637,7 @@ $.widget('sokol.app', {
                 this.open('document/' + id, "edit");
             }, this)
         ).fail($.proxy(function(e) {
-                $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
+                this.error = $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
             }, this));
     },
     createDocumentForm: function(id, mode) {
@@ -2799,7 +2799,8 @@ $.widget('sokol.formButtons', {
 
     _create: function () {
         var buttons = this.element;
-        buttons.addClass('formMainPanel');
+        buttons.addClass('formButtonsPanel');
+        buttons.attr('name', 'formButtonsPanel');
 
         var saveButton = $('<button type="button" name="save" style="display: none;" class="btn btn-success controlElementLeftMargin documentActionButton">Сохранить</button>');
         saveButton.click($.proxy(function() {

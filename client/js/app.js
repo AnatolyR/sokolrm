@@ -148,7 +148,7 @@ $.widget('sokol.app', {
                 this.open('document/' + id, "edit");
             }, this)
         ).fail($.proxy(function(e) {
-                $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
+                this.error = $('<div class="alert alert-danger" role="alert">Не удалось создать документ "' + type + '". Обратитесь к администратору.</div>').appendTo(this.element);
             }, this));
     },
     createDocumentForm: function(id, mode) {

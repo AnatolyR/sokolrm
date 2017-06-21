@@ -31,6 +31,8 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -79,6 +81,23 @@ public class DocumentIT {
         testDocument("outgoingNoApprovers");
     }
 
+    @Test
+    public void testOutgoingDocumentTwoApprovers() throws IOException {
+        doAssert = true;
+        testDocument("outgoingTwoApprovers");
+    }
+
+    @Test
+    public void testOutgoingDocumentTwoSuccessApprovers() throws IOException {
+        doAssert = false;
+        testDocument("outgoingTwoSuccessApprovers", range(1, 29));
+    }
+    
+    public Integer[] range(Integer start, Integer end) {
+        List<Integer> collect = IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
+        return collect.toArray(new Integer[collect.size()]);
+    }
+
     //@Test(dataProvider = "flows")
     public void testDocument(String flowName, Integer...  stepNumbers) throws IOException {
         ArrayNode steps = (ArrayNode) mapper.readTree(DocumentIT.class.getResourceAsStream("/" + flowName + ".json"));
@@ -90,7 +109,10 @@ public class DocumentIT {
             if (stepNumbers.length > 0 && !ArrayUtils.contains(stepNumbers, currentStepNumber[0])) {
                 return;
             }
-            String action = s.get("action").asText();
+            String action = s.has("action") ? s.get("action").asText() : null;
+            if (action == null) {
+                return;
+            }
 
             switch (action) {
                 case "login":
@@ -178,6 +200,13 @@ public class DocumentIT {
                         throw new RuntimeException("Can not execute report", e);
                     }
                     break;
+                case "approveReport":
+                    try {
+                        doApproveReport(s, objects);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Can not execute report", e);
+                    }
+                    break;
             }
 //            try {
 //                if (ts != null) {
@@ -248,6 +277,17 @@ public class DocumentIT {
         checkDocument(step, objects);
     }
 
+    private void doApproveReport(JsonNode step, Map<String, Object> objects) throws InterruptedException {
+        String comment = step.get("comment").asText();
+
+        fillFirstString("comment", comment);
+
+        ts.click("Согласовать", "executionReportButton", false);
+        Thread.sleep(2000);
+
+        checkDocument(step, objects);
+    }
+
     private void doClick(JsonNode step, Map<String, Object> objects) throws InterruptedException {
         String value = step.get("value").asText();
         ts.click(value, null, false);
@@ -265,7 +305,9 @@ public class DocumentIT {
     private void openObject(JsonNode step, Map<String, Object> objects) throws InterruptedException {
         String linkTitle = step.get("value").asText();
         linkTitle = linkTitle.replace("${date3}", objects.get("date3").toString());
-        ts.click(linkTitle, null, false);
+        if (!ts.click(linkTitle, null, false)) {
+            throw new AssertionError("No object to open '" + linkTitle + "'");
+        }
         Thread.sleep(2000);
 
         RemoteWebDriver driver = ts.getDriver();
@@ -443,6 +485,11 @@ public class DocumentIT {
             } catch (IOException e) {
                 throw new RuntimeException("Can not load header file", e);
             }
+        }
+
+        if (step.has("buttons")) {
+            String fileName = "/" + testName + "/" + step.get("buttons").asText() + ".txt";
+            checkBlock(fileName, "formButtonsPanel", objects);
         }
 
         if (step.has("sokolExecutionPanel")) {

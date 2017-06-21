@@ -73,6 +73,115 @@
   },
   {
     "action": "doAction",
+    "name": "На согласование"
+  },
+  {
+    "action": "execute",
+    "comment": "Test comment",
+    "executors": [
+      {
+        "user": "Гарина В. М.",
+        "date": "${datePlus3d}"
+      },
+      {
+        "user": "Захаров",
+        "date": "${datePlus3d}"
+      }
+    ],
+    "sokolExecutionPanel": "sokolExecutionPanel.create",
+    "header": "header.execution"
+  },
+  {
+    "action": "close"
+  },
+  {
+    "action": "sleep",
+    "value": 3000
+  },
+  {
+    "action": "logout"
+  },
+  {
+    "comment": "-------------- СОГЛАСОВАНИЕ ГАРИНА --------------"
+  },
+  {
+    "action": "login",
+    "user": "garina",
+    "pass": "123"
+  },
+  {
+    "action": "openList",
+    "listId": "incomingTasks"
+  },
+  {
+    "action": "openObject",
+    "value": "Исходящий ${date3}"
+  },
+  {
+    "action": "click",
+    "value": "Согласовать"
+  },
+  {
+    "action": "close"
+  },
+  {
+    "action": "sleep",
+    "value": 3000
+  },
+  {
+    "action": "logout"
+  },
+  {
+    "comment": "-------------- СОГЛАСОВАНИЕ ЗАХАРОВЫМ --------------"
+  },
+  {
+    "action": "login",
+    "user": "zaharov",
+    "pass": "123"
+  },
+  {
+    "action": "openList",
+    "listId": "incomingTasks"
+  },
+  {
+    "action": "openObject",
+    "value": "Исходящий ${date3}"
+  },
+  {
+    "action": "click",
+    "value": "Согласовать с замечанием"
+  },
+  {
+    "action": "approveReport",
+    "comment": "Замечание по согласованию от Захарова",
+    "sokolExecutionReportPanel": "sokolExecutionReportPanel.zaharov.agreed"
+  },
+  {
+    "action": "close"
+  },
+  {
+    "action": "sleep",
+    "value": 3000
+  },
+  {
+    "action": "logout"
+  },
+  {
+    "comment": "-------------- ОТПРАВКА НА ПОДПИСАНИЕ ЛУКОВЫМ --------------"
+  },
+  {
+    "action": "login",
+    "user": "lukov",
+    "pass": "123"
+  },
+  {
+    "action": "openObject",
+    "value": "Исходящий ${date3}",
+    "header": "header.approved",
+    "sokolExecutionPanel": "sokolExecutionPanel.approved"
+  },
+  {
+    "action": "doAction",
     "name": "На подписание",
     "mainAttributes": "mainAttributes1",
     "header": "header.tosign",
@@ -89,28 +198,7 @@
     "action": "logout"
   },
   {
-    "action": "login",
-    "user": "zaharov",
-    "pass": "123"
-  },
-  {
-    "action": "openList",
-    "listId": "outgoingDocuments"
-  },
-  {
-    "action": "openObject",
-    "value": "Исходящий ${date3}",
-    "buttons": "buttons.noactions"
-  },
-  {
-    "action": "close"
-  },
-  {
-    "action": "sleep",
-    "value": 3000
-  },
-  {
-    "action": "logout"
+    "comment": "-------------- ПОДПИСАНИЕ И ОТПРАВКА В АРХИВ ИВАШОВЫМ --------------"
   },
   {
     "action": "login",
