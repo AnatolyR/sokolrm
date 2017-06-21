@@ -18,7 +18,7 @@ import com.kattysoft.core.model.Document;
 import com.kattysoft.core.model.DocumentLink;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.DocumentLinkRepository;
-import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.*;
 import org.codehaus.jackson.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -323,6 +323,10 @@ public class DocumentServiceImpl implements DocumentService {
         if (Utils.isUUID(documentNumber)) {
             linkId = UUID.fromString(documentNumber);
         } else {
+            Document document = getDocumentByNumber(documentNumber);
+            if (document != null) {
+                linkId = UUID.fromString(document.getId());
+            }
             //todo search by documentNumber
         }
         if (linkId != null) {
@@ -338,6 +342,16 @@ public class DocumentServiceImpl implements DocumentService {
         } else {
             throw new SokolException("Document to link not found");
         }
+    }
+
+    private Document getDocumentByNumber(String documentNumber) {
+        Specification spec = new Specification();
+        spec.setCondition(new ContainerCondition(ContainerOperation.AND, new ValueCondition("documentNumber", Operation.EQUAL, documentNumber)));
+        List<Document> documentsList = documentDao.getDocumentsList(spec);
+        if (documentsList.size() > 0) {
+            return documentsList.get(0);
+        }
+        return null;
     }
 
     @Override
