@@ -155,6 +155,15 @@ public class DocumentCardController {
             if (status == null || status.isEmpty()) {
                 return;
             }
+            String currentUserId = userService.getCurrentUser().getId().toString();
+            if (accessRightService.checkDocumentRights(document, "", AccessRightLevel.DELETE)
+                || ("draft".equals(document.getStatus()) && currentUserId.equals(document.getFields().get("author")))) {
+                ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("deleteAction", true);
+            }
+            if (accessRightService.checkDocumentRights(document, "", AccessRightLevel.WRITE)
+                || ("draft".equals(document.getStatus()) && currentUserId.equals(document.getFields().get("author")))) {
+                ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("editAction", true);
+            }
             com.fasterxml.jackson.databind.JsonNode states = flow.get("states");
             com.fasterxml.jackson.databind.JsonNode state = StreamSupport.stream(states.spliterator(), false).filter(s -> status.equals(s.get("id").textValue())).findFirst().orElse(null);
             if (state == null || !state.has("actions")) {
@@ -171,17 +180,21 @@ public class DocumentCardController {
                         if (addressee.contains(currentUser.getId().toString())) {
                             filteredActions.add(a);
                         }
+                    } else if ("toapproval".equals(actionId) || "tosign".equals(actionId)) {
+                        if (currentUserId.equals(document.getFields().get("author"))) {
+                            filteredActions.add(a);
+                        }
+                    } else if ("sign".equals(actionId) || "reject".equals(actionId)) {
+                        String signerId = (String) document.getFields().get("signer");
+                        if (currentUser.getId().toString().equals(signerId)) {
+                            filteredActions.add(a);
+                        }
                     } else {
                         filteredActions.add(a);
                     }
                 }
             });
             ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).set("actions", filteredActions);
-            String currentUserId = userService.getCurrentUser().getId().toString();
-            if (accessRightService.checkDocumentRights(document, "", AccessRightLevel.DELETE)
-                || ("draft".equals(document.getStatus()) && currentUserId.equals(document.getFields().get("author")))) {
-                ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("deleteAction", true);
-            }
         }
     }
 

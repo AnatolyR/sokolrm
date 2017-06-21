@@ -18,11 +18,11 @@
       "title": "Внутренние"
     },
     {
-      "id": "incomingReviewTasks",
+      "id": "reviewDocuments",
       "title": "На рассмотрение"
     },
     {
-      "id": "incomingSignTasks",
+      "id": "signDocuments",
       "title": "На подписание"
     },
     {

@@ -13,10 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.GroupService;
-import com.kattysoft.core.SokolException;
-import com.kattysoft.core.UserService;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Group;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
@@ -52,6 +49,9 @@ public class UserController {
 
     @Autowired
     private GroupService groupService;
+    
+    @Autowired
+    private AccessRightService accessRightService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -153,6 +153,13 @@ public class UserController {
         }
 
         JsonNode formConfig = configService.getConfig2("forms/userForm");
+
+        if (accessRightService.checkRights("_system", "users", "", AccessRightLevel.DELETE)) {
+            ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("deleteAction", true);
+        }
+        if (accessRightService.checkRights("_system", "users", "", AccessRightLevel.WRITE)) {
+            ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("editAction", true);
+        }
 
         ObjectNode card = mapper.createObjectNode();
         card.set("form", formConfig);
@@ -261,5 +268,9 @@ public class UserController {
 
     public void setGroupService(GroupService groupService) {
         this.groupService = groupService;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

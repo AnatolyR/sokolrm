@@ -11,6 +11,7 @@ modules["container"] = (function() {
         "type" : "form",
         containerType: 'document',
         "form" : {
+            "editAction": true,
             "title": "Основные реквизиты",
             "fields" : [ {
                 "id" : "title",

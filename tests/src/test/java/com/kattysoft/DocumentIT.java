@@ -73,6 +73,12 @@ public class DocumentIT {
         testDocument("incomingTwoExecutors");
     }
 
+    @Test
+    public void testOutgoingDocumentNoApprovers() throws IOException {
+        doAssert = true;
+        testDocument("outgoingNoApprovers");
+    }
+
     //@Test(dataProvider = "flows")
     public void testDocument(String flowName, Integer...  stepNumbers) throws IOException {
         ArrayNode steps = (ArrayNode) mapper.readTree(DocumentIT.class.getResourceAsStream("/" + flowName + ".json"));
@@ -277,7 +283,9 @@ public class DocumentIT {
 
     private void doActionAction(JsonNode step, Map<String, Object> objects) throws InterruptedException {
         String name = step.get("name").asText();
-        ts.click(name, "documentActionButton", false);
+        if (!ts.click(name, "documentActionButton", false)) {
+            throw new AssertionError("Not object to click '" + name + "'");
+        }
         Thread.sleep(2000);
 
         ArrayNode data = (ArrayNode) step.get("objects");

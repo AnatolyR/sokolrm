@@ -98,6 +98,9 @@ public class TaskController {
             if (!accessRightService.checkDocumentRights(document, "*toapproval", AccessRightLevel.ALLOW)) {
                 throw new NoAccessRightsException("Not access rights to start approval document");
             }
+            if (!currentUser.getId().toString().equals(document.getFields().get("author"))) {
+                throw new NoAccessRightsException("Only author can create approve list");
+            }
         } else if ("acquaintance".equals(type)) {
             if (!accessRightService.checkDocumentRights(document, "*toacquaintance", AccessRightLevel.ALLOW)) {
                 throw new NoAccessRightsException("Not access rights to start acquaintance document");

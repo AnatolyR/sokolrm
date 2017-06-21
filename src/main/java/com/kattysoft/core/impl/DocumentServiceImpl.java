@@ -85,11 +85,20 @@ public class DocumentServiceImpl implements DocumentService {
             document.getFields().remove("author");
         }
 
+        if (document.getId() == null && !accessRightService.checkDocumentRights(document, "", AccessRightLevel.CREATE)) {
+            throw new SokolException("Not enough access rights to create document");
+        }
+        
         //todo проверка прав на поля
         Document existDocument = documentDao.getDocument(document.getId(), new ArrayList<String>(document.getFields().keySet()));
         if (document.getId() != null && existDocument == null) {
             throw new SokolException("Document not found");
         }
+        
+        if (existDocument!= null && !checkAccessRights(document, existDocument)) {
+            throw new SokolException("Not enough access rights to write document");
+        }
+        
         if ("template".equals(document.getStatus())) {
             if ("draft".equals(existDocument.getStatus())) {
                 document.getFields().put("status", "template");
@@ -109,6 +118,22 @@ public class DocumentServiceImpl implements DocumentService {
         saveHistory(existDocument, document, systemAuthor);
 
         return id;
+    }
+
+    private boolean checkAccessRights(Document document, Document existDocument) {
+        User currentUser = userService.getCurrentUser();
+        
+        if (accessRightService.checkDocumentRights(existDocument, "", AccessRightLevel.WRITE)) {
+            return true;
+        }
+        if ("draft".equals(existDocument.getStatus()) && currentUser.getId().toString().equals(existDocument.getFields().get("author"))) {
+            return true;
+        }
+        if (document.getFields().size() == 1 && document.getFields().containsKey("status")) {
+            return true;
+        }
+        
+        return false;
     }
 
     @Override

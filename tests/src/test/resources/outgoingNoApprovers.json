@@ -4,17 +4,17 @@
   },
   {
     "action": "login",
-    "user": "ivashov",
+    "user": "lukov",
     "pass": "123"
   },
   {
     "action": "newDocument",
-    "type": "Входящий",
+    "type": "Исходящий",
     "data": [
       {
         "name": "title",
         "type": "string",
-        "value": "Входящий ${date3}"
+        "value": "Исходящий ${date3}"
       },
       {
         "name": "documentKind",
@@ -22,39 +22,14 @@
         "value": "Письмо"
       },
       {
-        "name": "addressee",
-        "type": "select",
-        "value": "Ивашов В. Н."
-      },
-      {
         "name": "correspondent",
         "type": "select",
         "value": "ПРОФИНТЕР"
       },
       {
-        "name": "externalSigner",
-        "type": "string",
-        "value": "Калинин С. В."
-      },
-      {
-        "name": "externalExecutor",
-        "type": "string",
-        "value": "Михеев А. П."
-      },
-      {
-        "name": "externalNumber",
-        "type": "string",
-        "value": "ИИ-1022"
-      },
-      {
-        "name": "externalDate",
-        "type": "string",
-        "value": "14.03.2017"
-      },
-      {
-        "name": "executionDate",
-        "type": "string",
-        "value": "${datePlus3d}"
+        "name": "signer",
+        "type": "select",
+        "value": "Ивашов В. Н."
       },
       {
         "name": "pagesQuantity",
@@ -79,12 +54,12 @@
       {
         "name": "space",
         "type": "select",
-        "value": "Входящие"
+        "value": "Исходящие"
       },
       {
         "name": "archivecase",
         "type": "string",
-        "value": "Письма 2017"
+        "value": "Исходящие письма 2017"
       }
     ],
     "mainAttributes": "mainAttributes1",
@@ -92,55 +67,68 @@
   },
   {
     "action": "doAction",
-    "name": "Редактировать"
+    "name": "Опубликовать"
   },
   {
-    "action": "editDocument",
-    "data": [
-      {
-        "name": "documentKind",
-        "type": "select",
-        "value": "Заявка",
-        "clear": true
-      },
-      {
-        "name": "comment",
-        "type": "string",
-        "value": "Комментарий автоматически созданного документа ${date} отредактировано",
-        "clear": true
-      }
-    ],
-    "mainAttributes": "mainAttributes2",
-    "header": "header2"
+    "action": "doAction",
+    "name": "На подписание",
+    "mainAttributes": "mainAttributes1",
+    "header": "header.tosign"
+  },
+  {
+    "action": "close"
+  },
+  {
+    "action": "sleep",
+    "value": 3000
+  },
+  {
+    "action": "logout"
+  },
+  {
+    "action": "login",
+    "user": "ivashov",
+    "pass": "123"
+  },
+  {
+    "action": "openList",
+    "listId": "signDocuments"
+  },
+  {
+    "action": "openObject",
+    "value": "Исходящий ${date3}"
+  },
+  {
+    "action": "doAction",
+    "name": "Подписать"
   },
   {
     "action": "doAction",
     "name": "Зарегистрировать",
-    "mainAttributes": "mainAttributesRegistered",
-    "header": "headerRegistered",
+    "mainAttributes": "mainAttributes.registered",
+    "header": "header.registered",
     "objects": [
       {
         "name": "documentNumber",
         "type": "documentNumber",
-        "param": "Входящие документы"
+        "param": "Исходящие документы"
       }
     ]
   },
   {
     "action": "doAction",
-    "name": "На рассмотрение",
-    "header": "header.review"
+    "name": "Отправлено",
+    "header": "header.sent"
   },
   {
     "action": "doAction",
     "name": "В дело",
-    "header": "header.case"
+    "header": "header.tocase"
   },
   {
     "action": "doAction",
     "name": "В архив",
-    "header": "header.archive",
-    "sokolHistoryPanel": "sokolHistoryPanel"
+    "header": "header.archive"
   },
   {
     "action": "close"

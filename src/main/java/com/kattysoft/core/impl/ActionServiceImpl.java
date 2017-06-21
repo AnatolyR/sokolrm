@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
 import com.kattysoft.core.model.Task;
+import com.kattysoft.core.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -36,6 +37,12 @@ public class ActionServiceImpl implements ActionService {
 
     @Autowired
     private RegistrationListService registrationListService;
+    
+    @Autowired
+    private AccessRightService accessRightService;
+    
+    @Autowired
+    private UserService userService;
 
     @Override
     public void doAction(String documentId, String actionId) {
@@ -46,6 +53,26 @@ public class ActionServiceImpl implements ActionService {
         if (actionId == null) {
             throw new SokolException("Action is empty");
         }
+
+        User currentUser = userService.getCurrentUser();
+        if (accessRightService.checkDocumentRights(document, "*" + actionId, AccessRightLevel.ALLOW)) {
+            if ("doresolution".equals(actionId)) {
+                List<String> addressee = (List<String>) document.getFields().get("addressee");
+                if (addressee.contains(currentUser.getId().toString())) {
+                    throw new NoAccessRightsException("Only addressee can create resolution");
+                }
+            } else if ("toapproval".equals(actionId) || "tosign".equals(actionId)) {
+                if (!currentUser.getId().toString().equals(document.getFields().get("author"))) {
+                    throw new NoAccessRightsException("Only author can toapproval or tosign");
+                }
+            } else if ("sign".equals(actionId) || "reject".equals(actionId)) {
+                String signerId = (String) document.getFields().get("signer");
+                if (!currentUser.getId().toString().equals(signerId)) {
+                    throw new NoAccessRightsException("Only signer can sign or reject");
+                }
+            } 
+        }
+        
         String typeId = document.getType();
         JsonNode type = configService.getConfig2("types/" + typeId + "Type");
         String flowId = type.get("flow").textValue();
@@ -103,5 +130,13 @@ public class ActionServiceImpl implements ActionService {
 
     public void setTaskService(TaskService taskService) {
         this.taskService = taskService;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

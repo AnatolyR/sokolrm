@@ -25,6 +25,7 @@ var mockResponses = mockResponses || [];
         var response = {
             "type" : "form",
             "form" : {
+                "editAction": true,
                 "fields" : [ {
                     "id" : "title",
                     "title" : "Заголовок",

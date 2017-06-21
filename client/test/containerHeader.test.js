@@ -9,6 +9,7 @@ modules["containerHeader"] = (function() {
     var options = {
         "type" : "form",
         "form" : {
+            "editAction": true,
             "fields" : [ {
                 "id" : "title",
                 "title" : "Заголовок",

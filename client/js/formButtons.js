@@ -14,11 +14,13 @@ $.widget('sokol.formButtons', {
         }, this));
         saveButton.appendTo(buttons);
 
-        var editButton = $('<button type="button" name="edit" style="display: none;" class="btn btn-default controlElementLeftMargin documentActionButton">Редактировать</button>');
-        editButton.click($.proxy(function() {
-            this.options.dispatcher.goToMode("edit");
-        }, this));
-        editButton.appendTo(buttons);
+        if (this.options.editAction) {
+            var editButton = $('<button type="button" name="edit" style="display: none;" class="btn btn-default controlElementLeftMargin documentActionButton">Редактировать</button>');
+            editButton.click($.proxy(function () {
+                this.options.dispatcher.goToMode("edit");
+            }, this));
+            editButton.appendTo(buttons);
+        }
 
         if (this.options.id) {
             var cancelButton = $('<button type="button" name="cancel" style="display: none;" class="btn btn-default controlElementLeftMargin documentActionButton">Отменить</button>');

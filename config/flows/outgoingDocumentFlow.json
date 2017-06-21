@@ -6,7 +6,7 @@
       "actions": [
         {
           "id": "toproject",
-          "title": "Опуликовать",
+          "title": "Опубликовать",
           "state": "project"
         }
       ]

@@ -1,5 +1,7 @@
 package com.kattysoft.core.impl;
 
+import com.kattysoft.core.AccessRightLevel;
+import com.kattysoft.core.AccessRightService;
 import com.kattysoft.core.DocumentService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.dao.DocumentDao;
@@ -31,6 +33,9 @@ public class DocumentServiceImplTest {
 
     @Mock
     private UserService userService;
+    
+    @Mock
+    private AccessRightService accessRightService;
 
     @InjectMocks
     private DocumentService documentService;
@@ -49,6 +54,8 @@ public class DocumentServiceImplTest {
         user.setId(UUID.randomUUID());
         user.setTitle("Test User");
         when(userService.getCurrentUser()).thenReturn(user);
+        when(accessRightService.checkDocumentRights(any(Document.class), any(String.class), any(AccessRightLevel.class))).thenReturn(true);
+        when(accessRightService.checkRights(any(String.class), any(String.class), any(String.class), any(AccessRightLevel.class))).thenReturn(true);
     }
 
     @Test

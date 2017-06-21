@@ -148,7 +148,7 @@ public class TestService {
         submitButton.click();
     }
 
-    public void click(String text, String clazzWanted, boolean contains) throws InterruptedException {
+    public boolean click(String text, String clazzWanted, boolean contains) throws InterruptedException {
         text = text.trim();
         log.info("Click '${text}'");
         java.util.List<WebElement> elements = contains ?
@@ -204,7 +204,9 @@ public class TestService {
         logElement("Clickable ", clickable);
         if (clickable != null) {
             clickable.click();
+            return true;
         }
+        return false;
     }
 
     public WebElement elementByXpath(String xpath) {

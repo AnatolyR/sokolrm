@@ -1,0 +1,98 @@
+{
+  "condition": "status = 'sign' AND signer = '${currentUser}'",
+  "gridConfig": {
+    "title": "Документы",
+    "sortColumn": "created",
+    "sortAsc": false,
+    "columnsVisible": [
+      "id",
+      "documentNumber",
+      "author",
+      "type",
+      "status",
+      "title",
+      "registrationDate"
+    ],
+    "columns": [
+      {
+        "id": "id",
+        "type": "hidden"
+      },
+      {
+        "id": "documentNumber",
+        "title": "Номер"
+      },
+      {
+        "id": "author",
+        "title": "Автор",
+        "render": "user"
+      },
+      {
+        "id": "type",
+        "title": "Тип",
+        "render": "doctype"
+      },
+      {
+        "id": "documentKind",
+        "title": "Вид документа"
+      },
+      {
+        "id": "status",
+        "title": "Статус",
+        "render": "status"
+      },
+      {
+        "id": "title",
+        "title": "Заголовок",
+        "render": "link",
+        "linkType": "document"
+      },
+      {
+        "id": "created",
+        "title": "Дата создания",
+        "render": "datetime"
+      },
+      {
+        "id": "registrationDate",
+        "title": "Дата регистрации",
+        "render": "datetime"
+      },
+      {
+        "id": "pagesQuantity",
+        "title": "Кол. стр."
+      },
+      {
+        "id": "addressee",
+        "title": "Адресаты (ИД)"
+      },
+      {
+        "id": "addresseeTitle",
+        "title": "Адресаты"
+      },
+      {
+        "id": "correspondent",
+        "title": "Корреспондент (ИД)"
+      },
+      {
+        "id": "correspondentTitle",
+        "title": "Корреспондент"
+      },
+      {
+        "id": "executionDate",
+        "title": "Дата исполнения"
+      },
+      {
+        "id": "signer",
+        "title": "Подписант"
+      },
+      {
+        "id": "space",
+        "title": "Пространство"
+      },
+      {
+        "id": "archivecase",
+        "title": "Дело"
+      }
+    ]
+  }
+}
