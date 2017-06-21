@@ -118,7 +118,7 @@ public class TaskServiceImpl implements TaskService {
                     updateDocumentStatus(documentId, "approval", systemUser);
                 }
             } else {
-                boolean done = !tasks.stream().filter(t -> !"agreed".equals(t.getResult())).findFirst().isPresent();
+                boolean done = !tasks.stream().filter(t -> !("agreed".equals(t.getResult()) || "agreed_with_note".equals(t.getResult()))).findFirst().isPresent();
                 if (done) {
                     if ("approval".equals(document.getStatus())) {
                         updateDocumentStatus(documentId, "agreed", systemUser);

@@ -2,6 +2,8 @@
   "condition": "type = 'outgoingDocument' AND status IS DISTINCT FROM 'draft' AND status IS DISTINCT FROM 'template' AND status IS DISTINCT FROM 'archive'",
   "gridConfig": {
     "title": "Исходящие документы",
+    "sortColumn": "created",
+    "sortAsc": false,
     "columnsVisible": [
       "id",
       "documentNumber",

@@ -73,10 +73,24 @@
   },
   {
     "action": "doAction",
-    "name": "На подписание",
-    "mainAttributes": "mainAttributes1",
-    "header": "header.tosign",
-    "buttons": "buttons.aftersign"
+    "name": "На согласование"
+  },
+  {
+    "action": "execute",
+    "comment": "Test comment",
+    "executors": [
+      {
+        "user": "Гарина В. М.",
+        "date": "${datePlus3d}"
+      },
+      {
+        "user": "Захаров",
+        "date": "${datePlus3d}"
+      }
+    ],
+    "sokolExecutionPanel": "sokolExecutionPanel.create",
+    "header": "header.execution",
+    "sokolHistoryPanel": "history.executecreate"
   },
   {
     "action": "close"
@@ -87,6 +101,39 @@
   },
   {
     "action": "logout"
+  },
+  {
+    "comment": "-------------- НЕ СОГЛАСОВАНИЕ ГАРИНА --------------"
+  },
+  {
+    "action": "login",
+    "user": "garina",
+    "pass": "123"
+  },
+  {
+    "action": "openList",
+    "listId": "incomingTasks"
+  },
+  {
+    "action": "openObject",
+    "value": "Исходящий ${date3}"
+  },
+  {
+    "action": "click",
+    "value": "Не согласовывать"
+  },
+  {
+    "action": "close"
+  },
+  {
+    "action": "sleep",
+    "value": 3000
+  },
+  {
+    "action": "logout"
+  },
+  {
+    "comment": "-------------- СОГЛАСОВАНИЕ ЗАХАРОВЫМ --------------"
   },
   {
     "action": "login",
@@ -95,12 +142,15 @@
   },
   {
     "action": "openList",
-    "listId": "outgoingDocuments"
+    "listId": "incomingTasks"
   },
   {
     "action": "openObject",
-    "value": "Исходящий ${date3}",
-    "buttons": "buttons.noactions"
+    "value": "Исходящий ${date3}"
+  },
+  {
+    "action": "click",
+    "value": "Согласовать"
   },
   {
     "action": "close"
@@ -114,49 +164,15 @@
   },
   {
     "action": "login",
-    "user": "ivashov",
+    "user": "lukov",
     "pass": "123"
-  },
-  {
-    "action": "openList",
-    "listId": "signDocuments"
   },
   {
     "action": "openObject",
     "value": "Исходящий ${date3}",
-    "buttons": "buttons.sign"
-  },
-  {
-    "action": "doAction",
-    "name": "Подписать"
-  },
-  {
-    "action": "doAction",
-    "name": "Зарегистрировать",
-    "mainAttributes": "mainAttributes.registered",
-    "header": "header.registered",
-    "objects": [
-      {
-        "name": "documentNumber",
-        "type": "documentNumber",
-        "param": "Исходящие документы"
-      }
-    ]
-  },
-  {
-    "action": "doAction",
-    "name": "Отправлено",
-    "header": "header.sent"
-  },
-  {
-    "action": "doAction",
-    "name": "В дело",
-    "header": "header.tocase"
-  },
-  {
-    "action": "doAction",
-    "name": "В архив",
-    "header": "header.archive"
+    "header": "header.notapproved",
+    "sokolExecutionPanel": "sokolExecutionPanel.notapproved",
+    "sokolHistoryPanel": "history.notapproved"
   },
   {
     "action": "close"
