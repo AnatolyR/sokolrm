@@ -2,6 +2,8 @@
   "condition": "author = '${currentUser}'",
   "gridConfig": {
     "title": "Мои документы",
+    "sortColumn": "created",
+    "sortAsc": false,
     "columnsVisible": [
       "id",
       "documentNumber",

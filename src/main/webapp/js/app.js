@@ -845,7 +845,7 @@ $.widget('sokol.attachesGrid', {
         attachDiv.hide();
         attachDiv.appendTo(panelBody);
         $(":file").filestyle({buttonText: "Выбрать вложение"});
-        var saveAttachButton = $('<button type="button" style="margin-right: 5px;" class="btn btn-primary">Добавить</button>');
+        var saveAttachButton = $('<button type="button" style="margin-right: 5px;" class="btn btn-primary attachPanelButtons">Добавить</button>');
         saveAttachButton.click($.proxy(function() {
             var file_data = $('#attachField').prop('files')[0];
             var form_data = new FormData();

@@ -20,6 +20,9 @@
     "value": "Запрос дополнительных документов"
   },
   {
+    "action": "addAttach"
+  },
+  {
     "action": "editDocument",
     "mainAttributes": "mainAttributes1",
     "data": [
@@ -28,7 +31,8 @@
         "type": "string",
         "value": ". Исходящий из шаблона ${date3}"
       }
-    ]
+    ],
+    "attachmentsPanel": "attachmentsPanel"
   },
   {
     "action": "close"

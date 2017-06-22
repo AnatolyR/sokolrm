@@ -48,6 +48,7 @@ public class DocumentIT {
     SimpleDateFormat dateFormat2 = new SimpleDateFormat("MMddHHmm");
     SimpleDateFormat dateFormat3 = new SimpleDateFormat("EE dd MMMM HH:mm", new Locale("ru"));
     private boolean doAssert = true;
+    private boolean addAttaches = false;
 
     @DataProvider(name = "flows")
     public Object[][] createData() {
@@ -155,6 +156,15 @@ public class DocumentIT {
                         newDocumentAction(s, objects);
                     } catch (Exception e) {
                         throw new RuntimeException("Can not create new document", e);
+                    }
+                    break;
+                case "addAttach":
+                    try {
+                        if (addAttaches) {
+                            addAttach(s, objects);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("Can not add attach", e);
                     }
                     break;
                 case "editDocument":
@@ -275,6 +285,16 @@ public class DocumentIT {
         //два исполнителя - оба неуспешно
 
         //один исполнитель - просрочено
+    }
+
+    private void addAttach(JsonNode s, Map<String, Object> objects) throws InterruptedException {
+        ts.click("Добавить вложение", null, false);
+        ts.click("Выбрать вложение", null, false);
+        Thread.sleep(1000);
+        ts.addAttach();
+        Thread.sleep(1000);
+        ts.click("Добавить", "attachPanelButtons", false);
+        Thread.sleep(2000);
     }
 
     private void doExecuteReport(JsonNode step, Map<String, Object> objects) throws InterruptedException {
@@ -528,6 +548,11 @@ public class DocumentIT {
         if (step.has("sokolHistoryPanel")) {
             String fileName = "/" + testName + "/" + step.get("sokolHistoryPanel").asText() + ".txt";
             checkBlock(fileName, "sokolHistoryPanel", objects);
+        }
+
+        if (step.has("attachmentsPanel") && addAttaches) {
+            String fileName = "/" + testName + "/" + step.get("attachmentsPanel").asText() + ".txt";
+            checkBlock(fileName, "attachmentsPanel", objects);
         }
 
         if (step.has("mainAttributes")) {
