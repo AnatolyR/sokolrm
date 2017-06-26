@@ -2156,7 +2156,7 @@ $.widget('sokol.filter', {
             condition.remove();
         });
         var addButton = $('<div class="btn-group tableCell" style=""><button type="button" class="form-control btn btn-success btn-sm" >' +
-            '<span class="glyphicon glyphicon-plus" ></span>' +
+            '<span class="glyphicon glyphicon-plus" title="Добавить элемент условия"></span>' +
             '</button></div>').appendTo(condition);
         addButton.click($.proxy(function() {
             this.addCondition(condition);
@@ -3716,7 +3716,7 @@ $.widget("sokol.grid", {
         for (var i = 0; i < this.options.columns.length; i++) {
             var column = this.options.columns[i];
             if (column.type != "hidden") {
-                var li = $('<li><a href="#" class="" data-value="' + column.id + '" tabIndex="-1"><input type="checkbox"/>&nbsp;' + column.title + '</a></li>');
+                var li = $('<li><a href="#" class="sokolListColumnSelectItem" data-value="' + column.id + '" tabIndex="-1"><input type="checkbox" style="margin-right: 10px;"/>' + column.title + '</a></li>');
                 var inp = li.find("input");
                 if (this.options.columnsVisible.indexOf(column.id) > -1) {
                     inp.prop('checked', true);

@@ -59,7 +59,7 @@ $.widget('sokol.filter', {
             condition.remove();
         });
         var addButton = $('<div class="btn-group tableCell" style=""><button type="button" class="form-control btn btn-success btn-sm" >' +
-            '<span class="glyphicon glyphicon-plus" ></span>' +
+            '<span class="glyphicon glyphicon-plus" title="Добавить элемент условия"></span>' +
             '</button></div>').appendTo(condition);
         addButton.click($.proxy(function() {
             this.addCondition(condition);

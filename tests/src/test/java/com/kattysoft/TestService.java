@@ -293,4 +293,74 @@ public class TestService {
         robot.mousePress(InputEvent.BUTTON1_MASK);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
     }
+
+    public void fillSelect(String selectName, String value, boolean clear) throws InterruptedException {
+        WebElement select = this.elementByXpath("//*[@name = '" + selectName + "']");
+        WebElement div = select.findElement(By.xpath(".."));
+        WebElement input = div.findElement(By.xpath(".//input"));
+        if (clear) {
+            input.sendKeys("\b");
+        }
+        input.sendKeys(value);
+        Thread.sleep(1000);
+        this.click(value, "highlight", true);
+        Thread.sleep(500);
+    }
+
+    public void fillSimpleSelect(String selectName, String value) throws InterruptedException {
+        WebElement select = this.elementByXpath("//*[@name = '" + selectName + "']");
+        WebElement div = select.findElement(By.xpath(".."));
+        WebElement button = div.findElement(By.xpath(".//button"));
+        
+        button.click();
+        
+        this.click(value, "text", false);
+        
+        Thread.sleep(1000);
+    }
+
+    public void fillNSimpleSelect(String selectName, int n, String value) throws InterruptedException {
+        List<WebElement> selects = this.elementsByXpath("//*[@name = '" + selectName + "']");
+        WebElement select = selects.get(n);
+        WebElement div = select.findElement(By.xpath(".."));
+        WebElement button = div.findElement(By.xpath(".//button"));
+
+        button.click();
+
+        this.click(value, "text", false);
+
+        Thread.sleep(1000);
+    }
+
+    public void fillFirstString(String name, String value) {
+        WebElement input = this.elementsByXpath("//*[@name = '" + name + "']").get(0);
+        input.sendKeys(value);
+    }
+
+    public void fillFirstSelect(String selectName, String value) throws InterruptedException {
+        WebElement select = this.elementsByXpath("//*[@name = '" + selectName + "']").get(0);
+        WebElement div = select.findElement(By.xpath(".."));
+        WebElement input = div.findElement(By.xpath(".//input"));
+        input.sendKeys(value);
+        Thread.sleep(1000);
+        this.click(value, "highlight", true);
+        Thread.sleep(500);
+    }
+
+    public void fillString(String name, String value, boolean clear) {
+        WebElement input = this.elementByXpath("//*[@name = '" + name + "']");
+        if (clear) {
+            input.clear();
+        }
+        input.sendKeys(value);
+    }
+
+    public void fillNString(String name, int n, String value, boolean clear) {
+        List<WebElement> inputs = this.elementsByXpath("//*[@name = '" + name + "']");
+        WebElement input = inputs.get(n);
+        if (clear) {
+            input.clear();
+        }
+        input.sendKeys(value);
+    }
 }
