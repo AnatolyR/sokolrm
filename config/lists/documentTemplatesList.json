@@ -2,6 +2,8 @@
   "condition": "status = 'template' AND author = '${currentUser}'",
   "gridConfig": {
     "title": "Документы",
+    "sortColumn": "created",
+    "sortAsc": false,
     "columnsVisible": [
       "id",
       "type",

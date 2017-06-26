@@ -5,7 +5,6 @@
     "columnsVisible": [
       "id",
       "documentNumber",
-      "type",
       "status",
       "title",
       "registrationDate"
@@ -39,6 +38,16 @@
         "id": "registrationDate",
         "title": "Дата регистрации",
         "render": "datetime"
+      },
+      {
+        "id": "signer",
+        "title": "Подписант",
+        "render": "user"
+      },
+      {
+        "id": "space",
+        "title": "Пространство",
+        "render": "space"
       }
     ]
   }

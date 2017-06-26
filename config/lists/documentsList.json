@@ -77,11 +77,13 @@
       },
       {
         "id": "signer",
-        "title": "Подписант"
+        "title": "Подписант",
+        "render": "user"
       },
       {
         "id": "space",
-        "title": "Пространство"
+        "title": "Пространство",
+        "render": "space"
       },
       {
         "id": "archivecase",

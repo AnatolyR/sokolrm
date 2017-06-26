@@ -1,22 +1,25 @@
 {
-  "condition": "status = 'sign' AND signer = '${currentUser}'",
+  "condition": "status = 'review' AND '${currentUser}' = ANY (addressee)",
   "gridConfig": {
     "title": "Документы",
     "sortColumn": "created",
     "sortAsc": false,
     "columnsVisible": [
       "id",
-      "author",
       "type",
       "documentKind",
       "title",
-      "correspondentTitle",
-      "space"
+      "signer",
+      "correspondentTitle"
     ],
     "columns": [
       {
         "id": "id",
         "type": "hidden"
+      },
+      {
+        "id": "documentNumber",
+        "title": "Номер"
       },
       {
         "id": "author",
@@ -33,15 +36,29 @@
         "title": "Вид документа"
       },
       {
+        "id": "status",
+        "title": "Статус",
+        "render": "status"
+      },
+      {
         "id": "title",
         "title": "Заголовок",
         "render": "link",
         "linkType": "document"
       },
       {
+        "id": "signer",
+        "title": "Подписант",
+        "render": "user"
+      },
+      {
         "id": "created",
         "title": "Дата создания",
         "render": "datetime"
+      },
+      {
+        "id": "pagesQuantity",
+        "title": "Кол. стр."
       },
       {
         "id": "correspondent",
@@ -55,6 +72,10 @@
         "id": "space",
         "title": "Пространство",
         "render": "space"
+      },
+      {
+        "id": "archivecase",
+        "title": "Дело"
       }
     ]
   }

@@ -7,10 +7,10 @@
     "columnsVisible": [
       "id",
       "documentNumber",
-      "type",
       "status",
       "title",
-      "registrationDate"
+      "registrationDate",
+      "correspondentTitle"
     ],
     "columns": [
       {
@@ -49,6 +49,11 @@
       {
         "id": "addresseeTitle",
         "title": "Адресаты"
+      },
+      {
+        "id": "space",
+        "title": "Пространство",
+        "render": "space"
       }
     ]
   }

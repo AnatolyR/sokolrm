@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kattysoft.core.*;
 import com.kattysoft.core.model.Document;
+import com.kattysoft.core.model.Space;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.specification.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public class DocumentListController {
 
     @Autowired
     private TitleService titleService;
+
+    @Autowired
+    private SpaceService spaceService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -90,6 +94,9 @@ public class DocumentListController {
                     if (render != null) {
                         if ("executionType".equals(render) || "executionStatus".equals(render) || "status".equals(render)) {
                             String name = titleService.getName(render, value);
+                            ((ObjectNode) jsonNode).put("value", name);
+                        } else if ("executionResult".equals(render)) {
+                            String name = titleService.getName("executionResult", value);
                             ((ObjectNode) jsonNode).put("value", name);
                         } else if ("user".equals(render)) {
                             if (!Utils.isUUID(value)) {
@@ -188,7 +195,7 @@ public class DocumentListController {
             String name = e.getKey();
             String renderer = e.getValue();
             if (document.get(name) != null) {
-                String value = document.get(name).asText();
+                String value = document.has(name) && !document.get(name).isNull() ? document.get(name).asText() : "";
                 if ("doctype".equals(renderer)) {
                     String type = value;
                     cacheTypeData(type, typeTitleCash, flowStatusTitleCash);
@@ -203,8 +210,22 @@ public class DocumentListController {
                 } else if ("executionType".equals(renderer) || "executionStatus".equals(renderer)) {
                     String titleValue = titleService.getTitleNotNull(renderer, value);
                     document.put(name, titleValue);
+                } else if ("executionResult".equals(renderer)) {
+                    String titleValue = titleService.getTitleNotNull(renderer, value);
+                    document.put(name, titleValue);
+                } else if ("space".equals(renderer)) {
+                    if (value == null || value.isEmpty()) {
+                        document.put(name, "");
+                    } else if (Utils.isUUID(value)) {
+                        Space space = spaceService.getSpace(value);
+                        document.put(name, space.getTitle());
+                    } else {
+                        document.put(name, "[" + value + "]");
+                    }
                 } else if ("user".equals(renderer)) {
-                    if (Utils.isUUID(value)) {
+                    if (value == null || value.isEmpty()) {
+                        document.put(name, "");
+                    } else if (Utils.isUUID(value)) {
                         User user = userService.getUserById(value);
                         document.put(name, user.getTitle());
                     } else {
@@ -252,5 +273,9 @@ public class DocumentListController {
 
     public void setTitleService(TitleService titleService) {
         this.titleService = titleService;
+    }
+
+    public void setSpaceService(SpaceService spaceService) {
+        this.spaceService = spaceService;
     }
 }

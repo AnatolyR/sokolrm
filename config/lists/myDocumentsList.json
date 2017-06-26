@@ -27,6 +27,10 @@
         "render": "doctype"
       },
       {
+        "id": "documentKind",
+        "title": "Вид документа"
+      },
+      {
         "id": "status",
         "title": "Статус",
         "render": "status"
@@ -38,9 +42,52 @@
         "linkType": "document"
       },
       {
+        "id": "created",
+        "title": "Дата создания",
+        "render": "datetime"
+      },
+      {
         "id": "registrationDate",
         "title": "Дата регистрации",
         "render": "datetime"
+      },
+      {
+        "id": "pagesQuantity",
+        "title": "Кол. стр."
+      },
+      {
+        "id": "addressee",
+        "title": "Адресаты (ИД)"
+      },
+      {
+        "id": "addresseeTitle",
+        "title": "Адресаты"
+      },
+      {
+        "id": "correspondent",
+        "title": "Корреспондент (ИД)"
+      },
+      {
+        "id": "correspondentTitle",
+        "title": "Корреспондент"
+      },
+      {
+        "id": "executionDate",
+        "title": "Дата исполнения"
+      },
+      {
+        "id": "signer",
+        "title": "Подписант",
+        "render": "user"
+      },
+      {
+        "id": "space",
+        "title": "Пространство",
+        "render": "space"
+      },
+      {
+        "id": "archivecase",
+        "title": "Дело"
       }
     ]
   }

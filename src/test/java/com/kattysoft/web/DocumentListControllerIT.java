@@ -86,6 +86,6 @@ public class DocumentListControllerIT {
             .andExpect(jsonPath("$.data[1].id").value("2"))
             .andExpect(jsonPath("$.data[1].title").value("Title 2"));
 
-        MatcherAssert.assertThat(content, CoreMatchers.equalTo("{\"data\":[{\"id\":\"1\",\"title\":\"Title 1\",\"type\":\"Входящий\",\"space\":null,\"kind\":null,\"status\":\"[null]\"},{\"id\":\"2\",\"title\":\"Title 2\",\"type\":\"[notExistType]\",\"space\":null,\"kind\":null,\"status\":\"[null]\"}],\"offset\":0,\"total\":2}"));
+        MatcherAssert.assertThat(content, CoreMatchers.equalTo("{\"data\":[{\"id\":\"1\",\"title\":\"Title 1\",\"type\":\"Входящий\",\"space\":\"\",\"kind\":null,\"status\":\"[]\"},{\"id\":\"2\",\"title\":\"Title 2\",\"type\":\"[notExistType]\",\"space\":\"\",\"kind\":null,\"status\":\"[]\"}],\"offset\":0,\"total\":2}"));
     }
 }

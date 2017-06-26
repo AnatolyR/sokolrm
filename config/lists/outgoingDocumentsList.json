@@ -7,10 +7,10 @@
     "columnsVisible": [
       "id",
       "documentNumber",
-      "type",
       "status",
       "title",
-      "registrationDate"
+      "registrationDate",
+      "correspondentTitle"
     ],
     "columns": [
       {
@@ -38,9 +38,23 @@
         "linkType": "document"
       },
       {
+        "id": "signer",
+        "title": "Подписант",
+        "render": "user"
+      },
+      {
         "id": "registrationDate",
         "title": "Дата регистрации",
         "render": "datetime"
+      },
+      {
+        "id": "correspondentTitle",
+        "title": "Корреспондент"
+      },
+      {
+        "id": "space",
+        "title": "Пространство",
+        "render": "space"
       }
     ]
   }

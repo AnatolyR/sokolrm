@@ -1,18 +1,20 @@
 {
-  "condition": "t.userId = '${currentUser}'::uuid AND t.status IS DISTINCT FROM 'complete'",
+  "condition": "t.userId = '${currentUser}'::uuid AND t.status = 'complete'",
   "join": "right join tasks t on d.id = t.documentId",
   "gridConfig": {
     "id": "tasks",
     "url": "app/documents",
-    "title": "Входящие задачи",
+    "title": "Архив входящих задач",
     "sortColumn": "t.created",
     "sortAsc": false,
     "columnsVisible": [
       "t.type",
       "t.author",
       "t.duedate",
+      "t.executeddate",
       "d.documentNumber",
-      "d.title"
+      "d.title",
+      "t.result"
     ],
     "columns": [
       {
@@ -35,6 +37,11 @@
         "render": "datetime"
       },
       {
+        "id": "t.executeddate",
+        "title": "Дата завершения",
+        "render": "datetime"
+      },
+      {
         "id": "d.documentNumber",
         "title": "Номер документа",
         "render": "link",
@@ -46,6 +53,11 @@
         "render": "link",
         "linkType": "task",
         "idColumn": "t.id"
+      },
+      {
+        "id": "t.result",
+        "title": "Результат",
+        "render": "executionResult"
       },
       {
         "id": "t.status",

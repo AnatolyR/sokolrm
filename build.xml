@@ -43,6 +43,17 @@
         </exec>
     </target>
 
+    <target name="restoreBackup">
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="/Users/anatolii/Documents/sokolsed/db/backup/dump_20170622-1704.sql"/>
+        </exec>
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="/Users/anatolii/Documents/sokolsed/db/backup/dump_files_20170622-1704.sql"/>
+        </exec>
+    </target>
+
     <target name="dump">
         <exec executable="pg_dump">
             <arg value="--schema"/>

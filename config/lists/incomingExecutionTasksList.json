@@ -1,18 +1,18 @@
 {
-  "condition": "t.userId = '${currentUser}'::uuid AND t.status IS DISTINCT FROM 'complete'",
+  "condition": "t.userId = '${currentUser}'::uuid AND t.status IS DISTINCT FROM 'complete' AND t.type = 'execution'",
   "join": "right join tasks t on d.id = t.documentId",
   "gridConfig": {
     "id": "tasks",
     "url": "app/documents",
-    "title": "Входящие задачи",
+    "title": "Входящие задачи на исполнение",
     "sortColumn": "t.created",
     "sortAsc": false,
     "columnsVisible": [
-      "t.type",
       "t.author",
       "t.duedate",
       "d.documentNumber",
-      "d.title"
+      "d.title",
+      "t.status"
     ],
     "columns": [
       {

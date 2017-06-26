@@ -2,6 +2,8 @@
   "condition": "status = 'archive'",
   "gridConfig": {
     "title": "Документы",
+    "sortColumn": "created",
+    "sortAsc": false,
     "columnsVisible": [
       "id",
       "documentNumber",
