@@ -92,6 +92,9 @@ var mockResponses = mockResponses || [];
 
     var documentKindData = {
         "title": "Вид документа",
+        "addable": true,
+        "deletable": true,
+        "selectable": true,
         "gridConfig": {"title": "Вид документа", "columns": [{"id": "title", "title": "Знчение", "editor": "text"}]},
         "data": [{
             "id": "5bd27ea3-80a5-4cb8-a289-14c2c0f9a4f9",
@@ -190,6 +193,9 @@ var mockResponses = mockResponses || [];
     };
 
     var organizationPersonsData = {
+        "addable": "link",
+        "deletable": true,
+        "selectable": true,
         "gridConfig": {
             "title": "Сотрудники организации",
             "columnsVisible": ["lastName", "firstName", "middleName", "title"],

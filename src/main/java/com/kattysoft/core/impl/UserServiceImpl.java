@@ -112,6 +112,12 @@ public class UserServiceImpl implements UserService {
                 user = existUser;
             }
         }
+        if (user.getLogin() != null && !user.getLogin().isEmpty()) {
+            List<User> allByLogin = userRepository.findAllByLogin(user.getLogin());
+            if (allByLogin != null && allByLogin.size() > 0 && !allByLogin.get(0).getId().equals(user.getId())) {
+                throw new SokolException("User with such login already exist");
+            }
+        }
         userRepository.save(user);
         return user.getId().toString();
     }

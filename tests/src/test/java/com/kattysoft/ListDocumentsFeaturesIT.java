@@ -12,6 +12,7 @@ package com.kattysoft;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.MatcherAssert;
 import org.openqa.selenium.WebElement;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -37,11 +38,18 @@ public class ListDocumentsFeaturesIT {
 //        ts = TestService.getInstance();
     }
     
+    @AfterTest
+    public void afterTest() {
+        if (!doAssert) {
+            throw new RuntimeException("doAssert set to false");
+        }
+    }
+    
     @Test
     public void testPaging() throws InterruptedException, AWTException, IOException {
         doAssert = true;
         
-        ts = TestService.getInstance();
+        ts = TestService.getInstance("ivashov", "123");
         String listId = "documents";
         Thread.sleep(2000);
         String categoryName = "category_" + listId;
@@ -97,7 +105,7 @@ public class ListDocumentsFeaturesIT {
     public void testColumns() throws InterruptedException, AWTException, IOException {
         doAssert = true;
 
-        ts = TestService.getInstance();
+        ts = TestService.getInstance("ivashov", "123");
         String listId = "documents";
         Thread.sleep(2000);
         String categoryName = "category_" + listId;
@@ -124,7 +132,7 @@ public class ListDocumentsFeaturesIT {
     public void testFilter() throws InterruptedException, AWTException, IOException {
         doAssert = true;
 
-        ts = TestService.getInstance();
+        ts = TestService.getInstance("ivashov", "123");
         String listId = "documents";
         Thread.sleep(2000);
         String categoryName = "category_" + listId;

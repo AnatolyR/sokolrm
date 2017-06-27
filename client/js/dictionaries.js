@@ -20,7 +20,7 @@ $.widget('sokol.dictionaries', {
             data.items.forEach($.proxy(function (item) {
                 if (item.type == 'header') {
                     if (item.title) {
-                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
+                        var header = $('<ul class="nav nav-sidebar"><li style="font-weight: bold;" name="category_' + item.id + '"><a class="sokolDictionaryListItem" href="">' + item.title + '</a></li></ul>').appendTo(sidebar);
                         currentNode = header;
                         header.find("a").click(produceHandler(item));
                     } else {
@@ -31,7 +31,7 @@ $.widget('sokol.dictionaries', {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
                     }
-                    var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
+                    var category = $('<li name="category_' + item.id + '"><a class="sokolDictionaryListItem" href="">' + item.title + '</a></li>').appendTo(currentNode);
                     category.find("a").click(produceHandler(item));
                 }
             }, this));
@@ -159,10 +159,10 @@ $.widget('sokol.dictionaries', {
                     columns: data.gridConfig.columns,
                     data: preparedData,
                     id: id,
-                    selectable: true,
-                    deletable: true,
+                    selectable: data.selectable,
+                    deletable: data.deletable,
                     deleteMethod: $.proxy(this.doDeleteWithConfirm, this),
-                    addable: true,
+                    addable: data.addable,
                     addMethod: $.proxy(this.doAdd, this)
                 };
                 this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
@@ -179,7 +179,7 @@ $.widget('sokol.dictionaries', {
         }
         $.getJSON('app/config', {id: 'dictionaries/' + id}, $.proxy(function(response) {
             var options = response.gridConfig;
-            options.addable = 'link';
+            options.addable = response.addable;
             this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
             document.title = options.title;
         }, this));

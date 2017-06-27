@@ -106,7 +106,7 @@ public class OpenDocumentIT {
 //        ts = TestService.getInstance();
     }
 
-    @Test(dataProvider = "documents")
+//    @Test(dataProvider = "documents") deprecated
     public void openDocument(String documentTitle, String headerContent, String mainAttributesContent,
                              String agreementContent, String attachesContent) throws InterruptedException, MalformedURLException, AWTException {
         ts = TestService.getInstance();

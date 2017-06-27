@@ -9,6 +9,7 @@
  */
 package com.kattysoft;
 
+import org.hamcrest.MatcherAssert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -30,6 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -75,6 +78,17 @@ public class TestService {
             Thread.sleep(3000);
         } else {
             instance.open();
+
+            WebElement headerUserMenu = instance.elementByXpath("//*[contains(@class, 'headerUserMenu')]");
+
+            if (headerUserMenu != null) {
+                headerUserMenu.click();
+                Thread.sleep(500);
+                instance.click("Выход", "sokolHeaderMenuItem", true);
+                Thread.sleep(1000);
+            }
+            instance.login(user, pass);
+            Thread.sleep(3000);
         }
         return instance;
     }
@@ -302,8 +316,8 @@ public class TestService {
             input.sendKeys("\b");
         }
         input.sendKeys(value);
-        Thread.sleep(1000);
-        this.click(value, "highlight", true);
+        Thread.sleep(2000);
+        this.click(value, null, true);
         Thread.sleep(500);
     }
 
@@ -362,5 +376,67 @@ public class TestService {
             input.clear();
         }
         input.sendKeys(value);
+    }
+
+    public String populate(String text, Map<String, Object> objects, String actualText) {
+        for (Map.Entry<String, Object> entry : objects.entrySet()) {
+            text = text.replace("${" + entry.getKey() + "}", entry.getValue().toString());
+        }
+
+        java.util.List<String> ignores = new ArrayList<>();
+        if (text.contains("${ignore}")) {
+            String[] textLines = text.split("\n");
+            String[] actualTextLines = actualText.split("\n");
+            for (int i = 0; i < textLines.length; i++) {
+                String textLine = textLines[i];
+                String actualTextLine = i < actualTextLines.length ? actualTextLines[i] : "";
+                if (textLine.contains("${ignore}")) {
+                    String[] words = textLine.split(" ");
+                    String[] actualWords = actualTextLine.split(" ");
+                    for (int j = 0; j < words.length; j++) {
+                        String word = words[j];
+                        String actualWord = j < actualWords.length ? actualWords[j] : "[no data]";
+                        if (word.equals("${ignore}")) {
+                            ignores.add(actualWord);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (String ignore : ignores) {
+            text = text.replaceFirst("\\$\\{ignore\\}", ignore);
+        }
+
+        return text;
+    }
+
+    public static void match(boolean doAssert, String actualText, String textFromFile) {
+        if (doAssert) {
+            MatcherAssert.assertThat(actualText, equalTo(textFromFile));
+        } else {
+            if (!textFromFile.equals(actualText)) {
+//                System.err.println("java.lang.AssertionError:\n" +
+//                    "Expected :" + textFromFile + "\n" +
+//                    "Actual   :" + actualText);
+                StringBuilder builder = new StringBuilder();
+                String[] actualTextLines = actualText.split("\n");
+                String[] textFromFileLines = textFromFile.split("\n");
+
+                for (int i = 0; i < textFromFileLines.length; i++) {
+                    String textFromFileLine = textFromFileLines[i];
+                    String actualTextLine = i < actualTextLines.length ? actualTextLines[i] : "";
+                    if (!textFromFileLine.equals(actualTextLine)) {
+                        builder.append(textFromFileLine);
+                        builder.append(" <-> ");
+                        builder.append(actualTextLine);
+                        builder.append("\n");
+                    }
+                }
+//                new AssertionError("Expected :" + textFromFile.replace("\n", "\\n") + "\n" +
+//                    "Actual   :" + actualText.replace("\n", "\\n")).printStackTrace();
+                System.out.println("[!!!] NOT MATCH Expected <-> Actual\n" + builder.toString());
+            }
+        }
     }
 }

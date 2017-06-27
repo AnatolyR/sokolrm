@@ -107,6 +107,12 @@ public class DocumentIT {
 
     //@Test(dataProvider = "flows")
     public void testDocument(String flowName, Integer...  stepNumbers) throws IOException {
+        try {
+            ts = TestService.getInstanceWithoutLogin();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         ArrayNode steps = (ArrayNode) mapper.readTree(DocumentIT.class.getResourceAsStream("/" + flowName + ".json"));
         Map<String, Object> objects = new HashMap<>();
         objects.put("testName", flowName);
@@ -637,9 +643,6 @@ public class DocumentIT {
     }
 
     private void logoutAction(JsonNode step) throws InterruptedException, AWTException, MalformedURLException {
-        if (ts == null) {
-            return;
-        }
         WebElement headerUserMenu = ts.elementByXpath("//*[contains(@class, 'headerUserMenu')]");
 
         if (headerUserMenu != null) {

@@ -44,4 +44,8 @@ public interface UserRepository extends CrudRepository<User, UUID>, JpaSpecifica
     @Override
     @EntityGraph(value = "User.groups", type = EntityGraph.EntityGraphType.LOAD)
     Page<User> findAll(Specification<User> specification, Pageable pageable);
+
+    User findOneByLogin(String login);
+
+    List<User> findAllByLogin(String login);
 }

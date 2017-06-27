@@ -34,7 +34,7 @@ public class ApproveDocumentIT {
 //        ts = TestService.getInstance();
     }
 
-    @Test
+//    @Test deprecated
     public void testApprove() throws InterruptedException, MalformedURLException, AWTException {
         ts = TestService.getInstance();
         System.out.println("===================================");

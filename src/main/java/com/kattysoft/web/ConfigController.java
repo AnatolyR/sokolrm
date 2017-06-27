@@ -68,6 +68,16 @@ public class ConfigController {
                 });
             }
         }
+        
+        if ("dictionaries/organizationPersons".equals(id)) {
+            if (accessRightService.checkRights("_system", "users", "", AccessRightLevel.CREATE)) {
+                ((ObjectNode) config).put("addable", "link");
+            }
+        } else if ("dictionaries/contragents".equals(id)) {
+            if (accessRightService.checkRights("_dictionaries", "contragents", "", AccessRightLevel.CREATE)) {
+                ((ObjectNode) config).put("addable", "link");
+            }
+        } 
 
         return config.toString();
     }

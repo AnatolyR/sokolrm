@@ -89,6 +89,11 @@ public class UserController {
             sortObject.setField(sort);
             sortObject.setOrder("true".equals(sortAsc) ? SortOrder.ASC : SortOrder.DESC);
             spec.setSort(Collections.singletonList(sortObject));
+        } else {
+            Sort sortObject = new Sort();
+            sortObject.setField("title");
+            sortObject.setOrder(SortOrder.ASC);
+            spec.setSort(Collections.singletonList(sortObject));
         }
 
         spec.setOffset(offset);
@@ -205,7 +210,9 @@ public class UserController {
             user.setLogin(login);
 
             ArrayNode groups = (ArrayNode) systemFields.get("groups");
-            groups.forEach(g -> user.getGroups().add(UUID.fromString(g.asText())));
+            if (groups != null) {
+                groups.forEach(g -> user.getGroups().add(UUID.fromString(g.asText())));
+            }
         }
 
         String id = userService.saveUser(user);

@@ -3,8 +3,10 @@
     <test name="Main Features" parallel="false" preserve-order="true">
         <classes>
             <class name="com.kattysoft.ListDocumentsIT"/>
-            <class name="com.kattysoft.OpenDocumentIT"/>
-            <class name="com.kattysoft.ApproveDocumentIT"/>
+            <class name="com.kattysoft.ListDocumentsFeaturesIT"/>
+            <class name="com.kattysoft.DocumentIT"/>
+            <class name="com.kattysoft.DictionariesIT"/>
+            <class name="com.kattysoft.DictionaryIT"/>
         </classes>
     </test>
 </suite>

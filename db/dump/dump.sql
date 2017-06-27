@@ -333,7 +333,6 @@ c47a9327-09ff-4351-8ed2-f55ec1c67790	b0243b1d-5268-4b34-9bae-850c3bf11da4	39649d
 88dcb2d8-2c82-4872-ba25-4b0f89bfe05c	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	39649da6-9fd9-4a3b-a356-2c1c99d9619a	_document		DELETE
 ce3a6aa8-88d6-4095-be3f-5fa5d928bc84	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	groups		CREATE
 956a9816-8cdc-4d4a-93dc-10e7093da5cb	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	groups		LIST
-25dc15e4-25cb-4aca-a179-2e722eaa9bbc	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_system	groups		LIST
 3071842a-b3d3-41c7-b57a-287ef279c98e	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	groups		READ
 168b42e0-e125-4730-85ed-1f98d747a559	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	users		LIST
 7e3791c3-b960-4bdf-b474-e69e9fd85f32	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document	toproject	CREATE
@@ -349,7 +348,6 @@ c0925422-1f94-4540-9911-d12f228fc468	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space
 4475c05a-1274-4cef-a268-0c01d6007899	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document	*send	ALLOW
 df59c89c-01a4-4151-b88a-796b0e28e311	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document		READ
 a40c51c6-bbba-4a0f-a9ef-8b9dbfac1ef4	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document	*toapproval	ALLOW
-21375c9b-524b-45bb-9cde-204ae29e8677	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document		READ
 f27a8f6e-e7b3-4785-8930-30d30bd13837	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	documentGroups		DELETE
 8b1cfd37-10ec-4a7e-a3ff-e5cb23949d94	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	documentGroups		LIST
 30a9878f-f71e-41c9-838b-057b190ab89c	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		LIST
@@ -358,8 +356,18 @@ f27a8f6e-e7b3-4785-8930-30d30bd13837	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_syste
 bf45a4a3-99a9-4a0a-a926-1f35647aea86	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		WRITE
 4f44e0d2-e1f7-45db-a2f4-16e1f25956a3	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	registrationLists		DELETE
 67a70f77-4952-42ff-97e0-4f7ea09918b7	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document		CREATE
-53dc12eb-aa08-41bc-a7e7-8d9d53899290	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document		CREATE
 2492b7c5-2141-4641-8b02-e4a819c052b3	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_space	_document		WRITE
+45dc4e62-8eb8-4200-882e-fdc2271437c7	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	users		CREATE
+4ace531b-097c-4f84-bb5b-8405231c3e58	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_dictionaries	contragents		CREATE
+4ea1299f-e350-4e14-9896-9bcee881ed87	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_dictionaries	documentKind		ADD
+1a2d3ea3-2ee6-454a-a40d-78cccf2d8db7	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_dictionaries	documentKind		DELETE
+f5e98cf6-63c8-4140-baa2-08d6e9bb1615	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	users		WRITE
+fb4918d7-51dd-46f0-820d-9321d8eb529c	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document	*toproject	ALLOW
+410fe670-80db-4786-8fa1-02035845bbd6	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document	*tosign	ALLOW
+aaa19b50-8bfe-4b07-8576-8519df81f088	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document	*toapproval	ALLOW
+53dc12eb-aa08-41bc-a7e7-8d9d53899290	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document		CREATE
+21375c9b-524b-45bb-9cde-204ae29e8677	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document		READ
+25dc15e4-25cb-4aca-a179-2e722eaa9bbc	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_system	groups		LIST
 \.
 
 
@@ -685,6 +693,7 @@ COPY user_groups (userid, groupid) FROM stdin;
 a2cfff23-4070-4063-9e94-c3956e824122	7db50d24-7de5-46e8-87ae-aa9cfa08b144
 722b151c-f9d7-4222-b541-cfc554695510	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103
 5d729b02-4d8c-4abd-80cc-c7497d1945cf	7db50d24-7de5-46e8-87ae-aa9cfa08b144
+f179d503-c3fe-4b31-b596-fb36aa58f364	7db50d24-7de5-46e8-87ae-aa9cfa08b144
 \.
 
 
@@ -733,6 +742,7 @@ a4fa069b-64ac-4a7e-ba5f-a3dc3e84c66e	Карандашова Д. Г.	\N	\N	Дар
 722b151c-f9d7-4222-b541-cfc554695510	Ивашов В. Н.	ivashov	7e2c122655f9886ab07d7b5fc79f56ac	Виктор	Николаевич	Ивашов112	{a838c335-0fdb-4b3e-9e30-da7fb51e676b,b0243b1d-5268-4b34-9bae-850c3bf11da4}
 5d729b02-4d8c-4abd-80cc-c7497d1945cf	Луков В. А.	lukov	e59f2fc3df2af536de7c197dc23232dd	Виктор	Алексеевич	Луков	\N
 a2cfff23-4070-4063-9e94-c3956e824122	Захаров Н. В.	zaharov	0d37826532c65adafc7cf711f1b25735	Никита	Вячеславович	Захаров	\N
+f179d503-c3fe-4b31-b596-fb36aa58f364	Гарина В. М.	garina	dc01a23feb54892f8ca55d74d5d1f35c	Валентина	Михайловна	Гарина	\N
 \.
 
 

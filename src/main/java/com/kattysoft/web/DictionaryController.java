@@ -50,6 +50,9 @@ public class DictionaryController {
     @Autowired
     private SpaceService spaceService;
 
+    @Autowired
+    private AccessRightService accessRightService;
+
     private ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "/dictionary", produces = "application/json; charset=utf-8")
@@ -126,6 +129,14 @@ public class DictionaryController {
             data.add(item);
         });
 
+        if (accessRightService.checkRights("_dictionaries", id, "", AccessRightLevel.ADD)) {
+            ((ObjectNode) config).put("addable", true);
+        }
+        if (accessRightService.checkRights("_dictionaries", id, "", AccessRightLevel.DELETE)) {
+            ((ObjectNode) config).put("selectable", true);
+            ((ObjectNode) config).put("deletable", true);
+        }
+
         ((ObjectNode) config).set("data", data);
 
         return config.toString();
@@ -192,5 +203,9 @@ public class DictionaryController {
 
     public void setSpaceService(SpaceService spaceService) {
         this.spaceService = spaceService;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }
