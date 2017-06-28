@@ -16,7 +16,6 @@ SET row_security = off;
 SET search_path = sokol, pg_catalog;
 
 DROP INDEX sokol.documents_stidx;
-ALTER TABLE ONLY sokol.users DROP CONSTRAINT users_pkey;
 ALTER TABLE ONLY sokol.taskslists DROP CONSTRAINT taskslists_pkey;
 ALTER TABLE ONLY sokol.tasks DROP CONSTRAINT tasks_pkey;
 ALTER TABLE ONLY sokol.spaces DROP CONSTRAINT spaces_pkey;
@@ -368,6 +367,9 @@ aaa19b50-8bfe-4b07-8576-8519df81f088	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space
 53dc12eb-aa08-41bc-a7e7-8d9d53899290	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document		CREATE
 21375c9b-524b-45bb-9cde-204ae29e8677	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_space	_document		READ
 25dc15e4-25cb-4aca-a179-2e722eaa9bbc	7db50d24-7de5-46e8-87ae-aa9cfa08b144	_system	groups		LIST
+bf1c5c84-1336-4551-961e-8504569f4de3	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_dictionaries	contragents		WRITE
+e6f8e93b-6559-4e0e-9b32-afde492073d3	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_system	users		DELETE
+177724e1-5a5d-449d-afa6-a20f82dc4f09	6f4c9bdb-2cb2-49ee-aa29-0543edbc5103	_dictionaries	contragents		DELETE
 \.
 
 
@@ -840,14 +842,6 @@ ALTER TABLE ONLY tasks
 
 ALTER TABLE ONLY taskslists
     ADD CONSTRAINT taskslists_pkey PRIMARY KEY (id);
-
-
---
--- Name: users_pkey; Type: CONSTRAINT; Schema: sokol; Owner: -
---
-
-ALTER TABLE ONLY users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
 --

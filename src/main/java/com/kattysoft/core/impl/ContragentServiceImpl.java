@@ -9,8 +9,7 @@
  */
 package com.kattysoft.core.impl;
 
-import com.kattysoft.core.ContragentService;
-import com.kattysoft.core.SokolException;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Contragent;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.repository.ContragentRepository;
@@ -32,6 +31,9 @@ public class ContragentServiceImpl implements ContragentService {
 
     @Autowired
     private ContragentRepository contragentRepository;
+
+    @Autowired
+    private AccessRightService accessRightService;
 
     @Override
     public List<Contragent> getContragentsByTitle(String title) {
@@ -79,9 +81,15 @@ public class ContragentServiceImpl implements ContragentService {
 
     public String saveContragent(Contragent contragent) {
         if (contragent.getId() == null) {
+            if (!accessRightService.checkRights("_dictionaries", "contragents", "", AccessRightLevel.CREATE)) {
+                throw new NoAccessRightsException("No rights to create contragent");
+            }
             UUID id = UUID.randomUUID();
             contragent.setId(id);
         } else {
+            if (!accessRightService.checkRights("_dictionaries", "contragents", "", AccessRightLevel.WRITE)) {
+                throw new NoAccessRightsException("No rights to save contragent");
+            }
             if (contragentRepository.findOne(contragent.getId()) == null) {
                 throw new SokolException("Contragent not found");
             }
@@ -91,11 +99,19 @@ public class ContragentServiceImpl implements ContragentService {
     }
 
     public void deleteContragent(String id) {
+        if (!accessRightService.checkRights("_dictionaries", "contragents", "", AccessRightLevel.DELETE)) {
+            throw new NoAccessRightsException("No rights to delete contragent");
+        }
+        
         UUID uuid = UUID.fromString(id);
         contragentRepository.delete(uuid);
     }
 
     public void setContragentRepository(ContragentRepository contragentRepository) {
         this.contragentRepository = contragentRepository;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

@@ -10,19 +10,17 @@
 package com.kattysoft.core.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.DictionaryService;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Dictionary;
 import com.kattysoft.core.model.DictionaryValue;
 import com.kattysoft.core.repository.DictionaryValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -34,6 +32,9 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Autowired
     private DictionaryValueRepository dictionaryValueRepository;
+
+    @Autowired
+    private AccessRightService accessRightService;
 
     @Override
     public List<String> getValuesTitlesForDictionaryId(String dictionaryId) {
@@ -50,6 +51,16 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public void deleteDictionaryValues(List<String> ids) {
+        List<UUID> uuids = ids.stream().map(UUID::fromString).collect(Collectors.toList());
+        Iterable<DictionaryValue> all = dictionaryValueRepository.findAll(uuids);
+        Set<String> dictionaries = new HashSet<>();
+        StreamSupport.stream(all.spliterator(), false).forEach(d -> dictionaries.add(d.getDictionaryId()));
+        for (String dictionary : dictionaries) {
+            if (!accessRightService.checkRights("_dictionaries", dictionary, "", AccessRightLevel.DELETE)) {
+                throw new NoAccessRightsException("No rights to delete dictionary value");
+            }
+        }
+        
         List<DictionaryValue> values = ids.stream().map(id -> new DictionaryValue(UUID.fromString(id))).collect(Collectors.toList());
         dictionaryValueRepository.delete(values);
     }
@@ -66,6 +77,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     public String addDictionaryValue(DictionaryValue value) {
         if (value.getDictionaryId() == null || value.getDictionaryId().isEmpty()) {
             throw new RuntimeException("dictionaryId is null");
+        }
+        if (!accessRightService.checkRights("_dictionaries", value.getDictionaryId(), "", AccessRightLevel.ADD)) {
+            throw new NoAccessRightsException("No rights to add dictionary value");
         }
         UUID id = UUID.randomUUID();
         value.setId(id);
@@ -105,5 +119,9 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

@@ -9,9 +9,7 @@
  */
 package com.kattysoft.core.impl;
 
-import com.kattysoft.core.SokolException;
-import com.kattysoft.core.UserService;
-import com.kattysoft.core.Utils;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.UserRepository;
@@ -41,6 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AccessRightService accessRightService;
 
     private Map<Long, User> usersPerThread = new ConcurrentHashMap<>();
 
@@ -101,9 +102,15 @@ public class UserServiceImpl implements UserService {
 
     public String saveUser(User user) {
         if (user.getId() == null) {
+            if (!accessRightService.checkRights("_system", "users", "", AccessRightLevel.CREATE)) {
+                throw new NoAccessRightsException("No rights to create user");
+            }
             UUID id = UUID.randomUUID();
             user.setId(id);
         } else {
+            if (!accessRightService.checkRights("_system", "users", "", AccessRightLevel.WRITE)) {
+                throw new NoAccessRightsException("No rights to save user");
+            }
             User existUser = userRepository.findOne(user.getId());
             if (existUser == null) {
                 throw new SokolException("User not found");
@@ -123,6 +130,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteUser(String id) {
+        if (!accessRightService.checkRights("_system", "users", "", AccessRightLevel.DELETE)) {
+            throw new NoAccessRightsException("No rights to delete user");
+        }
         UUID uuid = UUID.fromString(id);
         userRepository.delete(uuid);
     }
@@ -187,5 +197,9 @@ public class UserServiceImpl implements UserService {
         long id = Thread.currentThread().getId();
         User user = usersPerThread.get(id);
         return user;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

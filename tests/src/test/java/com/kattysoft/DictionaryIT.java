@@ -11,6 +11,7 @@ package com.kattysoft;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.MatcherAssert;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.AfterTest;
@@ -59,6 +60,63 @@ public class DictionaryIT {
     public void testReadUser2() throws InterruptedException, AWTException, IOException {
         doAssert = true;
         testReadUser("lukov", "123", "user2");
+    }
+
+    @Test
+    public void testReadContragent1() throws InterruptedException, AWTException, IOException {
+        doAssert = true;
+        testReadContragent("ivashov", "123", "contragent1");
+    }
+
+    @Test
+    public void testReadContragent2() throws InterruptedException, AWTException, IOException {
+        doAssert = true;
+        testReadContragent("lukov", "123", "contragent2");
+    }
+
+    public void testReadContragent(String login, String pass, String contentName) throws InterruptedException, IOException, AWTException {
+        ts = TestService.getInstance(login, pass);
+
+        ts.click("Справочники", null, false);
+        Thread.sleep(1000);
+
+        ts.click("Контрагенты", "sokolDictionaryListItem", false);
+        Thread.sleep(1000);
+
+        String linkTitle = "СТРИМ, автострахование";
+        if (!ts.click(linkTitle, null, false)) {
+            throw new AssertionError("No object to open '" + linkTitle + "'");
+        }
+        Thread.sleep(2000);
+
+        RemoteWebDriver driver = ts.getDriver();
+        Set<String> windowHandles = driver.getWindowHandles();
+        for (String windowHandle : windowHandles) {
+            driver.switchTo().window(windowHandle);
+            String currentUrl = driver.getCurrentUrl();
+            if (currentUrl.contains("#contragent/")) {
+                break;
+            }
+        }
+        Thread.sleep(1000);
+
+        try {
+            String contragent = ts.elementByXpath("/html/body/div[contains(@class, 'container')]").getText();
+            System.out.println("\nContragent [" + contentName + "]:\n" + contragent);
+            TestService.match(doAssert, contragent, getContent(contentName));
+        } finally {
+            ts.getDriver().close();
+            Thread.sleep(2000);
+            windowHandles = ts.getDriver().getWindowHandles();
+            for (String windowHandle : windowHandles) {
+                ts.getDriver().switchTo().window(windowHandle);
+                String currentUrl = ts.getDriver().getCurrentUrl();
+                if (currentUrl.contains("#dictionaries/contragents")) {
+                    break;
+                }
+            }
+            Thread.sleep(1000);
+        }
     }
     
     public void testReadUser(String login, String pass, String contentName) throws InterruptedException, IOException, AWTException {
@@ -182,6 +240,112 @@ public class DictionaryIT {
         }
     }
 
+    @Test
+    public void testCreateContragent() throws InterruptedException, IOException, AWTException {
+        doAssert = true;
+        ts = TestService.getInstance("ivashov", "123");
+
+        ts.click("Справочники", null, false);
+        Thread.sleep(1000);
+
+        ts.click("Контрагенты", "sokolDictionaryListItem", false);
+        Thread.sleep(1000);
+
+        ts.click("Создать", "btn", false);
+        Thread.sleep(1000);
+
+        RemoteWebDriver driver = ts.getDriver();
+        Set<String> windowHandles = driver.getWindowHandles();
+        for (String windowHandle : windowHandles) {
+            driver.switchTo().window(windowHandle);
+            String currentUrl = driver.getCurrentUrl();
+            if (currentUrl.contains("#contragent/")) {
+                break;
+            }
+        }
+        Thread.sleep(1000);
+
+        try {
+
+            String user = ts.elementByXpath("/html/body/div[contains(@class, 'container')]").getText();
+            System.out.println("\n[contragentNew]:\n" + user);
+            TestService.match(doAssert, user, getContent("contragentNew"));
+
+            String contragentTitle = "Company Title" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddhhmmss"));
+
+            ts.fillString("title", contragentTitle, false);
+            ts.fillString("fullName", "Test Company", false);
+            ts.fillString("address", "Russia, Moscow", false);
+            ts.fillString("phone", "8(495)2003535", false);
+
+            ts.click("Сохранить", "btn", false);
+            Thread.sleep(3000);
+
+            String testUser = ts.elementByXpath("/html/body/div[contains(@class, 'container')]").getText();
+            System.out.println("\n[contragentTest]:\n" + testUser);
+            TestService.match(doAssert, testUser, getContent("contragentTest").replace("Company Title", contragentTitle));
+
+            if (!ts.click("Редактировать", "btn", false)) {
+                throw new RuntimeException("Can not click");
+            }
+            Thread.sleep(1000);
+
+            ts.fillString("address", ", pr. Lenina 121, o. 405", false);
+            ts.getDriver().executeScript("window.scrollTo(0, 0);");
+            Thread.sleep(500);
+            ts.click("Сохранить", "btn", false);
+            Thread.sleep(2000);
+            String testUser2 = ts.elementByXpath("/html/body/div[contains(@class, 'container')]").getText();
+            System.out.println("\n[contragentTest2]:\n" + testUser2);
+            TestService.match(doAssert, testUser2, getContent("contragentTest2").replace("Company Title", contragentTitle));
+        } finally {
+            ts.getDriver().close();
+            Thread.sleep(3000);
+            windowHandles = ts.getDriver().getWindowHandles();
+            for (String windowHandle : windowHandles) {
+                ts.getDriver().switchTo().window(windowHandle);
+                String currentUrl = ts.getDriver().getCurrentUrl();
+                if (currentUrl.contains("#dictionaries/contragents")) {
+                    break;
+                }
+            }
+            Thread.sleep(1000);
+        }
+    }
+
+    @Test
+    public void testCreateDocumentKind() throws InterruptedException, IOException, AWTException {
+        doAssert = true;
+        ts = TestService.getInstance("ivashov", "123");
+
+        ts.click("Справочники", null, false);
+        Thread.sleep(1000);
+
+        ts.click("Виды документов", "sokolDictionaryListItem", false);
+        Thread.sleep(1000);
+
+        ts.checkList(doAssert, "dictionaries/beforeAddDocumentKind");
+        
+        ts.click("Добавить", "btn", false);
+        Thread.sleep(1000);
+
+        ts.fillString("title", "Test Test Test", false).sendKeys(Keys.RETURN);
+
+        ts.click("Виды документов", "sokolDictionaryListItem", false);
+        Thread.sleep(1000);
+        ts.checkList(doAssert, "dictionaries/afterAddDocumentKind");
+
+        ts.elementByXpath("//input[@type='checkbox']").click();
+        ts.click("Удалить", "btn", false);
+        Thread.sleep(500);
+        ts.click("Удалить", "confirmButton", false);
+        Thread.sleep(500);
+        ts.checkList(doAssert, "dictionaries/afterDeleteAddDocumentKind");
+        ts.click("Виды документов", "sokolDictionaryListItem", false);
+        Thread.sleep(1000);
+        ts.checkList(doAssert, "dictionaries/afterDeleteAddDocumentKind");
+    }
+
     private void checkButtons(String id, String buttons) {
         WebElement tableButtons = ts.elementByXpath("//*[contains(@name, 'tableButtons')]");
         System.out.println("\nTable buttons [" + id + "]:\n" + tableButtons.getText());
@@ -237,15 +401,5 @@ public class DictionaryIT {
         WebElement tablePanel = ts.elementByXpath("//*[contains(@name, 'tablePanel')]");
         System.out.println("\nTable [" + listId + "]:\n" + tablePanel.getText());
         assertThat(tablePanel.getText(), equalTo(listContent));
-    }
-
-    private void checkList(String listFile) throws IOException {
-        String textFromFile = IOUtils.toString(ListDocumentsFeaturesIT.class.getResourceAsStream("/dictionaries/" + listFile + ".txt"));
-
-        WebElement tablePanel = ts.elementByXpath("//*[contains(@name, 'tablePanel')]");
-        System.out.println("\nTable [" + listFile + "]:\n" + tablePanel.getText());
-        String actualText = tablePanel.getText();
-
-        TestService.match(doAssert, actualText, textFromFile);
     }
 }

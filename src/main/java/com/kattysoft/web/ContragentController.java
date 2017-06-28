@@ -13,9 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.kattysoft.core.ConfigService;
-import com.kattysoft.core.ContragentService;
-import com.kattysoft.core.SokolException;
+import com.kattysoft.core.*;
 import com.kattysoft.core.model.Contragent;
 import com.kattysoft.core.model.Page;
 import com.kattysoft.core.specification.*;
@@ -44,6 +42,9 @@ public class ContragentController {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private AccessRightService accessRightService;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -113,6 +114,13 @@ public class ContragentController {
 
         JsonNode formConfig = configService.getConfig2("forms/contragentForm");
 
+        if (accessRightService.checkRights("_dictionaries", "contragents", "", AccessRightLevel.DELETE)) {
+            ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("deleteAction", true);
+        }
+        if (accessRightService.checkRights("_dictionaries", "contragents", "", AccessRightLevel.WRITE)) {
+            ((com.fasterxml.jackson.databind.node.ObjectNode) formConfig).put("editAction", true);
+        }
+        
         ObjectNode card = mapper.createObjectNode();
         card.set("form", formConfig);
         ObjectNode data = (ObjectNode) mapper.<JsonNode>valueToTree(contragent);
@@ -152,5 +160,9 @@ public class ContragentController {
 
     public void setConfigService(ConfigService configService) {
         this.configService = configService;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

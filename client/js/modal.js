@@ -22,7 +22,7 @@ $.widget('sokol.smodal', {
             '            </div>' +
             '            <div class="modal-footer">' +
             '                <button type="button" class="btn btn-default" data-dismiss="modal">' + (this.options.confirmButtonTitle ? 'Отмена' : 'ОК') + '</button>' +
-            (this.options.confirmButtonTitle ? '                <button type="button" name="confirmButton" class="btn btn-danger">' + this.options.confirmButtonTitle + '</button>' : '') +
+            (this.options.confirmButtonTitle ? '                <button type="button" name="confirmButton" class="btn btn-danger confirmButton">' + this.options.confirmButtonTitle + '</button>' : '') +
             '            </div>' +
             '        </div>' +
             '    </div>' +

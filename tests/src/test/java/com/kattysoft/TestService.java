@@ -9,6 +9,7 @@
  */
 package com.kattysoft;
 
+import org.apache.commons.io.IOUtils;
 import org.hamcrest.MatcherAssert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
@@ -44,6 +45,8 @@ public class TestService {
 
     private Robot robot;
     private RemoteWebDriver driver;
+    
+    private String user;
 
 //    public static String screenPath = "/Users/anatolii/Documents/sokolsed/tests/";
     public static String screenPath = "/Users/anatolii/Desktop/tests";
@@ -79,16 +82,18 @@ public class TestService {
         } else {
             instance.open();
 
-            WebElement headerUserMenu = instance.elementByXpath("//*[contains(@class, 'headerUserMenu')]");
+            if (!user.equals(instance.user)) {
+                WebElement headerUserMenu = instance.elementByXpath("//*[contains(@class, 'headerUserMenu')]");
 
-            if (headerUserMenu != null) {
-                headerUserMenu.click();
-                Thread.sleep(500);
-                instance.click("Выход", "sokolHeaderMenuItem", true);
-                Thread.sleep(1000);
+                if (headerUserMenu != null) {
+                    headerUserMenu.click();
+                    Thread.sleep(500);
+                    instance.click("Выход", "sokolHeaderMenuItem", true);
+                    Thread.sleep(1000);
+                }
+                instance.login(user, pass);
+                Thread.sleep(3000);
             }
-            instance.login(user, pass);
-            Thread.sleep(3000);
         }
         return instance;
     }
@@ -361,12 +366,13 @@ public class TestService {
         Thread.sleep(500);
     }
 
-    public void fillString(String name, String value, boolean clear) {
+    public WebElement fillString(String name, String value, boolean clear) {
         WebElement input = this.elementByXpath("//*[@name = '" + name + "']");
         if (clear) {
             input.clear();
         }
         input.sendKeys(value);
+        return input;
     }
 
     public void fillNString(String name, int n, String value, boolean clear) {
@@ -438,5 +444,15 @@ public class TestService {
                 System.out.println("[!!!] NOT MATCH Expected <-> Actual\n" + builder.toString());
             }
         }
+    }
+
+    public void checkList(boolean doAssert, String listFile) throws IOException {
+        String textFromFile = IOUtils.toString(ListDocumentsFeaturesIT.class.getResourceAsStream("/" + listFile + ".txt"));
+
+        WebElement tablePanel = this.elementByXpath("//*[contains(@name, 'tablePanel')]");
+        System.out.println("\nTable [" + listFile + "]:\n" + tablePanel.getText());
+        String actualText = tablePanel.getText();
+
+        TestService.match(doAssert, actualText, textFromFile);
     }
 }

@@ -110,6 +110,20 @@ public class DictionariesIT {
         checkList("users");
     }
 
+    @Test
+    public void testCanNotCreateDocumentKind() throws InterruptedException, IOException, AWTException {
+        doAssert = true;
+        ts = TestService.getInstance("lukov", "123");
+
+        ts.click("Справочники", null, false);
+        Thread.sleep(1000);
+
+        ts.click("Виды документов", "sokolDictionaryListItem", false);
+        Thread.sleep(1000);
+
+        checkButtons("buttons3", "Найдено: 34");
+    }
+
     private void checkButtons(String id, String buttons) {
         WebElement tableButtons = ts.elementByXpath("//*[contains(@name, 'tableButtons')]");
         System.out.println("\nTable buttons [" + id + "]:\n" + tableButtons.getText());

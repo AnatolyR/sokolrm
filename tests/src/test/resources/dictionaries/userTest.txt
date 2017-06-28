@@ -1,4 +1,4 @@
-Редактировать
+РедактироватьУдалить
 Test Title
 Lastname Middlename Firstname
 Статус записи:
