@@ -1,13 +1,15 @@
 {
-  "condition": "t.userId = '${currentUser}'::uuid",
+  "condition": "true",
   "join": "right join tasks t on d.id = t.documentId",
   "gridConfig": {
     "id": "searchTasks",
     "url": "app/documents",
-    "title": "Входящие задачи",
+    "title": "Задачи",
     "columnsVisible": [
       "t.type",
       "t.author",
+      "t.created",
+      "t.userid",
       "d.documentNumber",
       "d.title",
       "t.status"
@@ -25,6 +27,16 @@
       {
         "id": "t.author",
         "title": "Автор",
+        "render": "user"
+      },
+      {
+        "id": "t.created",
+        "title": "Дата создания задачи",
+        "render": "datetime"
+      },
+      {
+        "id": "t.userid",
+        "title": "Исполнитель",
         "render": "user"
       },
       {

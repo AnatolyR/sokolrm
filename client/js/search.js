@@ -33,7 +33,7 @@ $.widget('sokol.search', {
                     if (!currentNode) {
                         currentNode = $('<ul class="nav nav-sidebar"></ul>').appendTo(sidebar);
                     }
-                    var category = $('<li name="category_' + item.id + '"><a href="">' + item.title + '</a></li>').appendTo(currentNode);
+                    var category = $('<li name="category_' + item.id + '"><a href="" class="sokolSearchCategoryItem">' + item.title + '</a></li>').appendTo(currentNode);
 
                     category.find('a').click(produceHandler(item));
                     if (item.id == 'all') {

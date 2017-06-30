@@ -6,3 +6,5 @@ CREATE TABLE contragents (
   address text,
   phone varchar(255)
 );
+
+CREATE INDEX contragents_stidx ON contragents USING gin (to_tsvector('russian'::regconfig, title));

@@ -166,6 +166,7 @@ public class TestService {
         password.sendKeys(passwordData);
 
         submitButton.click();
+        instance.user = userData;
     }
 
     public boolean click(String text, String clazzWanted, boolean contains) throws InterruptedException {

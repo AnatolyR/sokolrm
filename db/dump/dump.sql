@@ -16,6 +16,7 @@ SET row_security = off;
 SET search_path = sokol, pg_catalog;
 
 DROP INDEX sokol.documents_stidx;
+DROP INDEX sokol.contragents_stidx;
 ALTER TABLE ONLY sokol.taskslists DROP CONSTRAINT taskslists_pkey;
 ALTER TABLE ONLY sokol.tasks DROP CONSTRAINT tasks_pkey;
 ALTER TABLE ONLY sokol.spaces DROP CONSTRAINT spaces_pkey;
@@ -842,6 +843,13 @@ ALTER TABLE ONLY tasks
 
 ALTER TABLE ONLY taskslists
     ADD CONSTRAINT taskslists_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: contragents_stidx; Type: INDEX; Schema: sokol; Owner: -
+--
+
+CREATE INDEX contragents_stidx ON contragents USING gin (to_tsvector('russian'::regconfig, (title)::text));
 
 
 --
