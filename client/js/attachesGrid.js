@@ -135,8 +135,8 @@ $.widget('sokol.attachesGrid', {
             var form_data = new FormData();
             form_data.append('file', file_data);
             $.ajax({
-                url: 'upload?objectId=' + this.options.id, // point to server-side PHP script
-                dataType: 'text',  // what to expect back from the PHP script, if anything
+                url: 'upload?objectId=' + this.options.id + "&objectType=" + this.options.objectType, 
+                dataType: 'text',  
                 cache: false,
                 contentType: false,
                 processData: false,

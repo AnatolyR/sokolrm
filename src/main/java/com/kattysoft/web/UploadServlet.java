@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -76,19 +77,24 @@ public class UploadServlet extends HttpServlet {
             for (FileItem item : items) {
                 String id = UUID.randomUUID().toString();
                 String fileName = item.getName();
-
+                fileName = fileName.replace(new String(new char[] {'и', (char) 774}), "й");
+                fileName = fileName.replace(new String(new char[] {'И', (char) 774}), "Й");
+                
                 String objectId = req.getParameter("objectId");
+                String objectType = req.getParameter("objectType");
                 InputStream inputStream = item.getInputStream();
                 conn = dataSource.getConnection();
-                ps = conn.prepareStatement("INSERT INTO files (id, objectId, title, size, content, author, authorTitle, created) VALUES (?::uuid, ?::uuid, ?, ?, ?, ?::uuid, ?, ?)");
+                ps = conn.prepareStatement("INSERT INTO files (id, objectId, objectType, title, size, content, author, authorTitle, created, searchtext) VALUES (?::uuid, ?::uuid, ?, ?, ?, ?, ?::uuid, ?, ?, ?)");
                 ps.setString(1, id);
                 ps.setString(2, objectId);
-                ps.setString(3, fileName);
-                ps.setInt(4, (int) item.getSize());
-                ps.setBinaryStream(5, inputStream, (int) item.getSize());
-                ps.setString(6, user.getId().toString());
-                ps.setString(7, user.getTitle());
-                ps.setTimestamp(8, new java.sql.Timestamp(new Date().getTime()));
+                ps.setString(3, objectType);
+                ps.setString(4, fileName);
+                ps.setInt(5, (int) item.getSize());
+                ps.setBinaryStream(6, inputStream, (int) item.getSize());
+                ps.setString(7, user.getId().toString());
+                ps.setString(8, user.getTitle());
+                ps.setTimestamp(9, new java.sql.Timestamp(new Date().getTime()));
+                ps.setString(10, fileName.replace(".", " ")); //to prevent treat file names as hostname, because it not possible search without extension in that case
                 ps.executeUpdate();
             }
         } catch (FileUploadException | SQLException e) {
@@ -113,10 +119,12 @@ public class UploadServlet extends HttpServlet {
             rs = ps.executeQuery();
             if (rs.next()) {
                 String fileName = rs.getString("title");
+                String fileNameAdditional = URLEncoder.encode(fileName);
+                fileNameAdditional = fileNameAdditional.replace("+", " ");
                 Integer size = rs.getInt("size");
                 InputStream inputStream = rs.getBinaryStream("content");
                 resp.setContentType("application/octet-stream");
-                resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"; size=" + size);
+                resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + fileNameAdditional + "; size=" + size);
                 IOUtils.copy(inputStream, resp.getOutputStream());
                 resp.flushBuffer();
                 inputStream.close();

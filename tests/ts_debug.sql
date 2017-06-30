@@ -1,0 +1,1 @@
+SELECT alias, description, token, lexemes FROM ts_debug('russian', 'значение для отладки');

@@ -100,7 +100,12 @@ $.widget('sokol.container', {
         }
 
         if (this.options.id) {
-            this.attaches = $.sokol.attachesGrid({mode: this.options.mode, id: data.id}, $('<div></div>').appendTo(this.element));
+            this.attaches = $.sokol.attachesGrid({
+                    mode: this.options.mode, 
+                    id: data.id,
+                    objectType: this.options.containerType
+                }, 
+                $('<div></div>').appendTo(this.element));
         }
     },
 

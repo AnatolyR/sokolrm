@@ -386,7 +386,7 @@ $.widget("sokol.grid", {
                         if (!val || 0 === val.length) {
                             val = "[Заголовок не указан]";
                         }
-                        var linkType = column.linkType ? column.linkType : this.options.objectType;
+                        var linkType = column.linkType ? column.linkType : (column.linkTypeColumn ? rowObj[column.linkTypeColumn] : this.options.objectType);
                         var id = column.idColumn ? rowObj[column.idColumn] : rowObj.id;
                         var td = $('<td><a href="#' + linkType + '/' + id + '" target="_blank">' + val + '</a></td>');
                         td.appendTo(row);
@@ -394,6 +394,9 @@ $.widget("sokol.grid", {
                         val = moment(val, 'DD.MM.YYYY HH:mm').format('L LT');
 
                         var td = $('<td>' + (val ? val : '') + '</td>');
+                        td.appendTo(row);
+                    } else if (column.render == 'file') {
+                        var td = $('<td><a href="download?id=' + rowObj.id + '" target="_blank">' + val + '</a></td>');
                         td.appendTo(row);
                     } else if (column.render == 'boolean') {
                         if (val) {

@@ -8,7 +8,9 @@
 package com.kattysoft.core;
 
 import com.kattysoft.core.model.Attach;
+import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
+import com.kattysoft.core.specification.Specification;
 
 import java.util.Date;
 import java.util.List;
@@ -25,4 +27,6 @@ public interface AttachService {
     byte[] getContent(String id);
 
     void addContent(String objectId, String name, User user, Date date, byte[] bytes);
+
+    Page<Attach> getAttaches(Specification spec);
 }

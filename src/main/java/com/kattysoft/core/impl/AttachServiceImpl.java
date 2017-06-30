@@ -12,9 +12,16 @@ package com.kattysoft.core.impl;
 import com.kattysoft.core.AttachService;
 import com.kattysoft.core.dao.AttachesDao;
 import com.kattysoft.core.model.Attach;
+import com.kattysoft.core.model.Contragent;
+import com.kattysoft.core.model.Page;
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.repository.AttachRepository;
+import com.kattysoft.core.specification.SortOrder;
+import com.kattysoft.core.specification.Specification;
+import com.kattysoft.core.specification.SpecificationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.Date;
 import java.util.List;
@@ -52,6 +59,33 @@ public class AttachServiceImpl implements AttachService {
     @Override
     public void addContent(String reportObjectId, String name, User user, Date date, byte[] bytes) {
         attachesDao.addContent(reportObjectId, name, user, date, bytes);
+    }
+
+    @Override
+    public Page<Attach> getAttaches(Specification specification) {
+        int offset = specification.getOffset();
+        int size = specification.getSize();
+        int pageNum = offset / size;
+
+        Sort sort;
+        if (specification.getSort() != null && specification.getSort().size() > 0) {
+            sort = new Sort(specification.getSort().get(0).getOrder() == SortOrder.ASC
+                ? Sort.Direction.ASC : Sort.Direction.DESC, specification.getSort().get(0).getField());
+        } else {
+            sort = new Sort("title");
+        }
+
+        PageRequest pageRequest = new PageRequest(pageNum, size, sort);
+
+        org.springframework.data.jpa.domain.Specification<Attach> spec = null;
+        if (specification.getCondition() != null) {
+            spec = SpecificationUtil.conditionToSpringSpecification(specification.getCondition(), Attach.class);
+        }
+
+        org.springframework.data.domain.Page<Attach> repoPage = attachRepository.findAll(spec, pageRequest);
+
+        Page<Attach> page = new Page<>(repoPage.getTotalElements(), repoPage.getContent());
+        return page;
     }
 
     public void setAttachRepository(AttachRepository attachRepository) {

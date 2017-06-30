@@ -8,6 +8,7 @@
 package com.kattysoft.core.repository;
 
 import com.kattysoft.core.model.Attach;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -17,6 +18,6 @@ import java.util.UUID;
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 18.01.2017
  */
-public interface AttachRepository extends CrudRepository<Attach, UUID> {
+public interface AttachRepository extends CrudRepository<Attach, UUID>, JpaSpecificationExecutor<Attach> {
     List<Attach> findAllByObjectIdOrderByCreatedDesc(UUID objectId);
 }

@@ -156,7 +156,7 @@ public class DocumentDaoPg implements DocumentDao {
 
             List<Object> paramsValues = new ArrayList<>();
             if (spec.getSearchText() != null && !spec.getSearchText().isEmpty()) {
-                columns.add("ts_headline('russian', searchtext, to_tsquery('russian', ?), 'StartSel = <mark>, StopSel = </mark>') as textheadline");
+                columns.add("ts_headline('russian', searchtext, plainto_tsquery('russian', ?), 'StartSel = <mark>, StopSel = </mark>') as textheadline");
                 paramsValues.add(spec.getSearchText());
                 fieldsNames.add("textheadline");
                 columnTypes.put("textheadline", "text");
@@ -177,7 +177,7 @@ public class DocumentDaoPg implements DocumentDao {
                 String conditionSql = conditionToSql(condition, paramsValues, columnTypes);
 
                 if (spec.getSearchText() != null && !spec.getSearchText().isEmpty()) {
-                    conditionSql += " AND to_tsvector('russian', searchtext) @@ to_tsquery('russian', ?)";
+                    conditionSql += " AND to_tsvector('russian', searchtext) @@ plainto_tsquery('russian', ?)";
                     paramsValues.add(spec.getSearchText());
                 }
 
@@ -405,7 +405,7 @@ public class DocumentDaoPg implements DocumentDao {
                 String conditionSql = conditionToSql(condition, paramsValues, columnTypes);
 
                 if (spec.getSearchText() != null && !spec.getSearchText().isEmpty()) {
-                    conditionSql += " AND to_tsvector('russian', searchtext) @@ to_tsquery('russian', ?)";
+                    conditionSql += " AND to_tsvector('russian', searchtext) @@ plainto_tsquery('russian', ?)";
                     paramsValues.add(spec.getSearchText());
                 }
 

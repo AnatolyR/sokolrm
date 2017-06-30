@@ -50,7 +50,7 @@ $.widget('sokol.search', {
             '</div>' +
             '<button type="button" class="btn btn-default">Найти</button>' +
             '</form>').appendTo(this.main);
-        this.text.find("button").click($.proxy(function() {
+        var doSearch = $.proxy(function() {
             if (!this.options.id || this.options.id == 'all') {
                 this.createGrid('all');
             } else {
@@ -64,7 +64,16 @@ $.widget('sokol.search', {
                     a.find('span').remove();
                 }
             }
-        }, this));
+        }, this);
+        this.text.find("button").click(doSearch);
+        this.text.keypress(
+            function (event) {
+                if (event.which == '13') {
+                    event.preventDefault();
+                    doSearch();
+                }
+            }
+        );
     },
 
     //    $.getJSON('app/config', {id: 'navigation/search'}, $.proxy(function(data) {

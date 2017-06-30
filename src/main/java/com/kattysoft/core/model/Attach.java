@@ -40,6 +40,10 @@ public class Attach {
     private String authorTitle;
 
     private Date created;
+    
+    private String searchtext;
+    
+    private String objectType;
 
     public UUID getId() {
         return id;
@@ -95,5 +99,21 @@ public class Attach {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public String getSearchtext() {
+        return searchtext;
+    }
+
+    public void setSearchtext(String searchtext) {
+        this.searchtext = searchtext;
+    }
+
+    public String getObjectType() {
+        return objectType;
+    }
+
+    public void setObjectType(String objectType) {
+        this.objectType = objectType;
     }
 }

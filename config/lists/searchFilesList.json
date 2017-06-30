@@ -6,11 +6,27 @@
     "columns": [
       {
         "id": "title",
-        "title": "Вложение"
+        "title": "Вложение",
+        "render": "file"
       },
       {
-        "id": "object",
-        "title": "Объект"
+        "id": "created",
+        "title": "Добавлен"
+      },
+      {
+        "id": "authorTitle",
+        "title": "Автор"
+      },
+      {
+        "id": "objectTypeTitle",
+        "title": "Тип объекта"
+      },
+      {
+        "id": "objectTitle",
+        "title": "Объект",
+        "render": "link",
+        "linkTypeColumn": "objectType",
+        "idColumn": "objectId"
       }
     ]
   }

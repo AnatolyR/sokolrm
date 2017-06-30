@@ -57,11 +57,11 @@ public class PostgreSQLFullTextSearchFunction implements SQLFunction {
             field = (String) args.get(1);
             value = (String) args.get(2);
 //            fragment = "to_tsvector('russian', " + field + ") @@ to_tsquery(" + ftsConfig + ", " + value + ")";
-            fragment = field + " @@ to_tsquery('russian', " + ftsConfig + ", " + value + ")";
+            fragment = field + " @@ plainto_tsquery('russian', " + ftsConfig + ", " + value + ")";
         } else {
             field = (String) args.get(0);
             value = (String) args.get(1);
-            fragment = "(to_tsvector('russian', " + field + ") @@ to_tsquery('russian', " + value + "))";
+            fragment = "(to_tsvector('russian', " + field + ") @@ plainto_tsquery('russian', " + value + "))";
 //            fragment = "(" + field + " @@ to_tsquery('russian', " + value + "))";
         }
         return fragment;

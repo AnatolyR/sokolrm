@@ -25,6 +25,15 @@ public class TitleServiceImpl implements TitleService {
     public static Map<String, Map<String, String>> values = new HashMap<>();
 
     static {
+        Map<String, String> objectTypes = new HashMap<>();
+        objectTypes.put("document", "Документ");
+        objectTypes.put("task", "Задача");
+        objectTypes.put("user", "Пользователь");
+        objectTypes.put("contragent", "Контрагент");
+        objectTypes.put("report", "Отчет");
+        objectTypes.put("group", "Группа");
+        values.put("objectTypes", objectTypes);
+        
         Map<String, String> executionStatus = new HashMap<>();
         executionStatus.put("run", "Выполняется");
         executionStatus.put("complete", "Завершено");

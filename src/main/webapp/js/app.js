@@ -581,8 +581,8 @@ $.widget('sokol.app', {
             var type = id.substring(4);
             this.createDocument(type);
 
-        } else if (id.startsWith('reports/')) {
-            this.container = $.sokol.reports({id: id.substring(8), dispatcher: this}, $("<div></div>").appendTo("body"));
+        } else if (id.startsWith('report/')) {
+            this.container = $.sokol.reports({id: id.substring(7), dispatcher: this}, $("<div></div>").appendTo("body"));
         } else if (id == 'reports') {
             this.container = $.sokol.reports({id: null, dispatcher: this}, $("<div></div>").appendTo("body"));
 
@@ -851,8 +851,8 @@ $.widget('sokol.attachesGrid', {
             var form_data = new FormData();
             form_data.append('file', file_data);
             $.ajax({
-                url: 'upload?objectId=' + this.options.id, // point to server-side PHP script
-                dataType: 'text',  // what to expect back from the PHP script, if anything
+                url: 'upload?objectId=' + this.options.id + "&objectType=" + this.options.objectType, 
+                dataType: 'text',  
                 cache: false,
                 contentType: false,
                 processData: false,
@@ -989,7 +989,12 @@ $.widget('sokol.container', {
         }
 
         if (this.options.id) {
-            this.attaches = $.sokol.attachesGrid({mode: this.options.mode, id: data.id}, $('<div></div>').appendTo(this.element));
+            this.attaches = $.sokol.attachesGrid({
+                    mode: this.options.mode, 
+                    id: data.id,
+                    objectType: this.options.containerType
+                }, 
+                $('<div></div>').appendTo(this.element));
         }
     },
 
@@ -3334,7 +3339,7 @@ $.widget("sokol.grid", {
                         if (!val || 0 === val.length) {
                             val = "[Заголовок не указан]";
                         }
-                        var linkType = column.linkType ? column.linkType : this.options.objectType;
+                        var linkType = column.linkType ? column.linkType : (column.linkTypeColumn ? rowObj[column.linkTypeColumn] : this.options.objectType);
                         var id = column.idColumn ? rowObj[column.idColumn] : rowObj.id;
                         var td = $('<td><a href="#' + linkType + '/' + id + '" target="_blank">' + val + '</a></td>');
                         td.appendTo(row);
@@ -3342,6 +3347,9 @@ $.widget("sokol.grid", {
                         val = moment(val, 'DD.MM.YYYY HH:mm').format('L LT');
 
                         var td = $('<td>' + (val ? val : '') + '</td>');
+                        td.appendTo(row);
+                    } else if (column.render == 'file') {
+                        var td = $('<td><a href="download?id=' + rowObj.id + '" target="_blank">' + val + '</a></td>');
                         td.appendTo(row);
                     } else if (column.render == 'boolean') {
                         if (val) {
@@ -4299,11 +4307,11 @@ $.widget('sokol.reports', {
         }, this)).fail(function (jqXHR, textStatus, errorThrown) {
             $.notify({message: 'Не удалось получить данные. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
-        //if (this.options.id) {
-        //    this.createReportForm(id);
-        //} else {
+        if (this.options.id) {
+            this.createReportForm(this.options.id);
+        } else {
             this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите отчет</div></div>').appendTo(this.main);
-        //}
+        }
 
     },
 
@@ -4362,7 +4370,7 @@ $.widget('sokol.reports', {
                 this.doGenerate();
             }, this));
 
-            this.attaches = $.sokol.attachesGrid({mode: 'edit', id: res.attachesId}, $('<div></div>').appendTo(this.main));
+            this.attaches = $.sokol.attachesGrid({mode: 'edit', id: res.attachesId, objectType: 'report'}, $('<div></div>').appendTo(this.main));
         }, this)).fail(function failLoadReportForm() {
             $.notify({message: 'Не удалось загрузить форму отчета "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
@@ -4441,7 +4449,7 @@ $.widget('sokol.search', {
             '</div>' +
             '<button type="button" class="btn btn-default">Найти</button>' +
             '</form>').appendTo(this.main);
-        this.text.find("button").click($.proxy(function() {
+        var doSearch = $.proxy(function() {
             if (!this.options.id || this.options.id == 'all') {
                 this.createGrid('all');
             } else {
@@ -4455,7 +4463,16 @@ $.widget('sokol.search', {
                     a.find('span').remove();
                 }
             }
-        }, this));
+        }, this);
+        this.text.find("button").click(doSearch);
+        this.text.keypress(
+            function (event) {
+                if (event.which == '13') {
+                    event.preventDefault();
+                    doSearch();
+                }
+            }
+        );
     },
 
     //    $.getJSON('app/config', {id: 'navigation/search'}, $.proxy(function(data) {

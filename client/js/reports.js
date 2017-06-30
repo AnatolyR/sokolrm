@@ -51,11 +51,11 @@ $.widget('sokol.reports', {
         }, this)).fail(function (jqXHR, textStatus, errorThrown) {
             $.notify({message: 'Не удалось получить данные. Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
-        //if (this.options.id) {
-        //    this.createReportForm(id);
-        //} else {
+        if (this.options.id) {
+            this.createReportForm(this.options.id);
+        } else {
             this.info = $('<div class="jumbotron" role="alert"><div class="container">Выберите отчет</div></div>').appendTo(this.main);
-        //}
+        }
 
     },
 
@@ -114,7 +114,7 @@ $.widget('sokol.reports', {
                 this.doGenerate();
             }, this));
 
-            this.attaches = $.sokol.attachesGrid({mode: 'edit', id: res.attachesId}, $('<div></div>').appendTo(this.main));
+            this.attaches = $.sokol.attachesGrid({mode: 'edit', id: res.attachesId, objectType: 'report'}, $('<div></div>').appendTo(this.main));
         }, this)).fail(function failLoadReportForm() {
             $.notify({message: 'Не удалось загрузить форму отчета "' + id + '". Обратитесь к администратору.'},{type: 'danger', delay: 0, timer: 0});
         });
