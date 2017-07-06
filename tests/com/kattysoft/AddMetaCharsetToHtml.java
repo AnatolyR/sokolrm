@@ -21,7 +21,7 @@ public class AddMetaCharsetToHtml {
         FileInputStream inputStream = new FileInputStream(args[0]);
         String result = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
         inputStream.close();
-        result = result.replace("<head>", "<head><meta charset=\"UTF-8\">");
+        result = result.replaceFirst("<head>", "<head><meta charset=\"UTF-8\">");
 
         FileOutputStream outputStream = new FileOutputStream(args[0]);
         outputStream.write(result.getBytes());

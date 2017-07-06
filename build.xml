@@ -103,12 +103,12 @@
     <target name="openReport">
         <exec executable="java">
             <arg value="-cp" />
-            <arg value="/Users/anatolii/Documents/sokolsed/tests/" />
+            <arg value="./tests/" />
             <arg value="com.kattysoft.AddMetaCharsetToHtml" />
-            <arg value="/Users/anatolii/Documents/sokolsed/tests/target/failsafe-reports/emailable-report.html"/>
+            <arg value="./tests/target/failsafe-reports/emailable-report.html"/>
         </exec>
         <exec executable="open">
-            <arg value="/Users/anatolii/Documents/sokolsed/tests/target/failsafe-reports/emailable-report.html"/>
+            <arg value="./tests/target/failsafe-reports/emailable-report.html"/>
         </exec>
     </target>
 </project>
