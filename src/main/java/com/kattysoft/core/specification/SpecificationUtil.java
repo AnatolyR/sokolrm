@@ -1,31 +1,36 @@
 /*
- * Copyright 2016 Anatolii Rakovskii (rtolik@yandex.ru)
+ * Copyright 2016-2017 the original author or authors.
  *
- * No part of this file can be copied or reproduced without written permission of author.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Software distributed on an "AS IS" BASIS,
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.kattysoft.core.specification;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.kattysoft.core.model.User;
 import org.hibernate.metamodel.internal.PluralAttributeImpl;
-import org.hibernate.query.criteria.internal.CriteriaBuilderImpl;
-import org.hibernate.query.criteria.internal.Renderable;
-import org.hibernate.query.criteria.internal.compile.RenderingContext;
-import org.hibernate.query.criteria.internal.predicate.LikePredicate;
-import org.joda.time.LocalDate;
 
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)

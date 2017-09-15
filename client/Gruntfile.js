@@ -3,6 +3,7 @@ module.exports = function(grunt) {
         concat: {
             js: {
                 dest: 'dist/bundle.js',
+                nonull: true,
                 src: [
                     'node_modules/jquery/dist/jquery.js',
                     'node_modules/jquery-ui-dist/jquery-ui.js',
@@ -24,6 +25,7 @@ module.exports = function(grunt) {
             },
             appjs: {
                 dest: 'dist/app.js',
+                nonull: true,
                 src: 'js/*.js',
                 options: {
                     sourceMap: true
@@ -31,6 +33,7 @@ module.exports = function(grunt) {
             },
             css: {
                 dest: 'dist/bundle.css',
+                nonull: true,
                 src: [
                     'node_modules/jquery-ui-dist/jquery-ui.css',
                     'node_modules/bootstrap/dist/css/bootstrap.css',
@@ -42,6 +45,7 @@ module.exports = function(grunt) {
             },
             appcss: {
                 dest: 'dist/app.css',
+                nonull: true,
                 src: 'css/*.css'
             }
         },
