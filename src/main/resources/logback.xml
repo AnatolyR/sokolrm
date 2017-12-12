@@ -24,6 +24,7 @@
     <!--</appender>-->
 
     <!--<logger name="com.kattysoft.core.impl.AccessRightServiceImpl" level="debug" />-->
+    <logger name="com.kattysoft.core.dao.DBUtilDaoPg" level="debug" />
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

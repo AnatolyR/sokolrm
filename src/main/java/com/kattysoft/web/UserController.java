@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -211,6 +212,7 @@ public class UserController {
 
             ArrayNode groups = (ArrayNode) systemFields.get("groups");
             if (groups != null) {
+                user.setGroups(new ArrayList<>());
                 groups.forEach(g -> user.getGroups().add(UUID.fromString(g.asText())));
             }
         }
@@ -241,9 +243,9 @@ public class UserController {
         }
 
         //todo check password for rules
-        String id = userService.savePassword(currentUser.getId().toString(), newPassword);
+        userService.savePassword(newPassword);
 
-        return id;
+        return currentUser.getId().toString();
     }
 
     @RequestMapping(value = "/deleteuser")

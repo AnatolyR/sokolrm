@@ -129,6 +129,22 @@ public class UserServiceImpl implements UserService {
         return user.getId().toString();
     }
 
+    public void savePassword(String pass) {
+        UUID id = getCurrentUser().getId();
+        User existUser = userRepository.findOne(id);
+        User user = new User();
+        if (existUser == null) {
+            throw new SokolException("User not found");
+        } else {
+            BeanUtils.copyProperties(user, existUser, Utils.getNullPropertyNames(user));
+            user = existUser;
+        }
+        String hashedPass = hashPass(pass, user.getLogin());
+        user.setPassword(hashedPass);
+        userRepository.save(user);
+    }
+
+
     public void deleteUser(String id) {
         if (!accessRightService.checkRights("_system", "users", "", AccessRightLevel.DELETE)) {
             throw new NoAccessRightsException("No rights to delete user");
@@ -138,9 +154,10 @@ public class UserServiceImpl implements UserService {
     }
 
     public static String chars = "abcdefghigklmopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
+
     public String resetPassword(String id) {
         int l = chars.length();
-        Random random  = new Random();
+        Random random = new Random();
         String pass = "";
         for (int i = 0; i < 8; i++) {
             pass += chars.charAt(random.nextInt(l));
@@ -155,14 +172,18 @@ public class UserServiceImpl implements UserService {
         if (user.getLogin() == null || user.getLogin().length() < 3) {
             throw new SokolException("Login length too small");
         }
+        String hashedPass = hashPass(pass, user.getLogin());
+        user.setPassword(hashedPass);
+        this.saveUser(user);
+        return pass;
+    }
+
+    private String hashPass(String pass, String login) {
         try {
-            String hashedPass = md5(md5(md5(pass) + user.getLogin()) + PASS_SALT);
-            user.setPassword(hashedPass);
+            return md5(md5(md5(pass) + login) + PASS_SALT);
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        this.saveUser(user);
-        return pass;
     }
 
     public void setUserRepository(UserRepository userRepository) {
@@ -177,7 +198,7 @@ public class UserServiceImpl implements UserService {
 
     public static String byteArrayToHex(byte[] a) {
         StringBuilder sb = new StringBuilder(a.length * 2);
-        for(byte b: a)
+        for (byte b : a)
             sb.append(String.format("%02x", b & 0xff));
         return sb.toString();
     }

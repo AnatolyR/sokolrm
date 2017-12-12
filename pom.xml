@@ -198,6 +198,28 @@
 
     <build>
         <finalName>sokol</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <targetPath>config</targetPath>
+                <directory>config</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <targetPath>db/initial</targetPath>
+                <directory>db/initial</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <!-- sudo mvn tomcat7:run -Ddbproperties=/Users/anatolii/Documents/sokolsed/db/db.properties -->

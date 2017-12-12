@@ -119,9 +119,6 @@ public class User {
     }
 
     public List<UUID> getGroups() {
-        if (groups == null) {
-            groups = new ArrayList<>();
-        }
         return groups;
     }
 

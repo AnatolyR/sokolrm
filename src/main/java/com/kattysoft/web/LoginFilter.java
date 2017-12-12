@@ -9,6 +9,8 @@
  */
 package com.kattysoft.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kattysoft.core.InstallationService;
 import com.kattysoft.core.UserService;
 import com.kattysoft.core.model.User;
 import org.slf4j.Logger;
@@ -29,11 +31,14 @@ import java.io.IOException;
 public class LoginFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(LoginFilter.class);
     private UserService userService;
+    private InstallationService installationService;
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
         userService = applicationContext.getBean(UserService.class);
+        installationService = applicationContext.getBean(InstallationService.class);
     }
 
     @Override
@@ -41,6 +46,7 @@ public class LoginFilter implements Filter {
         HttpServletRequest req = ((HttpServletRequest) request);
         HttpServletResponse res = ((HttpServletResponse) response);
 
+        //todo do not use for js and css
         res.setHeader("Cache-Control", "private, no-store, no-cache, must-revalidate");
         res.setHeader("Pragma", "no-cache");
         res.setDateHeader("Expires", 0);
@@ -50,6 +56,45 @@ public class LoginFilter implements Filter {
         String servletPath = req.getServletPath();
         String pathInfo = req.getPathInfo();
         String path = (servletPath != null ? servletPath : "") + (pathInfo != null ? pathInfo : "");
+
+        if (path.equals("/icon.png")) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        if (!installationService.checkAppIsInstalled()) {
+            if (path.startsWith("/js/") || path.startsWith("/css/")) {
+                chain.doFilter(request, response);
+            } else if (path.equals("/doinstall")) {
+                String login = req.getParameter("login");
+                String pass = req.getParameter("login");
+                String[] samples = req.getParameterValues("samples");
+                installationService.install(login, pass, samples);
+                res.getWriter().append("true");
+                res.setStatus(HttpServletResponse.SC_OK);
+            } else if (path.equals("/checkinstallstatus")) {
+                InstallationService.Status status = installationService.getStatus();
+                res.getWriter().append(mapper.writeValueAsString(status));
+                res.setStatus(HttpServletResponse.SC_OK);
+            } else if (path.equals("/install")) {
+                req.getRequestDispatcher("install.html").forward(req, res);
+            }  else {
+                res.sendRedirect("install");
+            }
+            return;
+        } else {
+            if (path.equals("/doinstall") || path.equals("/install")) {
+                res.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
+                return;
+            }
+            if (path.equals("/checkinstallstatus")) {
+                InstallationService.Status status = new InstallationService.Status();
+                status.setProgress(100);
+                res.getWriter().append(mapper.writeValueAsString(status));
+                res.setStatus(HttpServletResponse.SC_OK);
+                return;
+            }
+        }
 
         if ("post".equalsIgnoreCase(req.getMethod()) && path.endsWith("login")) {
             try {

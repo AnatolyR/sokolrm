@@ -1,3 +1,9 @@
 <Context>
-    <Parameter name="app_config_path" value="/Users/anatolii/Documents/sokolsed/config/" override="false"/>
+    <Parameter name="app_config_path" value="/Users/anatolii/Documents/sokolrm/config/" override="false"/>
+
+    <Resource name="jdbc/sokol" auth="Container"
+              type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/anatolii?currentSchema=sokol"
+              username="anatolii" password="" maxActive="20" maxIdle="10"
+              maxWait="-1"/>
 </Context>

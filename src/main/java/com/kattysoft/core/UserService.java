@@ -12,7 +12,6 @@ import com.kattysoft.core.model.User;
 import com.kattysoft.core.specification.Specification;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -34,6 +33,8 @@ public interface UserService {
     User getUserById(String id);
 
     String saveUser(User user);
+
+    void savePassword(String password);
 
     void deleteUser(String id);
 

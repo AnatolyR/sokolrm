@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SOKOLRM Installation</title>
+
+    <link rel="stylesheet" href="css/bundle.css"/>
+    <link rel="stylesheet" href="css/docs.css"/>
+    <script src="js/bundle.js"></script>
+    <link rel="icon" type="image/png" href="icon.png?v=2"/>
+</head>
+<body data-spy="scroll" data-target="#navbar">
+<div class="container">
+    <div class="panel panel-default" style1="max-width: 330px;margin: 0 auto;">
+        <div class="panel-heading">
+            <h3 class="panel-title">Installing</h3>
+        </div>
+        <div class="panel-body">
+            <form id="installForm" class="form-signin" action="login.html">
+
+
+                <!--<div class="form-group" style="width: 200px;">-->
+                    <!--<label for="login" class="">Admin login</label>-->
+                    <!--<input name="user" id="login" class="form-control" required autofocus>-->
+                <!--</div>-->
+                <!--<div class="form-group" style="width: 200px;">-->
+                    <!--<label for="password" class="">Admin password</label>-->
+                    <!--<input type="password" name="password" id="password" class="form-control" placeholder1="Пароль"-->
+                           <!--required>-->
+                <!--</div>-->
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="samples" value="recordsConfig" checked>
+                            Install empty DB
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="samples" value="config" checked>
+                            Install sample configuration
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="radio" name="samples" value="data" checked>
+                            Install sample configuration and sample data
+                        </label>
+                    </div>
+                </div>
+                <div class="progress" id="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0;">
+                        0%
+                    </div>
+                </div>
+                <p style="display: none;" id="systemErrorMessage" class="text-danger">Error appears during installation process. See log file for more details.</p>
+                <p style="display: none;" id="errorMessage" class="text-danger">Error appears during installation process: <span style="font-weight: bold;" id="errorMessageText"></span></p>
+                <button id="submitButton" class="btn btn-primary">Install</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+<script>
+    $("#submitButton").click(function (e) {
+        e.preventDefault();
+//        var login = $("#login").val();
+//        var pass = $("#password").val();
+//        var error = false;
+//        if (!login || login.length < 5) {
+//            $("#login").parent().addClass("has-error");
+//            error = true;
+//        } else {
+//            $("#login").parent().removeClass("has-error");
+//        }
+//        if (!pass) {
+//            $("#password").parent().addClass("has-error");
+//            error = true;
+//        } else {
+//            $("#password").parent().removeClass("has-error");
+//        }
+//        if (error) {
+//            return;
+//        }
+        
+        $(this).prop('disabled', true);
+        var data = $("#installForm").serialize();
+        $(".form-check-input").prop('disabled', true);
+        
+        var check = function() {
+            $.getJSON("checkinstallstatus", {}, function(resp) {
+                var status = resp.progress;
+                $("#progress > div").css("width", status + "%").text(status + "%");
+                if (status < 100) {
+                    setTimeout(check, 1000);
+                } else {
+                    setTimeout(function() {
+                        window.location.href = "login";
+                    }, 1000);
+                }
+            });
+        };
+        $.post("doinstall", data, function (data) {
+            if (data == "true") {
+                setTimeout(check, 0);
+            }
+        }).fail(function (e) {
+            console.log(e);
+            if (e.responseJSON && e.responseJSON.error) {
+                $("#errorMessageText").text(e.responseJSON.error);
+                $("#errorMessage").show();
+            } else {
+                $("#systemErrorMessage").show();
+            }
+        });
+    });
+</script>
+
+</body>
+</body>
+</html>

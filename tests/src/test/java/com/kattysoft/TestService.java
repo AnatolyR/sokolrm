@@ -231,7 +231,8 @@ public class TestService {
     }
 
     public WebElement elementByXpath(String xpath) {
-        return driver.findElement(By.xpath(xpath));
+        List<WebElement> elements = driver.findElements(By.xpath(xpath));
+        return elements.size() > 0 ? elements.get(0) : null;
     }
 
     public java.util.List<WebElement> elementsByXpath(String xpath) {

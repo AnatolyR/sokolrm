@@ -32,7 +32,18 @@
         </exec>
     </target>
 
+    <target name="drop_schema">
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="./db/drop_schema.sql"/>
+        </exec>
+    </target>
+    
     <target name="restore">
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="./db/drop_schema.sql"/>
+        </exec>
         <exec executable="psql">
             <arg value="-f"/>
             <arg value="./db/dump/dump.sql"/>
@@ -60,7 +71,7 @@
             <arg value="sokol"/>
             <arg value="-T"/>
             <arg value="sokol.files"/>
-            <arg value="-c"/>
+            <!--<arg value="-c"/>-->
             <arg value="-O"/>
             <arg value="-f"/>
             <arg value="./db/dump/dump.sql"/>
@@ -70,10 +81,96 @@
             <arg value="sokol"/>
             <arg value="-t"/>
             <arg value="sokol.files"/>
-            <arg value="-c"/>
+            <!--<arg value="-c"/>-->
             <arg value="-O"/>
             <arg value="-f"/>
             <arg value="./db/dump/dump_files.sql"/>
+        </exec>
+    </target>
+
+    <target name="dump_admin">
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.groups"/>
+            <arg value="-t"/>
+            <arg value="sokol.users"/>
+            <arg value="-t"/>
+            <arg value="sokol.user_groups"/>
+            <arg value="-t"/>
+            <arg value="sokol.accessrecords"/>
+            <arg value="--inserts"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/initial/admin.sql"/>
+        </exec>
+    </target>
+    
+    <target name="dump_initial">
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-T"/>
+            <arg value="sokol.files"/>
+            <arg value="-T"/>
+            <arg value="sokol.configs"/>
+            <arg value="--inserts"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/initial/data.sql"/>
+        </exec>
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.files"/>
+            <arg value="--inserts"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/initial/files.sql"/>
+        </exec>
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.configs"/>
+            <arg value="--inserts"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/initial/configs.sql"/>
+        </exec>
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-T"/>
+            <arg value="sokol.files"/>
+            <arg value="-T"/>
+            <arg value="sokol.configs"/>
+            <arg value="-s"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/initial/schema.sql"/>
+        </exec>
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.files"/>
+            <arg value="-s"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/initial/schema_files.sql"/>
+        </exec>
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.configs"/>
+            <arg value="-s"/>
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/initial/schema_configs.sql"/>
         </exec>
     </target>
 

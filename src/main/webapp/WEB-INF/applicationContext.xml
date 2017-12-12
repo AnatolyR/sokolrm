@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" 
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
+       http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd 
+       http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd">
 
     <!--<context:property-placeholder location="file:///#{systemProperties.dbproperties2}"/>-->
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="location">
-            <value>file:///${app_config_path}app.properties</value>
-            <!--<value>file:///#{systemProperties['dbproperties']}</value>-->
-        </property>
-    </bean>
+    <!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+        <!--<property name="ignoreUnresolvablePlaceholders" value="true"/>-->
+        <!--<property name="location">-->
+            <!--<value>file:///${app_config_path}app.properties</value>-->
+            <!--&lt;!&ndash;<value>file:///#{systemProperties['dbproperties']}</value>&ndash;&gt;-->
+        <!--</property>-->
+    <!--</bean>-->
 
     <bean id="servletPropertyPlaceholderConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
     </bean>
@@ -24,12 +27,14 @@
      <!--Search for beans and autowiring-->
     <context:component-scan base-package="com.kattysoft"/>
 
-    <bean id="pgDb" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.postgresql.Driver"/>
-        <property name="url" value="${db.url}"/>
-        <property name="username" value="${db.username}"/>
-        <property name="password" value="${db.password}"/>
-    </bean>
+    <jee:jndi-lookup id="pgDb" expected-type="javax.sql.DataSource" jndi-name="/jdbc/sokol" resource-ref="true" />
+    
+    <!--<bean id="pgDb" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">-->
+        <!--<property name="driverClassName" value="org.postgresql.Driver"/>-->
+        <!--<property name="url" value="${db.url}"/>-->
+        <!--<property name="username" value="${db.username}"/>-->
+        <!--<property name="password" value="${db.password}"/>-->
+    <!--</bean>-->
 
     <bean id="entityManagerFactory"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -124,6 +129,14 @@
 
     <bean class="com.kattysoft.core.impl.ReportServiceImpl">
 
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.InstallationServiceImpl">
+
+    </bean>
+
+    <bean id="dbUtilDao" class="com.kattysoft.core.dao.DBUtilDaoPg">
+        <property name="dataSource" ref="pgDb" />
     </bean>
 
 </beans>

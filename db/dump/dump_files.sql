@@ -15,11 +15,6 @@ SET row_security = off;
 
 SET search_path = sokol, pg_catalog;
 
-DROP INDEX sokol.files_stidx;
-ALTER TABLE ONLY sokol.files DROP CONSTRAINT files_pkey;
-DROP TABLE sokol.files;
-SET search_path = sokol, pg_catalog;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
