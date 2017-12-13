@@ -56,7 +56,7 @@ public class DBUtilDaoPgTestIT extends AbstractTestNGSpringContextTests {
     @DataProvider(name = "sqls")
     public Object[][] createData() {
         return new Object[][]{
-            {"configs.sql", "SELECT count(*) FROM configs", "0"},
+            {"configs.sql", "SELECT count(*) FROM configs", "63"},
             {"data.sql", "SELECT count(*) FROM documents", "95"},
             {"files.sql", "SELECT count(*) FROM files", "20"},
             {"schema.sql", "SELECT count(*) FROM documents", "0"},

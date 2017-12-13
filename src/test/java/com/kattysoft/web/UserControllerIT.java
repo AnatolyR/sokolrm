@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -98,6 +97,6 @@ public class UserControllerIT {
         String content = mvcResult.getResponse().getContentAsString();
         System.out.println("Result: " + content);
 
-        MatcherAssert.assertThat(content, CoreMatchers.equalTo("{\"data\":[{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 6\",\"firstName\":\"Имя 6\",\"middleName\":\"Отчество 6\",\"lastName\":\"Фамилия 6\",\"groups\":[],\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 7\",\"firstName\":\"Имя 7\",\"middleName\":\"Отчество 7\",\"lastName\":\"Фамилия 7\",\"groups\":[],\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 8\",\"firstName\":\"Имя 8\",\"middleName\":\"Отчество 8\",\"lastName\":\"Фамилия 8\",\"groups\":[],\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 9\",\"firstName\":\"Имя 9\",\"middleName\":\"Отчество 9\",\"lastName\":\"Фамилия 9\",\"groups\":[],\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 10\",\"firstName\":\"Имя 10\",\"middleName\":\"Отчество 10\",\"lastName\":\"Фамилия 10\",\"groups\":[],\"groupsTitle\":[]}],\"offset\":5,\"total\":20}"));
+        MatcherAssert.assertThat(content, CoreMatchers.equalTo("{\"data\":[{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 6\",\"firstName\":\"Имя 6\",\"middleName\":\"Отчество 6\",\"lastName\":\"Фамилия 6\",\"groups\":null,\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 7\",\"firstName\":\"Имя 7\",\"middleName\":\"Отчество 7\",\"lastName\":\"Фамилия 7\",\"groups\":null,\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 8\",\"firstName\":\"Имя 8\",\"middleName\":\"Отчество 8\",\"lastName\":\"Фамилия 8\",\"groups\":null,\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 9\",\"firstName\":\"Имя 9\",\"middleName\":\"Отчество 9\",\"lastName\":\"Фамилия 9\",\"groups\":null,\"groupsTitle\":[]},{\"id\":\"12345678-1234-1234-1234-1234567890ab\",\"login\":null,\"title\":\"Фамилия И. О. 10\",\"firstName\":\"Имя 10\",\"middleName\":\"Отчество 10\",\"lastName\":\"Фамилия 10\",\"groups\":null,\"groupsTitle\":[]}],\"offset\":5,\"total\":20}"));
     }
 }

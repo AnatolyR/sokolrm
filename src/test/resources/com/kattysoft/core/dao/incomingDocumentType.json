@@ -1,0 +1,106 @@
+{
+  "title": "Входящий",
+  "actions": ["doresolution", "toreview", "doregistration", "tocase", "toarchive"],
+  "flow": "incomingDocumentFlow",
+  "fields": [
+    {
+      "id": "title",
+      "title": "Заголовок",
+      "type": "string",
+      "mandatory": true
+    },
+    {
+      "id": "status",
+      "title": "Статус",
+      "type": "string"
+    },
+    {
+      "id": "documentKind",
+      "title": "Вид документа",
+      "type": "select",
+      "dictionary": "documentKind"
+    },
+    {
+      "id": "addressee",
+      "title": "Адресаты",
+      "type": "dictionary",
+      "multiple": true,
+      "mandatory": true,
+      "dictionary": "organizationPersons"
+    },
+    {
+      "id": "correspondent",
+      "title": "Корреспондент",
+      "type": "dictionary",
+      "dictionary": "correspondent"
+    },
+    {
+      "id": "externalSigner",
+      "title": "Кем подписано",
+      "type": "smallstring"
+    },
+    {
+      "id": "externalExecutor",
+      "title": "Исполнитель",
+      "type": "smallstring"
+    },
+    {
+      "id": "externalNumber",
+      "title": "Исходящий номер",
+      "type": "smallstring"
+    },
+    {
+      "id": "externalDate",
+      "title": "Исходящая дата",
+      "type": "date"
+    },
+    {
+      "id": "documentNumber",
+      "title": "Номер документа",
+      "type": "smallstring"
+    },
+    {
+      "id": "registrationDate",
+      "title": "Дата регистрации",
+      "type": "date"
+    },
+    {
+      "id": "executionDate",
+      "title": "Дата исполнения",
+      "type": "date"
+    },
+    {
+      "id": "pagesQuantity",
+      "title": "Количество листов",
+      "type": "number"
+    },
+    {
+      "id": "itemQuantity",
+      "title": "Количество экземпляров",
+      "type": "number"
+    },
+    {
+      "id": "appQuantity",
+      "title": "Количество приложений",
+      "type": "number"
+    },
+    {
+      "id": "comment",
+      "title": "Комментарий",
+      "type": "text"
+    },
+    {
+      "id": "space",
+      "title": "Пространство",
+      "type": "dictionary",
+      "dictionary": "spaces",
+      "preload": true,
+      "multiple": false
+    },
+    {
+      "id": "archivecase",
+      "title": "Дело",
+      "type": "string"
+    }
+  ]
+}

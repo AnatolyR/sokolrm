@@ -11,14 +11,11 @@ package com.kattysoft.core.repository;
 
 import com.kattysoft.core.model.User;
 import com.kattysoft.core.specification.*;
-import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.jdbc.Sql;
@@ -27,19 +24,12 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.SingularAttribute;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static com.kattysoft.core.impl.UserServiceImpl.md5;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -77,6 +67,7 @@ public class UserRepositoryIT extends AbstractTestNGSpringContextTests {
         user.setMiddleName("Middle Name");
         user.setLastName("Last Name");
 
+        user.setGroups(new ArrayList<>());
         user.getGroups().add(UUID.randomUUID());
         user.getGroups().add(UUID.randomUUID());
 

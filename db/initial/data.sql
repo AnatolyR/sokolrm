@@ -709,7 +709,7 @@ INSERT INTO users VALUES ('722b151c-f9d7-4222-b541-cfc554695510', 'Ивашов 
 INSERT INTO users VALUES ('5d729b02-4d8c-4abd-80cc-c7497d1945cf', 'Луков В. А.', 'lukov', 'e59f2fc3df2af536de7c197dc23232dd', 'Виктор', 'Алексеевич', 'Луков', NULL);
 INSERT INTO users VALUES ('a2cfff23-4070-4063-9e94-c3956e824122', 'Захаров Н. В.', 'zaharov', '0d37826532c65adafc7cf711f1b25735', 'Никита', 'Вячеславович', 'Захаров', NULL);
 INSERT INTO users VALUES ('f179d503-c3fe-4b31-b596-fb36aa58f364', 'Гарина В. М.', 'garina', 'dc01a23feb54892f8ca55d74d5d1f35c', 'Валентина', 'Михайловна', 'Гарина', NULL);
-INSERT INTO users VALUES ('ca27f8db-2346-4e46-bed6-0b4130dda060', 'User 171129093843', 'testUser171129093848', '410c53ff4abfedc5e9652b512d4319ab', 'Firstname', 'Middlename', 'Lastname', NULL);
+INSERT INTO users VALUES ('ca27f8db-2346-4e46-bed6-0b4130dda060', 'User 171129093843', 'testUser171129093848', NULL, 'Firstname', 'Middlename', 'Lastname', NULL);
 INSERT INTO users VALUES ('dfe89495-cfa2-45e6-b62c-35bbe7ffc35e', 'Admin', 'admin', 'cdfc14470b8d824a6d13356ecf79adec', 'Admin', 'Admin', 'Admin', NULL);
 
 

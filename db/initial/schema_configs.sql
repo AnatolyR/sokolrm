@@ -25,7 +25,7 @@ SET default_with_oids = false;
 
 CREATE TABLE configs (
     id uuid NOT NULL,
-    title character varying(255),
+    path character varying(255),
     size integer,
     content bytea,
     author uuid,
@@ -40,6 +40,14 @@ CREATE TABLE configs (
 
 ALTER TABLE ONLY configs
     ADD CONSTRAINT config_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: configs_path_key; Type: CONSTRAINT; Schema: sokol; Owner: -
+--
+
+ALTER TABLE ONLY configs
+    ADD CONSTRAINT configs_path_key UNIQUE (path);
 
 
 --

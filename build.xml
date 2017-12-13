@@ -38,6 +38,32 @@
             <arg value="./db/drop_schema.sql"/>
         </exec>
     </target>
+
+    <target name="export_configs_from_db">
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="./db/exportConfigs.sql"/>
+            <arg value="-v"/>
+            <arg value="targetfolder='${basedir}/config/allConfigs.csv'"/>
+        </exec>
+        <exec executable="java">
+            <arg value="-cp" />
+            <arg value="./javautils/classes" />
+            <arg value="UnpackCsvToConfigFiles" />
+        </exec>
+    </target>
+    
+    <target name="import_configs_to_db">
+        <exec executable="java">
+            <arg value="-cp" />
+            <arg value="./javautils/classes" />
+            <arg value="GenerateSqlFromConfigFolder" />
+        </exec>
+        <exec executable="psql">
+            <arg value="-f"/>
+            <arg value="./db/importConfigs.sql"/>
+        </exec>
+    </target>
     
     <target name="restore">
         <exec executable="psql">
