@@ -9,7 +9,6 @@
  */
 package com.kattysoft.core.impl;
 
-import com.kattysoft.core.ConfigService;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -20,7 +19,7 @@ import java.io.IOException;
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 06.12.2016
  */
-public class ConfigServiceImpl implements ConfigService {
+public class ConfigServiceImpl extends ConfigServiceDBImpl {
     private String configPath;
     private ObjectMapper mapper = new ObjectMapper();
     private com.fasterxml.jackson.databind.ObjectMapper mapper2 = new com.fasterxml.jackson.databind.ObjectMapper();

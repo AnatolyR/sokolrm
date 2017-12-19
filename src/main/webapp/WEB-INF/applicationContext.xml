@@ -73,15 +73,15 @@
         <property name="documentDao" ref="documentDao" />
     </bean>
 
-    <!--<bean class="com.kattysoft.core.impl.ConfigServiceImpl">-->
-        <!--<property name="configPath">-->
-            <!--<value>${app_config_path}</value>-->
-        <!--</property>-->
-    <!--</bean>-->
-
-    <bean class="com.kattysoft.core.impl.ConfigServiceDBImpl">
-        <property name="configFileDao" ref="configFileDao" />
+    <bean class="com.kattysoft.core.impl.ConfigServiceImpl">
+        <property name="configPath">
+            <value>${app_config_path}</value>
+        </property>
     </bean>
+
+    <!--<bean class="com.kattysoft.core.impl.ConfigServiceDBImpl">-->
+        <!--<property name="configFileDao" ref="configFileDao" />-->
+    <!--</bean>-->
 
     <bean class="com.kattysoft.core.impl.UserServiceImpl">
 
@@ -145,6 +145,14 @@
 
     <bean id="configFileDao" class="com.kattysoft.core.dao.ConfigFileDaoPg">
         <property name="dataSource" ref="pgDb" />
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.ListServiceImpl">
+
+    </bean>
+
+    <bean class="com.kattysoft.core.impl.EntityServiceImpl">
+
     </bean>
 
 </beans>

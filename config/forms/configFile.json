@@ -1,0 +1,23 @@
+{
+  "title": "Свойства",
+  "fields": [
+    {
+      "id": "path",
+      "title": "Путь",
+      "type": "string",
+      "mandatory": true
+    }
+  ],
+  "subforms": [
+    {
+      "form" : {
+        "id": "configFileEditor"
+      }
+    } 
+  ],
+  "showAttaches": false,
+  "repositoryClassName": "com.kattysoft.core.repository.ConfigFileRepository",
+  "entityClassName": "com.kattysoft.core.model.ConfigFile",
+  "acType": "configFiles",
+  "acSpace": "_system"
+}

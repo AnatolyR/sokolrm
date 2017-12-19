@@ -71,6 +71,18 @@ $.widget('sokol.admin', {
         }, this));
     },
 
+    createListGrid: function(id) {
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('admin/' + id);
+        }
+        $.getJSON('app/config', {id: 'lists/' + id}, $.proxy(function(response) {
+            var options = response;
+            options.addable = 'link';
+            this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+            document.title = options.title;
+        }, this));
+    },
+
     createGrid: function(id) {
         this.options.id = "admin/" + id;
         if (this.grid) {
@@ -85,6 +97,10 @@ $.widget('sokol.admin', {
         }, this), 0);
         if (id == 'users' || id == 'groups' || id == 'registrationLists') {
             this.createPagedGrid(id);
+            return;
+        }
+        if (id == 'configFiles') {
+            this.createListGrid(id);
             return;
         }
         if (this.options.dispatcher) {

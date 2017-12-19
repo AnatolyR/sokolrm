@@ -9,13 +9,18 @@
  */
 package com.kattysoft.core.impl;
 
+import com.kattysoft.core.AccessRightLevel;
+import com.kattysoft.core.AccessRightService;
 import com.kattysoft.core.ConfigService;
+import com.kattysoft.core.NoAccessRightsException;
 import com.kattysoft.core.dao.ConfigFileDao;
+import com.kattysoft.core.repository.ConfigFileRepository;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -27,6 +32,12 @@ public class ConfigServiceDBImpl implements ConfigService {
     
     @Autowired
     private ConfigFileDao configFileDao;
+
+    @Autowired
+    private AccessRightService accessRightService;
+    
+    @Autowired
+    private ConfigFileRepository configFileRepository;
 
     @Override
     public JsonNode getConfig(String configName) {
@@ -54,7 +65,33 @@ public class ConfigServiceDBImpl implements ConfigService {
         }
     }
 
+    @Override
+    public com.fasterxml.jackson.databind.JsonNode getConfigById(String id) {
+        UUID uuid = UUID.fromString(id);
+        byte[] configContent = configFileDao.getContent(uuid);
+        if (configContent == null) {
+            return null;
+        }
+        try {
+            return mapper2.readTree(configContent);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not read config '" + id + "' from DB", e);
+        }
+    }
+
+    @Override
+    public void saveConfig(UUID uuid, byte[] content) {
+        if (!accessRightService.checkRights("_system", "configFiles", null, AccessRightLevel.WRITE)) {
+            throw new NoAccessRightsException("No rights to create entity");
+        }
+        configFileDao.saveContent(uuid, content);
+    }
+
     public void setConfigFileDao(ConfigFileDao configFileDao) {
         this.configFileDao = configFileDao;
+    }
+
+    public void setAccessRightService(AccessRightService accessRightService) {
+        this.accessRightService = accessRightService;
     }
 }

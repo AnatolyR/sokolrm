@@ -188,7 +188,7 @@ $.widget('sokol.accessRightsGrid', {
             var element = elementSelector.val();
             var subelement = subelementSelector.val();
             if ("_system" == space) {
-                if ("users" == element || "groups" == element || "registrationLists" == element) {
+                if ("users" == element || "groups" == element || "registrationLists" == element || "configFiles" == element) {
                     addAr(["CREATE", "READ", "WRITE", "DELETE", "LIST"]);
                 } else if ("documentGroups" == element) {
                     addAr(["ADD", "DELETE", "LIST"]);
@@ -361,6 +361,18 @@ $.widget('sokol.admin', {
         }, this));
     },
 
+    createListGrid: function(id) {
+        if (this.options.dispatcher) {
+            this.options.dispatcher.updateHash('admin/' + id);
+        }
+        $.getJSON('app/config', {id: 'lists/' + id}, $.proxy(function(response) {
+            var options = response;
+            options.addable = 'link';
+            this.grid = $.sokol.grid(options, $("<div></div>").appendTo(this.main));
+            document.title = options.title;
+        }, this));
+    },
+
     createGrid: function(id) {
         this.options.id = "admin/" + id;
         if (this.grid) {
@@ -375,6 +387,10 @@ $.widget('sokol.admin', {
         }, this), 0);
         if (id == 'users' || id == 'groups' || id == 'registrationLists') {
             this.createPagedGrid(id);
+            return;
+        }
+        if (id == 'configFiles') {
+            this.createListGrid(id);
             return;
         }
         if (this.options.dispatcher) {
@@ -565,6 +581,11 @@ $.widget('sokol.app', {
         } else if (id.startsWith('group/')) {
             this.createForm('group', id.substring(6), mode, 'Не удалось загрузить карточку группы');
 
+        } else if (id.startsWith('new/configFile')) {
+            this.createEntityForm('configFile', 'new/configFile', 'edit', 'Не удается создать файл конфигурации');
+        } else if (id.startsWith('configFile/')) {
+            this.createEntityForm('configFile', id.substring(11), mode, 'Не удалось загрузить файл конфигурации');
+
         } else if (id.startsWith('new/registrationlist')) {
             this.createForm('registrationlist', 'new/registrationlist', 'edit', 'Не удается создать карточку журнала регистрации');
         } else if (id.startsWith('registrationlist/')) {
@@ -612,6 +633,27 @@ $.widget('sokol.app', {
 
     createForm: function(type, id, mode, errorMessage) {
         $.getJSON('app/' + type + 'card', {id: id},
+            $.proxy(function (data) {
+                var options = {
+                    id: data.data.id,
+                    data: data.data,
+                    form: data.form,
+                    containerType: type,
+                    subforms: data.subforms
+                };
+                if (mode) {
+                    options.mode = mode;
+                }
+                options.dispatcher = this;
+                this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
+            }, this)
+        ).fail($.proxy(function(e) {
+                this.error = $('<div class="alert alert-danger" role="alert">' + errorMessage + ' "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+            }, this));
+    },
+
+    createEntityForm: function(type, id, mode, errorMessage) {
+        $.getJSON('app/entity', {type: type, id: id},
             $.proxy(function (data) {
                 var options = {
                     id: data.data.id,
@@ -887,6 +929,120 @@ $.widget('sokol.attachesGrid', {
         return panelBody;
     }
 });
+$.widget('sokol.configFileEditor', {
+    options: {
+        mode: 'read'
+    },
+    _create: function () {
+        this.createHeader();
+        this.createBlock();
+    },
+
+    createHeader: function() {
+        this.element.addClass('panel panel-default');
+        this.element.attr('name', 'sokolFileConfigPanel');
+
+        var panelHeader = $('<div class="panel-heading"></div>').appendTo(this.element);
+
+        this.paneTitleText = 'Файл конфигурации';
+        var panelTitle = $('<div name="panelTitle" class="panel-title">' + this.paneTitleText + '</div>').appendTo(panelHeader);
+        this.panelTitle = panelTitle;
+
+        var panelBody = $('<div class="panel-body"></div>');
+        panelBody.appendTo(this.element);
+        this.panelBody = panelBody;       
+    },
+
+    createBlock: function () {
+        if (this.options.configFileId) {
+            $.getJSON('app/rawConfig', {id: this.options.configFileId}, $.proxy(function (data) {
+                this.renderConfig(data);
+            }, this));
+        }
+    },
+    
+    markChanges: function() {
+        if (!this.markedChanges) {
+            this.saveButton.attr("disabled", false);
+            this.panelTitle.text(this.paneTitleText + " *");
+            this.markedChanges = true;
+        }
+    },
+
+    unmarkChanges: function() {
+        this.saveButton.attr("disabled", true);
+        this.panelTitle.text(this.paneTitleText);
+        this.markedChanges = false;
+    },
+    
+    renderConfig: function(data) {
+        this.createButtons();
+
+        var container = $('<div class="panel panel-default" id="jsoneditor" style="width: 100%; height: 600px; margin-bottom: 2px;"></div>');
+        container.appendTo(this.element);
+        $(container).resizable();
+        
+        var options = {
+            mode: 'code',
+            modes: ['code', 'form', 'text', 'tree', 'view'],
+            onChange: $.proxy(function() {
+                this.markChanges();
+            }, this)
+            //autocomplete: {
+            //    getOptions: function (text, path, input, editor) {
+            //        if (path[path.length - 1] == 'type') {
+            //            return ['string', 'link', 'number'];
+            //        }
+            //        return [];
+            //    }
+            //},
+            //templates: [
+            //    {
+            //        text: 'Field',
+            //        value: {
+            //            'id': '',
+            //            'title': '',
+            //            'type': ''
+            //        }
+            //    }
+            //]
+        };
+        var editor = new JSONEditor(container.get(0), options);
+        this.editor = editor;
+        editor.set(data);
+    },
+
+    saveConfigFile: function() {
+        var data = {};
+        data.content = this.editor.get();
+        data.id = this.options.configFileId;
+        
+        var message = 'Не удалось сохранить файл конфигурации.';
+
+        $.post('app/saveConfig', JSON.stringify(data), $.proxy(function (response) {
+            $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
+            this.unmarkChanges();
+        }, this)).fail($.proxy(function() {
+            $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
+        }, this));
+    },
+
+    createButtons: function() {
+        var saveButton = $('<button type="button" name="save" style="" class="btn btn-success controlElementLeftMargin">Сохранить</button>');
+        saveButton.addClass('executionReportButton');
+        saveButton.attr("disabled", true);
+        saveButton.click($.proxy(function() {
+            this.saveConfigFile();
+        }, this));
+        saveButton.appendTo(this.panelBody);
+        this.saveButton = saveButton;
+
+    },
+
+    _destroy: function () {
+        this.element.detach();
+    }
+});
 $.widget('sokol.container', {
     options: {
         mode: "read"
@@ -988,7 +1144,7 @@ $.widget('sokol.container', {
             }
         }
 
-        if (this.options.id) {
+        if (this.options.id && !(this.options.form.showAttaches === false)) {
             this.attaches = $.sokol.attachesGrid({
                     mode: this.options.mode, 
                     id: data.id,
@@ -1060,6 +1216,13 @@ $.widget('sokol.container', {
             this.createExecutionListIfExist(subform.data.type, taskId);
             return;
         }
+        if (subform.form.id == 'configFileEditor') {
+            var arGrid = $.sokol.configFileEditor({
+                configFileId: this.options.id
+            }, $('<div></div>').appendTo(this.element));
+            this.childs.push(arGrid);
+            return;
+        }
         var form = $.sokol.form({
             mode: "read",
             data: subform.data ? subform.data : this.options.data,
@@ -1084,11 +1247,17 @@ $.widget('sokol.container', {
     goToMode: function(mode) {
         this.options.mode = mode;
 
-        this.formButtons.setMode(mode);
+        if (this.formButtons && this.formButtons.setMode) {
+            this.formButtons.setMode(mode);
+        }
 
-        this.form.setMode(mode);
+        if (this.form && this.form.setMode) {
+            this.form.setMode(mode);
+        }
 
-        this.attaches.setMode(mode);
+        if (this.attaches && this.attaches.setMode) {
+            this.attaches.setMode(mode);
+        }
 
         for (var i = 0; i < this.childs.length; i++) {
             var child = this.childs[i];
@@ -1153,10 +1322,15 @@ $.widget('sokol.container', {
             saveUrl = 'app/saveGroup';
             openType = 'group';
             message = 'Не удалось сохранить карточку группы. Обратитесь к администратору.';
-        } else {
+        } else if (this.options.containerType == 'document') {
             saveUrl = 'app/savedocument';
             openType = 'document';
             message = 'Не удалось сохранить документ. Обратитесь к администратору.';
+        } else {
+            saveUrl = 'app/saveEntity';
+            data.saveType = this.options.containerType;
+            openType = this.options.containerType;
+            message = 'Не удалось сохранить сущность. Обратитесь к администратору.';
         }
 
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
@@ -1207,13 +1381,17 @@ $.widget('sokol.container', {
             deleteUrl = 'app/deleteGroup';
             errorMessage = 'Не удалось удалить карточку группы. Обратитесь к администратору.';
             message = 'Карточка группы удалена';
-        } else {
+        } else if (this.options.containerType == 'group') {
             deleteUrl = 'app/deletedocument';
             errorMessage = 'Не удалось удалить документ. Обратитесь к администратору.';
             message = 'Документ удален';
+        } else {
+            deleteUrl = 'app/deleteEntity';
+            errorMessage = 'Не удалось удалить сущность. Обратитесь к администратору.';
+            message = 'Удалено';
         }
         $.ajax({
-            url: deleteUrl + '?id=' + this.options.id,
+            url: deleteUrl + '?id=' + this.options.id + "&type=" + this.options.containerType,
             type: 'DELETE',
             success: $.proxy(function(result) {
                 if (result == "true") {

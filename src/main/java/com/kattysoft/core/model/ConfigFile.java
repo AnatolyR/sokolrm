@@ -1,5 +1,10 @@
 package com.kattysoft.core.model;
 
+import org.hibernate.annotations.Type;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
 
@@ -7,11 +12,16 @@ import java.util.UUID;
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 13.12.2017
  */
+@Entity
+@Table(name = "configs")
 public class ConfigFile {
+    @Id
+    @Type(type = "pg-uuid")
     private UUID id;
     
     private String path;
 
+    @Type(type = "pg-uuid")
     private UUID author;
 
     private String authorTitle;

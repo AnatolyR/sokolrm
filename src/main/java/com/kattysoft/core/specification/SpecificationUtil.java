@@ -12,20 +12,16 @@ package com.kattysoft.core.specification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.kattysoft.core.model.User;
 import org.hibernate.metamodel.internal.PluralAttributeImpl;
-import org.hibernate.query.criteria.internal.CriteriaBuilderImpl;
-import org.hibernate.query.criteria.internal.Renderable;
-import org.hibernate.query.criteria.internal.compile.RenderingContext;
-import org.hibernate.query.criteria.internal.predicate.LikePredicate;
-import org.joda.time.LocalDate;
 
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -132,9 +128,9 @@ public class SpecificationUtil {
             } else if (valueCondition.getOperation() == Operation.LIKE && valueCondition.getValue() instanceof String) {
                 predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue() + "%");
             } else if (valueCondition.getOperation() == Operation.STARTS && valueCondition.getValue() instanceof String) {
-                predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue());
-            } else if (valueCondition.getOperation() == Operation.ENDS && valueCondition.getValue() instanceof String) {
                 predicate = criteriaBuilder.like(path, valueCondition.getValue() + "%");
+            } else if (valueCondition.getOperation() == Operation.ENDS && valueCondition.getValue() instanceof String) {
+                predicate = criteriaBuilder.like(path, "%" + valueCondition.getValue());
             } else {
                 return null;
             }

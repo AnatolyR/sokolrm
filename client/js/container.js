@@ -99,7 +99,7 @@ $.widget('sokol.container', {
             }
         }
 
-        if (this.options.id) {
+        if (this.options.id && !(this.options.form.showAttaches === false)) {
             this.attaches = $.sokol.attachesGrid({
                     mode: this.options.mode, 
                     id: data.id,
@@ -171,6 +171,13 @@ $.widget('sokol.container', {
             this.createExecutionListIfExist(subform.data.type, taskId);
             return;
         }
+        if (subform.form.id == 'configFileEditor') {
+            var arGrid = $.sokol.configFileEditor({
+                configFileId: this.options.id
+            }, $('<div></div>').appendTo(this.element));
+            this.childs.push(arGrid);
+            return;
+        }
         var form = $.sokol.form({
             mode: "read",
             data: subform.data ? subform.data : this.options.data,
@@ -195,11 +202,17 @@ $.widget('sokol.container', {
     goToMode: function(mode) {
         this.options.mode = mode;
 
-        this.formButtons.setMode(mode);
+        if (this.formButtons && this.formButtons.setMode) {
+            this.formButtons.setMode(mode);
+        }
 
-        this.form.setMode(mode);
+        if (this.form && this.form.setMode) {
+            this.form.setMode(mode);
+        }
 
-        this.attaches.setMode(mode);
+        if (this.attaches && this.attaches.setMode) {
+            this.attaches.setMode(mode);
+        }
 
         for (var i = 0; i < this.childs.length; i++) {
             var child = this.childs[i];
@@ -264,10 +277,15 @@ $.widget('sokol.container', {
             saveUrl = 'app/saveGroup';
             openType = 'group';
             message = 'Не удалось сохранить карточку группы. Обратитесь к администратору.';
-        } else {
+        } else if (this.options.containerType == 'document') {
             saveUrl = 'app/savedocument';
             openType = 'document';
             message = 'Не удалось сохранить документ. Обратитесь к администратору.';
+        } else {
+            saveUrl = 'app/saveEntity';
+            data.saveType = this.options.containerType;
+            openType = this.options.containerType;
+            message = 'Не удалось сохранить сущность. Обратитесь к администратору.';
         }
 
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
@@ -318,13 +336,17 @@ $.widget('sokol.container', {
             deleteUrl = 'app/deleteGroup';
             errorMessage = 'Не удалось удалить карточку группы. Обратитесь к администратору.';
             message = 'Карточка группы удалена';
-        } else {
+        } else if (this.options.containerType == 'document') {
             deleteUrl = 'app/deletedocument';
             errorMessage = 'Не удалось удалить документ. Обратитесь к администратору.';
             message = 'Документ удален';
+        } else {
+            deleteUrl = 'app/deleteEntity';
+            errorMessage = 'Не удалось удалить сущность. Обратитесь к администратору.';
+            message = 'Удалено';
         }
         $.ajax({
-            url: deleteUrl + '?id=' + this.options.id,
+            url: deleteUrl + '?id=' + this.options.id + "&type=" + this.options.containerType,
             type: 'DELETE',
             success: $.proxy(function(result) {
                 if (result == "true") {

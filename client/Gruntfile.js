@@ -19,7 +19,9 @@ module.exports = function(grunt) {
                     'vendor/selectize.js',
                     'node_modules/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js',
                     //'node_modules/bootstrap-notify/bootstrap-notify.js'
-                    'vendor/bootstrap-notify-fixed-for-sokol.js'
+                    'vendor/bootstrap-notify-fixed-for-sokol.js',
+                    'node_modules/jsoneditor/dist/jsoneditor.js',
+                    'node_modules/jquery-resizable/resizable.js'
                 ]
             },
             appjs: {
@@ -37,7 +39,9 @@ module.exports = function(grunt) {
                     'node_modules/bootstrap-select/dist/css/bootstrap-select.css',
                     'node_modules/selectize/dist/css/selectize.css',
                     'node_modules/selectize/dist/css/selectize.bootstrap3.css',
-                    'node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
+                    'node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css',
+                    'node_modules/jsoneditor/dist/jsoneditor.css',
+                    'node_modules/jquery-resizable/resizable.css'
                 ]
             },
             appcss: {

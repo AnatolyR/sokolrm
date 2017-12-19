@@ -76,6 +76,11 @@ $.widget('sokol.app', {
         } else if (id.startsWith('group/')) {
             this.createForm('group', id.substring(6), mode, 'Не удалось загрузить карточку группы');
 
+        } else if (id.startsWith('new/configFile')) {
+            this.createEntityForm('configFile', 'new/configFile', 'edit', 'Не удается создать файл конфигурации');
+        } else if (id.startsWith('configFile/')) {
+            this.createEntityForm('configFile', id.substring(11), mode, 'Не удалось загрузить файл конфигурации');
+
         } else if (id.startsWith('new/registrationlist')) {
             this.createForm('registrationlist', 'new/registrationlist', 'edit', 'Не удается создать карточку журнала регистрации');
         } else if (id.startsWith('registrationlist/')) {
@@ -123,6 +128,27 @@ $.widget('sokol.app', {
 
     createForm: function(type, id, mode, errorMessage) {
         $.getJSON('app/' + type + 'card', {id: id},
+            $.proxy(function (data) {
+                var options = {
+                    id: data.data.id,
+                    data: data.data,
+                    form: data.form,
+                    containerType: type,
+                    subforms: data.subforms
+                };
+                if (mode) {
+                    options.mode = mode;
+                }
+                options.dispatcher = this;
+                this.container = $.sokol.container(options, $('<div></div>').appendTo("body"));
+            }, this)
+        ).fail($.proxy(function(e) {
+                this.error = $('<div class="alert alert-danger" role="alert">' + errorMessage + ' "' + id + '". Обратитесь к администратору.</div>').appendTo(this.element);
+            }, this));
+    },
+
+    createEntityForm: function(type, id, mode, errorMessage) {
+        $.getJSON('app/entity', {type: type, id: id},
             $.proxy(function (data) {
                 var options = {
                     id: data.data.id,

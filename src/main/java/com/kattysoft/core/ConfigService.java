@@ -9,6 +9,8 @@ package com.kattysoft.core;
 
 import org.codehaus.jackson.JsonNode;
 
+import java.util.UUID;
+
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
  * Date: 06.12.2016
@@ -16,4 +18,8 @@ import org.codehaus.jackson.JsonNode;
 public interface ConfigService {
     JsonNode getConfig(String configName);
     com.fasterxml.jackson.databind.JsonNode getConfig2(String configName);
+
+    com.fasterxml.jackson.databind.JsonNode getConfigById(String id);
+
+    void saveConfig(UUID uuid, byte[] content);
 }

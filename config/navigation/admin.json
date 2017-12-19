@@ -16,6 +16,10 @@
     {
       "id": "registrationLists",
       "title": "Журналы регистрации"
+    },
+    {
+      "id": "configFiles",
+      "title": "Файлы конфигурации"
     }
   ]
 }

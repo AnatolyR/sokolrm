@@ -1,0 +1,24 @@
+{
+  "checkAccessRightsForColumnLinks": true,
+  "gridConfig": {
+    "title": "Файлы конфигурации",
+    "addableType": "configFile",
+    "sortable": false,
+    "columns": [
+      {
+        "id": "path",
+        "title": "Название",
+        "render": "link",
+        "linkType": "configFile"
+      }
+    ],
+    "id": "configFiles",
+    "url": "app/list",
+    "filterable": true
+  },
+  "sortField": "path",
+  "repositoryClassName": "com.kattysoft.core.repository.ConfigFileRepository",
+  "entityClassName": "com.kattysoft.core.model.ConfigFile",
+  "acType": "configFiles",
+  "acSpace": "_system"
+}
