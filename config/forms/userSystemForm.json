@@ -30,6 +30,18 @@
       "title": "Группы доступа",
       "type": "group",
       "multiple": true
+    },
+    {
+      "id": "appConfigFile",
+      "title": "Файл настроек приложения",
+      "type": "string",
+      "mandatory": false
+    },
+    {
+      "id": "navigationConfigFile",
+      "title": "Файл настроек навигации",
+      "type": "string",
+      "mandatory": false
     }
   ]
 }

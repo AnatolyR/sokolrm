@@ -207,8 +207,13 @@ public class UserController {
         if (systemUserForm != null) {
             JsonNode systemFields = systemUserForm.get("fields");
             String login = systemFields.get("login").asText();
-            String email = systemFields.get("email").asText();
             user.setLogin(login);
+            String email = systemFields.get("email").asText();
+            user.setEmail(email);
+            String appConfigFile = systemFields.get("appConfigFile").asText();
+            user.setAppConfigFile(appConfigFile);
+            String navigationConfigFile = systemFields.get("navigationConfigFile").asText();
+            user.setNavigationConfigFile(navigationConfigFile);
 
             ArrayNode groups = (ArrayNode) systemFields.get("groups");
             if (groups != null) {

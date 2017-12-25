@@ -73,8 +73,26 @@ public class ConfigController {
         }
         if (id.equals("appSettings")) {
             User user = userService.getCurrentUser();
+            if (user.getAppConfigFile() != null) {
+                String configName = normalizeName(user.getAppConfigFile());
+                JsonNode customConfig = configService.getConfig(configName);
+                if (customConfig != null) {
+                    config = customConfig;
+                }
+            } 
             String userTitle = user.getTitle();
             ((ObjectNode) config).put("userName", userTitle);
+        }
+
+        if (id.equals("navigation/main")) {
+            User user = userService.getCurrentUser();
+            if (user.getNavigationConfigFile() != null) {
+                String configName = normalizeName(user.getNavigationConfigFile());
+                JsonNode customConfig = configService.getConfig(configName);
+                if (customConfig != null) {
+                    config = customConfig;
+                }
+            }
         }
 
         if (config.has("checkAccessRightsForItems") && config.get("checkAccessRightsForItems").asBoolean()) {
@@ -100,6 +118,16 @@ public class ConfigController {
         } 
 
         return config.toString();
+    }
+    
+    private String normalizeName(String configName) {
+        if (configName.startsWith("/")) {
+            configName = configName.substring(1);
+        }
+        if (configName.endsWith(".json")) {
+            configName = configName.substring(0, configName.length() - 5);
+        }
+        return configName;
     }
 
     @RequestMapping(value = "/rawConfig", produces = "application/json; charset=utf-8")

@@ -11,6 +11,7 @@ package com.kattysoft.web;
 
 import com.kattysoft.core.NoAccessRightsException;
 import com.kattysoft.core.SokolException;
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,16 @@ public class ErrorFilter implements Filter {
                 message = e.getCause().getMessage();
                 status = HttpServletResponse.SC_FORBIDDEN;
             } else {
-                throw e;
+                Throwable te = e.getCause();
+                while (te != null && !(te instanceof PSQLException)) {
+                    te = te.getCause();
+                }
+                if (te != null) {
+                    String pmessage = ((PSQLException) te).getMessage();
+                    if (pmessage != null && pmessage.contains("duplicate key value violates unique constraint")) {
+                        message = "Дублируются данные, которые должны быть уникальными";
+                    }
+                }
             }
             log.error("Error processing rest call", e);
             response.setContentType("application/json; charset=utf-8");

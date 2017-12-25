@@ -11,11 +11,8 @@ package com.kattysoft.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,12 +44,18 @@ public class User {
     private String middleName;
 
     private String lastName;
+    
+    private String email;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name="user_groups", joinColumns=@JoinColumn(name="userid"))
     @Column(name="groupid")
     @JsonIgnore
     private List<UUID> groups;
+    
+    private String appConfigFile;
+    
+    private String navigationConfigFile;
 
     public User() {
     }
@@ -118,11 +121,35 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public List<UUID> getGroups() {
         return groups;
     }
 
     public void setGroups(List<UUID> groups) {
         this.groups = groups;
+    }
+
+    public String getAppConfigFile() {
+        return appConfigFile;
+    }
+
+    public void setAppConfigFile(String appConfigFile) {
+        this.appConfigFile = appConfigFile;
+    }
+
+    public String getNavigationConfigFile() {
+        return navigationConfigFile;
+    }
+
+    public void setNavigationConfigFile(String navigationConfigFile) {
+        this.navigationConfigFile = navigationConfigFile;
     }
 }

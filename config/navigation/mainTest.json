@@ -1,0 +1,33 @@
+{
+  "items": [
+    {
+      "id": "documents",
+      "title": "Документы",
+      "type": "header"
+    },
+    {
+      "id": "incomingDocuments",
+      "title": "Входящие"
+    },
+    {
+      "id": "outgoingDocuments",
+      "title": "Исходящие"
+    },
+    {
+      "id": "internalDocuments",
+      "title": "Внутренние"
+    },
+    {
+      "id": "reviewDocuments",
+      "title": "На рассмотрение"
+    },
+    {
+      "id": "signDocuments",
+      "title": "На подписание"
+    },
+    {
+      "id": "myDocuments",
+      "title": "Мои документы"
+    }
+  ]
+}

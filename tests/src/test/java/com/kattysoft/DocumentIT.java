@@ -686,6 +686,9 @@ public class DocumentIT {
         if (clear) {
             input.clear();
         }
+        if (input == null) {
+            throw new RuntimeException("Field '" + name + "' not found");
+        }
         input.sendKeys(value);
     }
 

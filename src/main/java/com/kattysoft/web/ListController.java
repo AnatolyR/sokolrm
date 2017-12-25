@@ -64,7 +64,7 @@ public class ListController {
         } else if (sortField != null) {
             Sort sortObject = new Sort();
             sortObject.setField(sortField);
-            sortObject.setOrder("true".equals(sortAsc) ? SortOrder.ASC : SortOrder.DESC);
+            sortObject.setOrder(SortOrder.ASC);
             spec.setSort(Collections.singletonList(sortObject));
         }
 

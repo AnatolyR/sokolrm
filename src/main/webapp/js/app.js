@@ -1336,8 +1336,9 @@ $.widget('sokol.container', {
         $.post(saveUrl, JSON.stringify(data), $.proxy(function (id) {
             $.notify({message: 'Сохранено'}, {type: 'success', delay: 1000, timer: 1000});
             this.options.dispatcher.open(openType + '/' + id);
-        }, this)).fail($.proxy(function() {
-            $.notify({message: message},{type: 'danger', delay: 0, timer: 0});
+        }, this)).fail($.proxy(function(e) {
+            var detail = e.responseJSON.error;
+            $.notify({message: message + " " + detail},{type: 'danger', delay: 0, timer: 0});
         }, this));
     },
 
@@ -1381,7 +1382,7 @@ $.widget('sokol.container', {
             deleteUrl = 'app/deleteGroup';
             errorMessage = 'Не удалось удалить карточку группы. Обратитесь к администратору.';
             message = 'Карточка группы удалена';
-        } else if (this.options.containerType == 'group') {
+        } else if (this.options.containerType == 'document') {
             deleteUrl = 'app/deletedocument';
             errorMessage = 'Не удалось удалить документ. Обратитесь к администратору.';
             message = 'Документ удален';

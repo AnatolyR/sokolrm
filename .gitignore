@@ -11,5 +11,3 @@ buildNumber.properties
 *.iml
 node_modules/
 dist
-src/main/webapp/css/bundle.css
-src/main/webapp/js/bundle.js
