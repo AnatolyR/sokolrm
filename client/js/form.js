@@ -70,7 +70,7 @@ $.widget('sokol.form', {
         $(formNode).append('' +
             '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
             '<label class="control-label">' + field.title + ':</label>' +
-            (edit ? ('<input name="' + field.id + '" class="form-control" type="password" value="' + value + '">') :
+            (edit ? ('<input name="' + field.id + '" class="form-control" type="password" value="' + value + '"' + (field.disabled ? ' disabled' : '') + '>') :
                 ('<div>' + value + '</div>')) +
             '</div>');
     },
@@ -79,7 +79,7 @@ $.widget('sokol.form', {
         $(formNode).append('' +
             '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
             '<label class="control-label">' + field.title + ':</label>' +
-            (edit ? ('<input name="' + field.id + '" class="form-control" type="text" value="' + value + '">') :
+            (edit ? ('<input name="' + field.id + '" class="form-control" type="text" value="' + value + '"' + (field.disabled ? ' disabled' : '') + '>') :
                 ('<div>' + value + '</div>')) +
             '</div>');
     },
@@ -92,7 +92,7 @@ $.widget('sokol.form', {
         $(formNode).append('' +
             '<div class="form-group' + (field.mandatory && edit ? ' formGroupRequired' : '') + '" style="' + (field.type == 'smallstring' ? 'width: 50%;' : '') + '">' +
             '<label class="control-label">' + field.title + ':</label>' +
-            (edit ? ('<textarea rows="3" name="' + field.id + '" class="form-control">' + value + '</textarea>') :
+            (edit ? ('<textarea rows="3" name="' + field.id + '" class="form-control"' + (field.disabled ? ' disabled' : '') + '>' + value + '</textarea>') :
                 ('<div>' + value + '</div>')) +
             '</div>');
     },
@@ -375,9 +375,27 @@ $.widget('sokol.form', {
         $(formNode).append('' +
             '<div class="form-group' + (field.mandatory ? ' formGroupRequired' : '') + '" style="width: 200px;">' +
             '<label class="control-label">' + field.title + '</label>' +
-            '<input name="' + field.id + '" class="form-control" type="text" value="' + value + '">' +
+            '<input name="' + field.id + '" class="form-control" type="text" value="' + value + '" ' + (field.disabled ? ' disabled' : '') + '>' +
             '</div>');
     },
+
+    createFieldNumber00: function(formNode, field, value, edit) {
+        if (!edit) {
+            $(formNode).append('' +
+                '<div class="form-group' + (field.mandatory ? ' formGroupRequired' : '') + '" style="' + (field.width ? 'width: ' + field.width + ';' : '') + '">' +
+                '<label class="control-label">' + field.title + ':</label>' +
+                '<div>' + value + '</div>' +
+                '</div>' +
+                '');
+            return;
+        }
+        $(formNode).append('' +
+            '<div class="form-group' + (field.mandatory ? ' formGroupRequired' : '') + '" style="width: 200px;">' +
+            '<label class="control-label">' + field.title + '</label>' +
+            '<input name="' + field.id + '" class="form-control" type="text" value="' + value + '"' + (field.disabled ? ' disabled' : '') + '>' +
+            '</div>');
+    },
+    
     createMainBlock: function(container, form, data, edit) {
         var formNode;
         if (this.options.usePanel) {
@@ -439,6 +457,8 @@ $.widget('sokol.form', {
         if (!value && value !== 0) {
             value = "";
         }
+        edit =  edit && !(field.ar == 'read');
+        
         if (type == "string" || type == "smallstring") {
             this.createFieldString(formNode, field, value, edit);
         } else if (type == "text") {
@@ -459,6 +479,8 @@ $.widget('sokol.form', {
             this.createFieldUser(formNode, field, value, valueTitle, edit);
         } else if (type == "number") {
             this.createFieldNumber(formNode, field, value, edit);
+        } else if (type == "number00") {
+            this.createFieldNumber00(formNode, field, value, edit);
         }
     },
 
@@ -489,6 +511,7 @@ $.widget('sokol.form', {
 
         var valid = true;
         var numberRegex = /^-?\d+$/
+        var decimalRegex = /^[0-9]+(\.[0-9][0-9]?)?$/
 
         for (var i = 0; i < this.fieldsInfo.length; i++) {
             var field = this.fieldsInfo[i];
@@ -513,6 +536,13 @@ $.widget('sokol.form', {
 
             } else if(field.type == 'number') {
                 if (val.value && !val.value.match(numberRegex)) {
+                    fieldDiv.addClass("has-error");
+                    valid = false;
+                } else {
+                    fieldDiv.removeClass("has-error");
+                }
+            } else if(field.type == 'number00') {
+                if (val.value && !val.value.match(decimalRegex)) {
                     fieldDiv.addClass("has-error");
                     valid = false;
                 } else {

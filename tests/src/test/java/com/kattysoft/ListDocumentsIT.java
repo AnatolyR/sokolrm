@@ -12,7 +12,6 @@ package com.kattysoft;
 import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.awt.*;
@@ -37,17 +36,17 @@ public class ListDocumentsIT {
     
     @Test
     public void testDocumentsList() {
-        listDocuments("documents", 41);
+        listDocuments("documents", 45);
     }
 
     @Test
     public void testIncomingDocumentsList() {
-        listDocuments("incomingDocuments", 31);
+        listDocuments("incomingDocuments", 33);
     }
 
     @Test
     public void testOutgoingDocumentsList() {
-        listDocuments("outgoingDocuments", 10);
+        listDocuments("outgoingDocuments", 12);
     }
 
     @Test
@@ -62,12 +61,12 @@ public class ListDocumentsIT {
 
     @Test
     public void testSignDocumentsList() {
-        listDocuments("signDocuments", 1);
+        listDocuments("signDocuments", 2);
     }
 
     @Test
     public void testMyDocumentsList() {
-        listDocuments("myDocuments", 88);
+        listDocuments("myDocuments", 92);
     }
 
     @Test
@@ -122,12 +121,12 @@ public class ListDocumentsIT {
 
     @Test
     public void testArchivedOutgoingTasksList() {
-        listDocuments("archivedOutgoingTasks", 16);
+        listDocuments("archivedOutgoingTasks", 20);
     }
 
     @Test
     public void testArchivedDocumentsList() {
-        listDocuments("archivedDocuments", 18);
+        listDocuments("archivedDocuments", 20);
     }
     
     public void listDocuments(String listId, int listSize) {

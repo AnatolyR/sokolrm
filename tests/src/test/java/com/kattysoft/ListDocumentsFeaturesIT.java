@@ -19,11 +19,8 @@ import org.testng.annotations.Test;
 import java.awt.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.*;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Author: Anatolii Rakovskii (rtolik@yandex.ru)
@@ -69,7 +66,7 @@ public class ListDocumentsFeaturesIT {
 
         checkList("list3AfterPrev");
 
-        checkButtons("list4After50", "Найдено: 41 Предыдущая \n" +
+        checkButtons("--in code--", "Найдено: 45 Предыдущая \n" +
             "1 / 3\n" +
             " 1 / 3\n" +
             "2 / 3\n" +
@@ -89,7 +86,7 @@ public class ListDocumentsFeaturesIT {
         Thread.sleep(1000);
 
         checkList("list4After50");
-        checkButtons("list4After50", "Найдено: 41 \n" +
+        checkButtons("--in code--", "Найдено: 45 \n" +
             "  Отображать\n" +
             "50\n" +
             " 5\n" +

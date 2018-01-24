@@ -28,6 +28,11 @@
     {
       "id": "myDocuments",
       "title": "Мои документы"
+    },
+    {
+      "id": "incomingTasks",
+      "title": "Входящие задачи",
+      "type": "header"
     }
   ]
 }

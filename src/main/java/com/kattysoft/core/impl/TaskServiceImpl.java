@@ -114,7 +114,7 @@ public class TaskServiceImpl implements TaskService {
             }
         } else if ("approval".equals(type)) {
             if (runningTasks) {
-                if ("project".equals(document.getStatus()) || "agreed".equals(document.getStatus()) || "not_agreed".equals(document.getStatus())) {
+                if ("draft".equals(document.getStatus()) || "project".equals(document.getStatus()) || "agreed".equals(document.getStatus()) || "not_agreed".equals(document.getStatus())) {
                     updateDocumentStatus(documentId, "approval", systemUser);
                 }
             } else {

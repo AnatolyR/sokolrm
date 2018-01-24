@@ -343,6 +343,9 @@ public class DocumentIT {
         String listId = step.get("listId").asText();
         String categoryName = "category_" + listId;
         WebElement listsMenuItem = ts.elementByXpath("//*[contains(@name, '" + categoryName + "')]");
+        if (listsMenuItem == null) {
+            throw new RuntimeException("'" + categoryName + "' not found to click");
+        }
         listsMenuItem.click();
         Thread.sleep(2000);
     }

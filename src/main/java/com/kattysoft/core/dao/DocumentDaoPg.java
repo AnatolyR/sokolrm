@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -497,6 +498,12 @@ public class DocumentDaoPg implements DocumentDao {
                     } else if ("int4".equals(columnType)) {
                         if (value != null) {
                             prst.setInt(ix, (Integer) value);
+                        } else {
+                            prst.setNull(ix, java.sql.Types.INTEGER);
+                        }
+                    } else if ("numeric".equals(columnType)) {
+                        if (value != null) {
+                            prst.setBigDecimal(ix, (BigDecimal) value);
                         } else {
                             prst.setNull(ix, java.sql.Types.INTEGER);
                         }

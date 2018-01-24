@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -254,6 +255,15 @@ public class DocumentCardController {
                             String text = value.asText();
                             if (StringUtils.isNotEmpty(text)) {
                                 resultFields.put(name, Integer.parseInt(value.asText()));
+                            } else {
+                                resultFields.put(name, null);
+                            }
+                        }
+                    } else if ("number00".equals(type)) {
+                        if (value.isTextual()) {
+                            String text = value.asText();
+                            if (StringUtils.isNotEmpty(text)) {
+                                resultFields.put(name, new BigDecimal(value.asText()));
                             } else {
                                 resultFields.put(name, null);
                             }

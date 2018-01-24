@@ -114,6 +114,19 @@
         </exec>
     </target>
 
+    <target name="dump_configs">
+        <exec executable="pg_dump">
+            <arg value="--schema"/>
+            <arg value="sokol"/>
+            <arg value="-t"/>
+            <arg value="sokol.configs"/>
+            <!--<arg value="-c"/>-->
+            <arg value="-O"/>
+            <arg value="-f"/>
+            <arg value="./db/dump/dump_configs.sql"/>
+        </exec>
+    </target>
+
     <target name="dump_admin">
         <exec executable="pg_dump">
             <arg value="--schema"/>
