@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="../node_modules/bootstrap/dist/css/bootstrap.css" type="text/css" rel="stylesheet">
+    <link href="../vendor/jquery-ui-1.12.1/jquery-ui.css" type="text/css" rel="stylesheet">
+    <link href="../vendor/web-fonts-with-css/css/fontawesome-all.css" rel="stylesheet">
+     
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../vendor/jquery-ui-1.12.1/jquery-ui.js"></script>
+    <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+    <script src="examples.js"></script>
+    
+    <script src="grid/grid.js"></script>
+    <script src="grid/example.grid.simple.js"></script>
+    <script src="grid/example.grid.sort.js"></script>
+    <script src="grid/example.grid.columns.js"></script>
+    
+    
+</head>
+<body>
+<div id="examplesList" class="container">
+    <h1>Grid</h1>
+    <div><a href="#grid.simple">Simple Grid</a></div>
+    <div><a href="#grid.sort">Sort Grid</a></div>
+    <div><a href="#grid.columns">Columns Visibility </a></div>
+</div>
+<script>
+    $(window).bind('hashchange', function() {
+        var id = location.hash.slice(1);
+        if (id && examples[id]) {
+            $("#examplesList").hide();
+            examples[id]();
+        } else if (id === '') {
+            $(".example").remove();
+            $("#examplesList").show();
+        } else {
+            alert("Cannot find '" + id + "' example");
+        }
+    });
+    $(window).trigger('hashchange');
+</script>
+
+</body>
+</html>
