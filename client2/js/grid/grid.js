@@ -19,49 +19,27 @@ $.widget("sokolui.grid", {
         this.reload();
     },
 
+    _destroy: function() {
+        if (this.columnsSelector) {
+            this.columnsSelector.destroy();
+        }
+    },
+    
     _renderColumnsSelector: function(element) {
-        var selector = $('<div class="dropdown btn-group">'+
-            '<button type="button" style="" class="btn btn-default btn dropdown-toggle sokolGridColumnSelector" data-toggle="dropdown">' + 
-            sokol.t["grid.columns"] + 
-            ' <span class="caret"></span></button>'+
-            '<ul name="columns" class="dropdown-menu">'+
-            '</ul>'+
-            '</div>');
-
-        var ul = selector.find('ul');
-        
-        this.options.columns.forEach(function(col) {
-            var li = $('<li><a href="#" class="sokolGridColumnSelectItem" data-value="' + 
-                col.id + 
-                '" tabIndex="-1"><input type="checkbox" style="margin-right: 10px;"/>' + 
-                col.title + '</a></li>');
-            var inp = li.find("input");
-            if (col.visible !== false) {
-                inp.prop("checked", true);
+        this.columnsSelector = $.sokolui.checkboxdropdown({
+            title: sokol.t["grid.columns"],
+            items: this.options.columns.map(function(col) {
+                return {id: col.id, title: col.title, checked: col.visible !== false};
+            })
+        }, element);
+       
+        $(this.columnsSelector.element).on("checkboxdropdownchecked", $.proxy(function (e, data) {
+            var col = this.options.columns.find(function(col) {return col.id === data.itemId});
+            if (col) {
+                col.visible = data.checked;
             }
-            ul.append(li);
-        });
-
-        selector.appendTo(element);
-        
-        //$(selector).find('.dropdown-menu a').on('click', $.proxy(function(event) {
-        this._on(this.element, {'click .dropdown-menu a': function(event) {
-            var target = $(event.currentTarget),
-                colId = target.attr("data-value"),
-                checkbox = target.find("input");
-
-            this.options.columns.forEach(function(col) {
-                if (col.id == colId) {
-                    checkbox.prop("checked", !checkbox.prop("checked"));
-                    col.visible = checkbox.prop("checked");
-                }
-            });
-            
-            $(event.target).blur();
-        
             this.reload();
-            return false;
-        }});
+        }, this));
     },
     
     render: function() {

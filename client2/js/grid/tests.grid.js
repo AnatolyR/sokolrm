@@ -79,8 +79,8 @@ QUnit.test( "Columns Visibility", function( assert ) {
     }, $("#qunit-fixture"));
     assert.equal(grid.element.text(), "Колонки #FirstLastHandle#FirstLast1MarkOtto2JacobThornton3Larrythe Bird", "Last column hidden");
 
-    $(".sokolGridColumnSelector").trigger("click");
-    $(".sokolGridColumnSelectItem:contains('First')").trigger("click");
+    $("button:contains('Колонки')").trigger("click");
+    $("a:contains('First')").trigger("click");
     $("body").trigger("click");
     assert.equal(grid.element.text(), "Колонки #FirstLastHandle#Last1Otto2Thornton3the Bird", "Column with title 'First' are also hidden now");
 });
