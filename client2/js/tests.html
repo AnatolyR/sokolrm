@@ -7,17 +7,18 @@
     <title>Sokol UI Tests</title>
     
     <link rel="stylesheet" href="../vendor-test/qunit-2.6.0.css">
-    <link href="../node_modules/bootstrap/dist/css/bootstrap.css" type="text/css" rel="stylesheet">
-    <link href="../vendor/jquery-ui-1.12.1/jquery-ui.css" type="text/css" rel="stylesheet">
     <link href="../vendor/web-fonts-with-css/css/fontawesome-all.css" rel="stylesheet">
+    <link href="../../client/dist/bundle.css" rel="stylesheet">
 
-    <script src="../node_modules/jquery/dist/jquery.js"></script>
-    <script src="../vendor/jquery-ui-1.12.1/jquery-ui.js"></script>
-    <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
-    <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../../client/dist/bundle.js"></script>
 
     <script src="../vendor-test/qunit-2.6.0.js"></script>
-       
+
+    <script src="translation.ru.js"></script>
+    <script type="text/javascript">
+        sokol.t = sokol.translation.ru;
+    </script>
+    
     <script src="grid/grid.js"></script>
     <script src="grid/tests.grid.js"></script>
     

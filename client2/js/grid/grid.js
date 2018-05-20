@@ -6,11 +6,62 @@ $.widget("sokolui.grid", {
             column: null,
             order: "asc"
         },
-        datasource: null
+        datasource: null,
+        columnSelector: false
     },
     _create: function() {
+        var panel = $("<div>").css("margin-bottom", "1em").appendTo(this.element);
+        if (this.options.columnSelector) {
+            this._renderColumnsSelector(panel);
+        }
+        
         this.table = $("<table>").addClass("table table-bordered").appendTo(this.element);
         this.reload();
+    },
+
+    _renderColumnsSelector: function(element) {
+        var selector = $('<div class="dropdown btn-group">'+
+            '<button type="button" style="" class="btn btn-default btn dropdown-toggle sokolGridColumnSelector" data-toggle="dropdown">' + 
+            sokol.t["grid.columns"] + 
+            ' <span class="caret"></span></button>'+
+            '<ul name="columns" class="dropdown-menu">'+
+            '</ul>'+
+            '</div>');
+
+        var ul = selector.find('ul');
+        
+        this.options.columns.forEach(function(col) {
+            var li = $('<li><a href="#" class="sokolGridColumnSelectItem" data-value="' + 
+                col.id + 
+                '" tabIndex="-1"><input type="checkbox" style="margin-right: 10px;"/>' + 
+                col.title + '</a></li>');
+            var inp = li.find("input");
+            if (col.visible !== false) {
+                inp.prop("checked", true);
+            }
+            ul.append(li);
+        });
+
+        selector.appendTo(element);
+        
+        //$(selector).find('.dropdown-menu a').on('click', $.proxy(function(event) {
+        this._on(this.element, {'click .dropdown-menu a': function(event) {
+            var target = $(event.currentTarget),
+                colId = target.attr("data-value"),
+                checkbox = target.find("input");
+
+            this.options.columns.forEach(function(col) {
+                if (col.id == colId) {
+                    checkbox.prop("checked", !checkbox.prop("checked"));
+                    col.visible = checkbox.prop("checked");
+                }
+            });
+            
+            $(event.target).blur();
+        
+            this.reload();
+            return false;
+        }});
     },
     
     render: function() {

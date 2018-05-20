@@ -74,7 +74,13 @@ QUnit.test( "Columns Visibility", function( assert ) {
             {"num": 1, "first": "Mark", "last": "Otto", "handle": "@mdo"},
             {"num": 2, "first": "Jacob", "last": "Thornton", "handle": "@fat"},
             {"num": 3, "first": "Larry", "last": "the Bird", "handle": "@twitter"}
-        ]
+        ],
+        columnSelector: true
     }, $("#qunit-fixture"));
-    assert.equal(grid.element.text(), "#FirstLast1MarkOtto2JacobThornton3Larrythe Bird", "Last column hidden");
+    assert.equal(grid.element.text(), "Колонки #FirstLastHandle#FirstLast1MarkOtto2JacobThornton3Larrythe Bird", "Last column hidden");
+
+    $(".sokolGridColumnSelector").trigger("click");
+    $(".sokolGridColumnSelectItem:contains('First')").trigger("click");
+    $("body").trigger("click");
+    assert.equal(grid.element.text(), "Колонки #FirstLastHandle#Last1Otto2Thornton3the Bird", "Column with title 'First' are also hidden now");
 });
