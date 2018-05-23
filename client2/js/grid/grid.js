@@ -7,12 +7,20 @@ $.widget("sokolui.grid", {
             order: "asc"
         },
         datasource: null,
-        columnSelector: false
+        columnSelector: false,
+        pageSelector: false,
+        pageSize: 20,
+        page: 1,
+        totalSize: 0,
+        loading: false
     },
     _create: function() {
         var panel = $("<div>").css("margin-bottom", "1em").appendTo(this.element);
         if (this.options.columnSelector) {
             this._renderColumnsSelector(panel);
+        }
+        if (this.options.pageSelector) {
+            this._renderPageSelector(panel);
         }
         
         this.table = $("<table>").addClass("table table-bordered").appendTo(this.element);
@@ -23,8 +31,28 @@ $.widget("sokolui.grid", {
         if (this.columnsSelector) {
             this.columnsSelector.destroy();
         }
+        if (this.pageSelector) {
+            this.pageSelector.destroy();
+        }
     },
-    
+
+    _renderPageSelector: function(element) {
+        this.pageSelector = $.sokolui.pagingcontrol({
+            page: this.options.page,
+            pageSize: this.options.pageSize
+        }, element);
+        this._on(this.pageSelector.element, {
+            pagingcontrolpagechange: function(event, data) {
+                this.options.page = data.page;
+                this.reload();
+            },
+            pagingcontrolpagesizechange: function(event, data) {
+                this.options.page = data.page;
+                this.options.pageSize = data.pageSize;
+                this.reload();
+            }
+        });
+    },
     _renderColumnsSelector: function(element) {
         this.columnsSelector = $.sokolui.checkboxdropdown({
             title: sokol.t["grid.columns"],
@@ -49,13 +77,20 @@ $.widget("sokolui.grid", {
     },
     
     reload: function() {
-        var ds = this.options.datasource;
+        var opt = this.options;
+        var ds = opt.datasource;
         if (ds && typeof ds === "function") {
-            ds($.proxy(function(data) {
-                this.options.data = data;
+            ds($.proxy(function(data, totalSize) {
+                opt.data = data;
+                opt.totalSize = totalSize;
                 this.render();
+                if (this.pageSelector) {
+                    this.pageSelector.setOption("totalSize", totalSize);
+                }
             }, this), {
-                "sort": this.options.sort
+                sort: opt.sort,
+                size: opt.pageSize,
+                offset: (opt.page - 1) * opt.pageSize
             });
         } else {
             this.render();
