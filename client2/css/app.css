@@ -1,0 +1,21 @@
+.s-button-action {
+    margin-right: 0.5em;
+}
+
+.s-card .s-buttons-panel {
+    margin-top: 0.5em;
+    margin-bottom: -0.5em;
+}
+
+.s-card .s-header {
+    padding-left: 0; 
+    padding-top: 0;
+}
+
+.s-field .s-smallstring {
+    width: 50%;
+}
+
+.s-field.s-required > label:after {
+    content: "*";
+}
