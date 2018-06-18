@@ -1,5 +1,7 @@
-examples["form.simple"] = function() {
-    $.sokolui.form({
+QUnit.module("Form");
+
+QUnit.test("Simple form", function (assert) {
+    var form = $.sokolui.form({
         "type" : "form",
         "form" : {
             "editAction": true,
@@ -89,5 +91,7 @@ examples["form.simple"] = function() {
             "status" : "Зарегистрирован",
             "author" : "test"
         }
-    }, $("<div>").addClass("container-fluid example").appendTo("body"));
-};
+    }, $("#qunit-fixture"));
+    console.log("Form text content actual", form.element.text());
+    assert.equal(form.element.text(), "ЗаголовокВид документаПисьмоПисьмо Кем подписаноИсполнительИсходящий номер Номер документа", "Form text content");
+});

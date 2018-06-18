@@ -1,5 +1,7 @@
-examples["card.simple"] = function() {
-    $.sokolui.card({
+QUnit.module("Card");
+
+QUnit.test("Simple card", function (assert) {
+    var card = $.sokolui.card({
         buttons: [
             {name: "sign", title: "Подписать"},
             {name: "edit", title: "Редактировать"}
@@ -105,5 +107,7 @@ examples["card.simple"] = function() {
             "status" : "Зарегистрирован",
             "author" : "test"
         }
-    }, $("<div>").addClass("container-fluid example").appendTo("body"));
-};
+    }, $("#qunit-fixture"));
+    console.log("Card text content actual", card.element.text());
+    assert.equal(card.element.text(), "ПодписатьРедактироватьВходящий № Б12 от 30.04.2016 (Письмо)Test document 1rtyr235577788891011Статус: ЗарегистрированРеквизитыПроцессВложенияСвязиАудитЗаголовокВид документаПисьмоПисьмо Кем подписаноИсполнительИсходящий номер Номер документа", "Card text content");
+});
