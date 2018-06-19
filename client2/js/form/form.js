@@ -63,7 +63,7 @@ $.widget("sokolui.form", {
 
         var fieldConstructor = $.sokolui[type + "Field"];
         if (fieldConstructor) {
-            fieldConstructor({field: field, value: value, edit: true}, $("<div>").appendTo(formNode))
+            fieldConstructor({field: field, value: value, valueTitle: valueTitle, edit: true}, $("<div>").appendTo(formNode))
         }
     }
 });
