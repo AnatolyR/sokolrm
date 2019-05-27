@@ -19,3 +19,6 @@ Must be installed:
 
 3. Start 
 ```mvn tomcat:run```
+
+## Screenshots
+[Screenshots](https://github.com/AnatolyR/sokolrm/wiki/Screenshots)
