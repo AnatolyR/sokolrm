@@ -5,7 +5,7 @@ This is outdated information system only for historical and information purposes
 For any questions please contact rtolik@yandex.ru
 
 
-## Запуск
+## How to start
 Must be installed:
 * Maven 3
 * Java 8
